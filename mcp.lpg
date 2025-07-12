@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectGroup FileVersion="2">
+    <Targets>
+      <Target FileName="Src/Base/mcpbase.lpk"/>
+      <Target FileName="Src/IDE/mcpdesign.lpk"/>
+      <Target FileName="Src/IDE/mcplazcontrol.lpk"/>
+      <Target FileName="Src/proxy/mcpproxy.lpi">
+        <BuildModes>
+          <Mode Name="Default"/>
+        </BuildModes>
+      </Target>
+      <Target FileName="demo/weather.lpi">
+        <BuildModes>
+          <Mode Name="Default"/>
+        </BuildModes>
+      </Target>
+    </Targets>
+  </ProjectGroup>
+</CONFIG>
