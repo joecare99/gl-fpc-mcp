@@ -15,7 +15,7 @@
 
 program weather;
 
-{$define usesocket}
+{ $define usesocket}
 
 uses
   jsonparser,
@@ -89,7 +89,6 @@ begin
     Register;
   With TMCPEventTool.create('getforecast','Get tomorrow''s weather',@GetForecast) do
     begin
-    InputSchema.AddArgument('location',TJSONObject.Create(['type','string']),True);
     InputSchema.AddArgument('location',TJSONObject.Create(['type','string']),True);
     OutputSchema.AddArgument('City',TJSONObject.Create(['type','string']),True);
     OutputSchema.AddArgument('Forecast',TJSONObject.Create(['type','string']),True);
