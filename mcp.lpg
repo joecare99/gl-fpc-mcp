@@ -5,6 +5,11 @@
       <Target FileName="Src/Base/mcpbase.lpk"/>
       <Target FileName="Src/IDE/mcpdesign.lpk"/>
       <Target FileName="Src/IDE/mcplazcontrol.lpk"/>
+      <Target FileName="tests/mcptests.lpi">
+        <BuildModes>
+          <Mode Name="Default"/>
+        </BuildModes>
+      </Target>
       <Target FileName="Src/proxy/mcpproxy.lpi">
         <BuildModes>
           <Mode Name="Default"/>
