@@ -16,8 +16,8 @@ the Pascal AI workshop organized by Blaise Pascal Magazine on 2025-07-12.
 * [mcp.lpg](mcp.lpg) This is the project group containing all 
 * [Src/Base](Src/Base) contains the source code for all classes to create a
   MCP server
-* [Src/IDE] Contains the packages for Lazarus IDE integration
-* [Src/proxy] Contains the MCP proxy (using the private socket protocol)
+* [Src/IDE](Src/IDE) Contains the packages for Lazarus IDE integration
+* [Src/proxy](Src/proxy) Contains the MCP proxy (using the private socket protocol)
 * [demo](demo) Contains a demo project. Simulates a weather service
 * [dbconnector](dbconnector) Contains a MCP server allowing to execute SQL statements on a database/
 
