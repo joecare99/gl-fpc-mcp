@@ -20,7 +20,12 @@ unit mcp.dispatcher.base;
 interface
 
 uses
-  Classes, SysUtils, fpjson, fpjsonrpc, mcp.Handler, mcp.types, mcp.controller, mcp.transport.base;
+  Classes, SysUtils, fpjson, fpjsonrpc,
+  mcp.Logging,
+  mcp.Handler,
+  mcp.types,
+  mcp.controller,
+  mcp.transport.base;
 
 Type
   {
@@ -48,6 +53,7 @@ Type
   protected
     function ExecuteHandler(H: TCustomJSONRPCHandler; Params, ID: TJSONData; AContext: TJSONRPCCallContext): TJSONData; override;
     function ExecuteMethod(const AClassName, AMethodName: TJSONStringType;  Params, ID: TJSONData; AContext: TJSONRPCCallContext): TJSONData; override;
+    function CheckRequest(Request: TJSONData; Out AClassName, AMethodName : TJSONStringType; Out ID, Params : TJSONData): TJSONData; override;
   public
     constructor Create(AOwner: TComponent); override;
     Property Transport : TMCPMessageTransport Read FTransport Write FTransport;
@@ -101,9 +107,11 @@ end;
 function TJSONRPCDispatcher.ExecuteHandler(H: TCustomJSONRPCHandler; Params,
   ID: TJSONData; AContext: TJSONRPCCallContext): TJSONData;
 begin
+  MCPLogger.Trace('[%s] Execute handler "%s" - start',[ClassName,H.ClassName]);
   if H is TMCPBaseHandler then
     TMCPBaseHandler(H).Transport:=Self.FTransport;
   Result:=Inherited ExecuteHandler(H,Params,ID,AContext);
+  MCPLogger.Trace('[%s] Execute handler "%s" - end',[ClassName,H.ClassName]);
 end;
 
 function TJSONRPCDispatcher.ExecuteMethod(const AClassName, AMethodName: TJSONStringType;
@@ -112,9 +120,11 @@ function TJSONRPCDispatcher.ExecuteMethod(const AClassName, AMethodName: TJSONSt
 {$IFDEF VER3_2}
 Var
   lID : TJSONData;
+  lRes : TJSONObject;
 {$ENDIF}
 
 begin
+  MCPLogger.Trace('[%s] ExecuteMethod "%s.%s" - start',[ClassName,AClassName,aMethodName]);
   try
 {$IFDEF VER3_2}
     lID:=ID;
@@ -131,9 +141,51 @@ begin
 {$ENDIF}
   except
     on E: EMCPException do // handle errors specific to MCP
-      Exit(CreateJSON2Error(E.Message, E.Code, ID.Clone, TransactionProperty))
-    else raise;
+      begin
+      MCPLogger.LogException(E,'[%s] ExecuteMethod "%s.%s"',[ClassName,AClassName,aMethodName]);
+      lRes:=CreateJSON2Error(E.Message, E.Code, ID.Clone, TransactionProperty);
+      if lRes.Types['id']=jtNull then
+        lRes.Delete('id');
+      Result:=lRes;
+      end;
+    on Ex: EJSON do // handle errors specific to JSON
+      begin
+      MCPLogger.LogException(Ex,'[%s] ExecuteMethod "%s.%s"',[ClassName,AClassName,aMethodName]);
+      lRes:=CreateJSON2Error(Ex.Message, 500, ID.Clone, TransactionProperty);
+      if lRes.Types['id']=jtNull then
+        lRes.Delete('id');
+      Result:=lRes;
+      end;
+    on Er: exception do // handle other errors
+      begin
+      MCPLogger.LogException(Er,'[%s] ExecuteMethod "%s.%s"',[ClassName,AClassName,aMethodName]);
+      lRes:=CreateJSON2Error(Er.Message, 500, ID.Clone, TransactionProperty);
+      if lRes.Types['id']=jtNull then
+        lRes.Delete('id');
+      Result:=lRes;
+      end
+  else
+    // Not even an Exception ??
+    raise;
   end;
+  MCPLogger.Trace('[%s] ExecuteMethod "%s.%s" - end',[ClassName,AClassName,aMethodName]);
+end;
+
+function TJSONRPCDispatcher.CheckRequest(Request: TJSONData; out AClassName, AMethodName: TJSONStringType; out ID, Params: TJSONData
+  ): TJSONData;
+var
+  lRequest : TJSONObject absolute Request;
+begin
+  MCPLogger.Trace('[%s] CheckRequest - start',[ClassName]);
+  if Request is TJSONObject then
+    begin
+    // FPC's JSON-RPC always expects a params property, but for notifications, we don't get one
+    // from some JSON-RPC clients, so we create one.
+    if lRequest.IndexOfName(ParamsProperty)=-1 then
+      lRequest.Add(ParamsProperty,TJSONObject.Create);
+    end;
+  Result:=inherited CheckRequest(Request, AClassName, AMethodName, ID, Params);
+  MCPLogger.Trace('[%s] CheckRequest - end (-> %s.%s)',[ClassName,AClassName,aMethodName]);
 end;
 
 { ---------------------------------------------------------------------
@@ -186,6 +238,7 @@ var
   Ctx : TMCPContext;
 
 begin
+  MCPLogger.Trace('[%s] Execute request - start',[ClassName]);
   Result:=nil;
   if Not (aRequest is TJSONObject) then
     Exit;
@@ -215,6 +268,7 @@ begin
       Ctx.Free;
     end;
     end;
+  MCPLogger.Trace('[%s] Execute request - end',[ClassName]);
 end;
 
 end.
