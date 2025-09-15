@@ -201,7 +201,7 @@ begin
     end;
   // Controller is using remote transport
   FController:=TMCPController.Create(Self);
-  FController.Transport:=SetupRemoteTransport;
+  FController.RegisterTransport(SetupRemoteTransport);
   // Dispatcher is using remote transport
   FDisp:=TMCPClientSocketDispatcher.Create(FController);
   // Set up text loop
