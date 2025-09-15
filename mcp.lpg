@@ -20,6 +20,11 @@
           <Mode Name="Default"/>
         </BuildModes>
       </Target>
+      <Target FileName="dbconnector/mcpdbconnector.lpi">
+        <BuildModes>
+          <Mode Name="Default"/>
+        </BuildModes>
+      </Target>
     </Targets>
   </ProjectGroup>
 </CONFIG>
