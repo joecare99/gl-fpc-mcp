@@ -16,7 +16,7 @@
 unit mcp.tools;
 
 {$mode objfpc}{$H+}
-
+{$modeswitch advancedrecords}
 interface
 
 uses
@@ -25,10 +25,32 @@ uses
 type
   TMCPToolRegistry = class;
   TMCPToolRegistryClass = class of TMCPToolRegistry;
-  TToolInvocationEvent = Procedure (aInput : TJSONData; aOutput : TJSONObject) of object;
 
 
   { TMCPTool }
+  TMCPToolContentType = (ctText,ctImage,ctAudio,ctResource);
+
+  { TMCPToolResult }
+
+  TMCPToolResult = record
+    ContentType : TMCPToolContentType;
+    MimeType : string;
+    Content: string; // uri in case of resource
+    Description : String;
+    constructor CreateText(aText : string);
+    constructor CreateText(aJSON : TJSONObject);
+    constructor CreateImage(aMime : string; aData : TBytes);
+    constructor CreateImage(aMime : string; aData : TStream);
+    constructor CreateAudio(aMime : string; aData : TBytes);
+    constructor CreateAudio(aMime : string; aData : TStream);
+    constructor CreateResource(aURI,aMime,aDescription : string);
+    Procedure ToJSON(aJSON : TJSONObject);
+    Function ToJSON : TJSONObject;
+  end;
+
+  TMCPToolResultArray = Array of TMCPToolResult;
+
+  TToolInvocationEvent = Procedure (aInput : TJSONData; var aOutput : TMCPToolResultArray) of object;
 
   TMCPTool = class abstract (TObject)
   private
@@ -40,7 +62,15 @@ type
     FOutputSchema: TMCPSchema;
     procedure SetMeta(AValue: TJSONObject);
   protected
-    Procedure DoExecute(aInput : TJSONObject; aResult : TJSONObject); virtual; abstract;
+    // Send messages to log facility
+    procedure DoLog(aType : TMCPLogType; const aMessage : String);
+    procedure DoLog(aType: TMCPLogType; const aFmt: String; const aArgs: array of const);
+    // Override this if you need multiple content answers
+    Procedure DoExecute(aInput : TJSONObject; var aResult : TMCPToolResultArray); virtual;
+    // Override this if you need a single content answer
+    Procedure DoExecute(aInput : TJSONObject; out aResult : TMCPToolResult); virtual;
+    // Override this if you need a JSON object as answer. It will be returned as text, in JSON
+    Procedure DoExecute(aInput : TJSONObject; aResult : TJSONObject); virtual;
   public
     constructor create(const aName : string; const aDescription : string); virtual;
     destructor destroy; override;
@@ -49,7 +79,6 @@ type
     Property Name : String read FName;
     property Description : String Read FDescription;
     Property InputSchema : TMCPSchema Read FInputSchema;
-    Property OutputSchema: TMCPSchema Read FOutputSchema;
     Property Annotations : TMCPAnnotation Read FAnnotations Write FAnnotations;
     procedure ToJSON(aJSON : TJSONObject); virtual;
     function ToJSON() : TJSONObject;
@@ -64,7 +93,7 @@ type
   private
     FOnExecute: TToolInvocationEvent;
   protected
-    procedure DoExecute(aInput : TJSONObject; aResult: TJSONObject); override;
+    procedure DoExecute(aInput : TJSONObject; var aResult : TMCPToolResultArray); override;
     property OnExecute : TToolInvocationEvent read FOnExecute Write FOnExecute;
   Public
     constructor create(const aName,aDescription : String; aOnExecute : TToolInvocationEvent); reintroduce; virtual;
@@ -107,7 +136,7 @@ Function ToolRegistry : TMCPToolRegistry;
 
 implementation
 
-uses mcp.strings;
+uses base64, mcp.logging, mcp.strings;
 
 function ToolRegistry: TMCPToolRegistry;
 begin
@@ -121,6 +150,46 @@ begin
   if FMeta=AValue then Exit;
   FreeAndNil(FMeta);
   FMeta:=AValue;
+end;
+
+procedure TMCPTool.DoLog(aType: TMCPLogType; const aMessage: String);
+begin
+  MCPLogger.Log(aType,'['+Self.ClassName+']: '+aMessage);
+end;
+
+procedure TMCPTool.DoLog(aType: TMCPLogType; const aFmt: String; const aArgs: array of const);
+begin
+  DoLog(aType,{$IFNDEF VER3_2}SafeFormat{$ELSE}Format{$ENDIF}(aFmt,aArgs));
+end;
+
+procedure TMCPTool.DoExecute(aInput: TJSONObject; var aResult: TMCPToolResultArray);
+// Defaults to calling DoExecute with single argument
+begin
+  SetLength(aResult,1);
+  DoExecute(aInput,aResult[0]);
+end;
+
+procedure TMCPTool.DoExecute(aInput: TJSONObject; out aResult: TMCPToolResult);
+// Defaults to calling DoExecute with JSON output
+var
+  aJSON : TJSONObject;
+begin
+  aJSON:=TJSONObject.Create;
+  try
+    DoExecute(aInput,aJSON);
+    if aJSON.Count>0 then
+      aResult:=TMCPToolResult.CreateText(aJSON.AsJSON)
+    else
+      aResult:=TMCPToolResult.CreateText('OK')
+  finally
+    aJSON.Free;
+  end;
+end;
+
+procedure TMCPTool.DoExecute(aInput: TJSONObject; aResult: TJSONObject);
+// Defaults to warning
+begin
+  DoLog(mltWarning,'Called json-based DoExecute, and it was not overridden in '+ClassName);
 end;
 
 constructor TMCPTool.create(const aName: string; const aDescription: string);
@@ -148,8 +217,23 @@ end;
 
 procedure TMCPTool.Execute(aInput: TJSONObject; aResult : TJSONObject);
 
+var
+  lToolResult : TMCPToolResultArray;
+  lArr : TJSONArray;
+  lContent : TJSONObject;
+  lResult : TMCPToolResult;
+
 begin
-  DoExecute(aInput,aResult);
+  lToolResult:=[];
+  DoExecute(aInput,lToolResult);
+  // Format result
+  lArr:=TJSONArray.Create;
+  for lResult in lToolResult do
+    begin
+    lContent:=lResult.ToJSON;
+    lArr.Add(lContent);
+    end;
+  aResult.Add('content',lArr);
 end;
 
 procedure TMCPTool.ToJSON(aJSON: TJSONObject);
@@ -162,7 +246,6 @@ begin
   if assigned(Anns) then
     aJSON.Add('annotations',Anns);
   aJSON.Add('inputSchema',InputSchema.ToJSON);
-  aJSON.Add('outputSchema',InputSchema.ToJSON);
 end;
 
 function TMCPTool.ToJSON: TJSONObject;
@@ -178,7 +261,7 @@ end;
 
 { TMCPEventTool }
 
-procedure TMCPEventTool.DoExecute(aInput: TJSONObject; aResult: TJSONObject);
+procedure TMCPEventTool.DoExecute(aInput: TJSONObject; var aResult: TMCPToolResultArray);
 begin
   FOnExecute(aInput,aResult);
 end;
@@ -225,12 +308,14 @@ end;
 
 procedure TMCPToolRegistry.Add(aTool: TMCPTool);
 begin
+  MCPLogger.Info('[%s] registering tool "%s" : "%s"',[ClassName,aTool.Name,aTool.Description]);
   FList.Add(aTool.Name,aTool);
   DoChange;
 end;
 
 procedure TMCPToolRegistry.Remove(const aName: String);
 begin
+  MCPLogger.Info('[%s] removing tool "%s"',[ClassName,aName]);
   if FList.Get(aName)=Nil then
     exit;
   FList.Remove(aName);
@@ -294,6 +379,137 @@ end;
 class procedure TMCPToolRegistry.Done;
 begin
   FreeAndNil(_instance);
+end;
+
+{ TMCPToolResult }
+
+constructor TMCPToolResult.CreateText(aText: string);
+begin
+  ContentType:=ctText;
+  Content:=aText;
+  MimeType:='text/plain';
+end;
+
+constructor TMCPToolResult.CreateText(aJSON: TJSONObject);
+begin
+  ContentType:=ctText;
+  Content:=aJSON.AsJSON;
+  MimeType:='text/plain'; // or
+end;
+
+Function StreamToBase64(aStream : TStream) : String;
+var
+  Enc : TBase64EncodingStream;
+  S : TStringStream;
+
+begin
+  Enc:=Nil;
+  S:=TStringStream.Create;
+  try
+    Enc:=TBase64EncodingStream.Create(S);
+    Enc.CopyFrom(aStream,0);
+    Enc.Flush;
+    Result:=S.DataString;
+  finally
+    Enc.Free;
+    S.Free;
+  end;
+
+end;
+
+Function BytesToBase64(aBytes : TBytes) : String;
+
+var
+  Enc : TBase64EncodingStream;
+  S : TStringStream;
+
+begin
+  Enc:=Nil;
+  S:=TStringStream.Create;
+  try
+    Enc:=TBase64EncodingStream.Create(S);
+    Enc.WriteBuffer(aBytes[0],length(aBytes));
+    Enc.Flush;
+    Result:=S.DataString;
+  finally
+    Enc.Free;
+    S.Free;
+  end;
+end;
+
+constructor TMCPToolResult.CreateImage(aMime: string; aData: TBytes);
+begin
+  ContentType:=ctImage;
+  MimeType:=aMime;
+  Content:=BytesToBase64(aData);
+end;
+
+constructor TMCPToolResult.CreateImage(aMime: string; aData: TStream);
+begin
+  ContentType:=ctImage;
+  MimeType:=aMime;
+  Content:=StreamToBase64(aData);
+end;
+
+constructor TMCPToolResult.CreateAudio(aMime: string; aData: TBytes);
+begin
+  ContentType:=ctAudio;
+  MimeType:=aMime;
+  Content:=BytesToBase64(aData);
+end;
+
+constructor TMCPToolResult.CreateAudio(aMime: string; aData: TStream);
+begin
+  ContentType:=ctAudio;
+  MimeType:=aMime;
+  Content:=StreamToBase64(aData);
+end;
+
+constructor TMCPToolResult.CreateResource(aURI, aMime, aDescription: string);
+begin
+  ContentType:=ctResource;
+  MimeType:=aMime;
+  Content:=aURI;
+  Description:=aDescription;
+end;
+
+procedure TMCPToolResult.ToJSON(aJSON: TJSONObject);
+
+Const
+  ResTypes : array[TMCPToolContentType] of string = ('text','image','audio','resource');
+
+begin
+  aJSON.Add('type',ResTypes[ContentType]);
+  case ContentType of
+    ctText :
+      aJSON.Add('text',Content);
+    ctAudio,
+    ctImage :
+      begin
+      aJSON.Add('mimeType',mimeType);
+      aJSON.Add('data',Content);
+      end;
+    ctResource:
+      begin
+      aJSON.Add('resource',TJSONObject.Create([
+        'uri',Content,
+        'mimeType',mimeType,
+        'text',Description
+      ]));
+      end;
+  end;
+
+end;
+
+function TMCPToolResult.ToJSON: TJSONObject;
+begin
+  Result:=TJSONObject.Create;
+  try
+    ToJSON(Result);
+  except
+    Result.Free;
+    Raise;
+  end;
 end;
 
 finalization
