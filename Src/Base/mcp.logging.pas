@@ -20,14 +20,14 @@ unit mcp.logging;
 interface
 
 uses
-  SysUtils;
+  SysUtils, mcp.types;
 
 Type
   EMCPLogger = class(Exception);
   TMCPLogger = class;
   TMCPLoggerClass = class of TMCPLogger;
-  TMCPLogLevel = (mllError,mllWarning,mllInfo,mllTrace,mllDebug);
-  TMCPLogLevels = set of TMCPLogLevel;
+  TMCPLogLevel = TMCPLogType;
+  TMCPLogLevels = TMCPLogTypes;
   TMCPLogEvent = procedure (aType: TMCPLogLevel; const Msg : string) of Object;
   TMCPLogEventArray = array of TMCPLogEvent;
 
@@ -75,7 +75,7 @@ function MCPLogger : TMCPLogger;
 implementation
 
 const
-  LogLevelNames : array[TMCPLogLevel] of string = ('Error','Warning','Info','Trace','Debug');
+  LogLevelNames : array[TMCPLogType] of string = ('Error','Warning','Info','Trace','Debug');
 
 resourcestring
   SErrLoggerInitialized = 'Logger is already initialized';
@@ -98,7 +98,7 @@ end;
 
 constructor TMCPLogger.create;
 begin
-  FLogLevels:=[mllError];
+  FLogLevels:=[mltError];
   FEnabled:=True;
   FLogToConsole:=True;
 end;
@@ -139,52 +139,52 @@ end;
 
 procedure TMCPLogger.Debug(const Msg: String);
 begin
-  Log(mllDebug,Msg);
+  Log(mltDebug,Msg);
 end;
 
 procedure TMCPLogger.Debug(const Fmt: String; const Args: array of const);
 begin
-  Log(mllDebug,Fmt,Args);
+  Log(mltDebug,Fmt,Args);
 end;
 
 procedure TMCPLogger.Error(const Msg: String);
 begin
-  Log(mllError,Msg);
+  Log(mltError,Msg);
 end;
 
 procedure TMCPLogger.Error(const Fmt: String; const Args: array of const);
 begin
-  Log(mllError,Fmt,Args);
+  Log(mltError,Fmt,Args);
 end;
 
 procedure TMCPLogger.Info(const Msg: String);
 begin
-  Log(mllInfo,Msg);
+  Log(mltInfo,Msg);
 end;
 
 procedure TMCPLogger.Info(const Fmt: String; const Args: array of const);
 begin
-  Log(mllInfo,Fmt,Args);
+  Log(mltInfo,Fmt,Args);
 end;
 
 procedure TMCPLogger.Warning(const Msg: String);
 begin
-  Log(mllWarning,Msg);
+  Log(mltWarning,Msg);
 end;
 
 procedure TMCPLogger.Warning(const Fmt: String; const Args: array of const);
 begin
-  Log(mllWarning,Fmt,Args);
+  Log(mltWarning,Fmt,Args);
 end;
 
 procedure TMCPLogger.Trace(const Msg: String);
 begin
-  Log(mllTrace,Msg);
+  Log(mltTrace,Msg);
 end;
 
 procedure TMCPLogger.Trace(const Fmt: String; const Args: array of const);
 begin
-  Log(mllTrace,Fmt,Args);
+  Log(mltTrace,Fmt,Args);
 end;
 
 procedure TMCPLogger.LogException(E: Exception; const Msg: String);

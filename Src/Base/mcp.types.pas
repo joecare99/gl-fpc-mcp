@@ -25,6 +25,11 @@ uses
   SysUtils,Types,  Contnrs, fpjson;
 
 Type
+  TMCPLogType = (mltError,mltWarning,mltInfo,mltTrace,mltDebug);
+  TMCPLogTypes = set of TMCPLogType;
+
+  TMCPLogEvent = procedure(Sender : TObject; aType : TMCPLogType; Const aMessage: string) of object;
+
   TMCPResourceKind = (rkUnknown,rkText,rkData);
   EMCPException = class(Exception)
     code: integer;
@@ -274,18 +279,25 @@ var
 begin
   aJSON.Add('type','object');
   lProps:=TJSONObject.Create;
-  aJSON.Add('properties',lProps);
   lList:=TArgumentLister.Create(lProps);
   try
     FArguments.Iterate(@lList.ListArg);
   finally
     lList.Free;
   end;
-  lReq:=TJSONArray.Create;
-  aJSON.Add('required',lReq);
-  For S in FRequired do
-    lReq.Add(s);
-
+  if lProps.Count=0 then
+    lProps.Free
+  else
+    begin
+    aJSON.Add('properties',lProps);
+    if Length(FRequired)>0 then
+      begin
+      lReq:=TJSONArray.Create;
+      aJSON.Add('required',lReq);
+      For S in FRequired do
+        lReq.Add(s);
+      end;
+    end;
 end;
 
 constructor TMCPSchema.Create;
