@@ -16,7 +16,7 @@ type
   TMCPEmptyTool = class(TMCPTool)
 
   protected
-    function DoExecute(aInput: TJSONObject): TJSONObject; override;
+    procedure DoExecute(aInput: TJSONObject; aOutput: TJSONObject); override;
   end;
   
   { TMCPToolRegistryTest }
@@ -51,9 +51,9 @@ uses
 
 { TMCPEmptyTool }
 
-function TMCPEmptyTool.DoExecute(aInput: TJSONObject): TJSONObject;
+procedure TMCPEmptyTool.DoExecute(aInput: TJSONObject; aOutput: TJSONObject);
 begin
-  Result:=Nil;
+  //
 end;
 
 { TMCPEmptyTool }

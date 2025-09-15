@@ -3,7 +3,7 @@ program mcptests;
 {$mode objfpc}{$H+}
 
 uses
-  Classes, consoletestrunner,
+  Classes, consoletestrunner, jsonparser,
   mcp.types.test,
   mcp.resources.test,
   mcp.resourceregistry.test,

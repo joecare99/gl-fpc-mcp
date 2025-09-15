@@ -22,12 +22,14 @@ type
 
 
 
+  { TTestConcreteTool }
+
   TTestConcreteTool = class(TMCPTool)
   private
     FMockDoExecuteResult: TJSONObject;
     FRecordedDoExecuteInput: TJSONObject;
   protected
-    function DoExecute(aInput: TJSONObject): TJSONObject; override;
+    procedure DoExecute(aInput: TJSONObject; aResult: TJSONObject); override;
   public
     constructor Create(const aName, aDescription: string); override;
     destructor Destroy; override;
@@ -44,7 +46,7 @@ type
     FEventToolTriggered: Boolean;
     FEventToolReceivedInput: TJSONData;
     FEventToolSetOutput: TJSONData;
-    procedure HandleToolInvocationEvent(aInput: TJSONData; var aOutput: TJSONData);
+    procedure HandleToolInvocationEvent(aInput: TJSONData; var aOutput: TMCPToolResultArray);
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -79,33 +81,42 @@ begin
   inherited Destroy;
 end;
 
-function TTestConcreteTool.DoExecute(aInput: TJSONObject): TJSONObject;
+procedure TTestConcreteTool.DoExecute(aInput: TJSONObject; aResult: TJSONObject);
+var
+  i : Integer;
 begin
   FreeAndNil(FRecordedDoExecuteInput);
   if Assigned(aInput) then
     FRecordedDoExecuteInput := aInput
   else
     FRecordedDoExecuteInput := nil;
-  Result := FMockDoExecuteResult;
+  for I:=0 to FMockDoExecuteResult.Count-1 do
+    aResult.Add(FMockDoExecuteResult.Names[i], FMockDoExecuteResult.Items[i].Clone);
   FMockDoExecuteResult := nil;
 end;
 
-procedure TMCPToolsTest.HandleToolInvocationEvent(aInput: TJSONData; var aOutput: TJSONData);
+procedure TMCPToolsTest.HandleToolInvocationEvent(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+var
+  lOutput : TJSONObject;
 begin
   FEventToolTriggered := True;
   FEventToolReceivedInput := aInput;
-  if (aInput is TJSONObject) and ((aInput as TJSONObject).IndexOfName('input_value') <> -1) then
-  begin
-    aOutput := TJSONObject.Create;
-    (aOutput as TJSONObject).Add('result', 'success');
-    (aOutput as TJSONObject).Add('calculated_value', (aInput as TJSONObject).Get('input_value',0) * 10);
-  end
-  else
-  begin
-    aOutput := TJSONObject.Create;
-    (aOutput as TJSONObject).Add('result', 'error');
+  lOutput := TJSONObject.Create;
+  try
+    if (aInput is TJSONObject) and ((aInput as TJSONObject).IndexOfName('input_value') <> -1) then
+      begin
+      lOutput.Add('result', 'success');
+      lOutput.Add('calculated_value', (aInput as TJSONObject).Get('input_value',0) * 10);
+      end
+    else
+      begin
+      lOutput.Add('result', 'error');
+      end;
+    SetLength(aOUtput,1);
+    aOutput[0]:= TMCPToolResult.CreateText(lOutput);
+  finally
+    lOutput.Free;
   end;
-  FEventToolSetOutput := aOutput;
 end;
 
 procedure TMCPToolsTest.SetUp;
@@ -140,7 +151,6 @@ begin
     AssertEquals('Name property should match constructor argument', 'test_tool_name', Tool.Name);
     AssertEquals('Description property should match constructor argument', 'This is a test tool description.', Tool.Description);
     AssertNotNull('InputSchema should be created', Tool.InputSchema);
-    AssertNotNull('OutputSchema should be created', Tool.OutputSchema);
     AssertNull('_Meta should be nil by default', Tool._Meta);
     AssertFalse('Annotations should be uninitialized by default', Tool.Annotations.Initialized);
     Tool._Meta := TestMeta;
@@ -179,12 +189,16 @@ end;
 procedure TMCPToolsTest.TestToolExecuteMethod;
 var
   Tool: TTestConcreteTool;
+  res : TJSONData;
   InputJson: TJSONObject;
   ExpectedOutputJson: TJSONObject;
   ActualOutputJson: TJSONObject;
+  lJSON : TJSONObject;
 begin
-  ActualOutputJson:=Nil;
+  ActualOutputJson:=TJSONObject.Create;
   InputJson:=Nil;
+  lJSON:=NIl;
+  Res:=Nil;
   Tool := TTestConcreteTool.Create('exec_tool', 'Tests the Execute method.');
   try
     InputJson := TJSONObject.Create;
@@ -194,15 +208,21 @@ begin
     ExpectedOutputJson.Add('status', 'OK');
     ExpectedOutputJson.Add('data', 'processed');
     Tool.MockDoExecuteResult := ExpectedOutputJson;
-    ActualOutputJson := Tool.Execute(InputJson);
+    Tool.Execute(InputJson,ActualOutputJson);
     AssertNotNull('Recorded input to DoExecute should not be nil', Tool.RecordedDoExecuteInput);
     AssertEquals('Recorded input param1 should match original', InputJson.Get('param1',''), Tool.RecordedDoExecuteInput.Get('param1',''));
     AssertEquals('Recorded input param2 should match original', InputJson.Get('param2',0), Tool.RecordedDoExecuteInput.Get('param2',0));
     AssertNotNull('Actual output from Execute should not be nil', ActualOutputJson);
-    AssertSame('Actual output object should be the expected mock result', ExpectedOutputJson, ActualOutputJson);
-    AssertEquals('Output status should be OK', 'OK', ActualOutputJson.Get('status',''));
-    AssertEquals('Output data should be processed', 'processed', ActualOutputJson.Get('data',''));
+    Res:=ActualOutputJson.FindPath('content[0].text');
+    AssertNotNull('Found text', Res);
+    AssertTrue('String',Res.JSONType=jtString);
+    lJSON:=GetJSON(Res.AsString) as TJSONObject;
+    AssertEquals('Actual output object should be the expected mock result', ExpectedOutputJson.AsJSON, lJSON.AsJSON);
+    AssertEquals('Output status should be OK', 'OK', lJson.Get('status',''));
+    AssertEquals('Output data should be processed', 'processed', lJson.Get('data',''));
   finally
+    lJSON.Free;
+    ExpectedOutputJson.Free;
     ActualOutputJson.Free;
     InputJson.Free;
     Tool.Free;
@@ -233,24 +253,38 @@ procedure TMCPToolsTest.TestEventToolExecution;
 var
   Tool: TMyEventTool;
   InputJson: TJSONObject;
-  ActualOutputJson: TJSONObject;
+  lArr : TJSONArray;
+  lJSON,lCont,lOutput : TJSONObject;
+
 begin
   InputJSON:=Nil;
+  lJSON:=Nil;
+  lOutput:=nil;
   Tool := TMyEventTool.Create('event_exec_tool', 'Event tool for execution.', @HandleToolInvocationEvent);
   try
     InputJson := TJSONObject.Create;
     InputJson.Add('input_value', 5);
     InputJson.Add('some_other_key', 'hello');
-    ActualOutputJson := Tool.Execute(InputJson);
+    lOutput:=TJSONObject.Create;
+    Tool.Execute(InputJson,lOutput);
+    lArr:=lOutput.Get('content',TJSONArray(Nil));
+    AssertNotNull('Have content',lArr);
+    AssertEquals('Correct content length',1,lArr.Count);
+    AssertTrue('Correct element type',lArr.Types[0]=jtObject);
+    lCont:=lArr.Objects[0];
+    AssertEquals('Correct output content type','text',lCont.Get('type',''));
+    AssertTrue('Correct output content',''<>lCont.Get('text',''));
     AssertTrue('HandleToolInvocationEvent should have been triggered', FEventToolTriggered);
     AssertSame('Input JSON received by event handler should be the same object as passed', InputJson, FEventToolReceivedInput);
-    AssertNotNull('Actual output JSON should not be nil', ActualOutputJson);
-    AssertSame('Actual output object should be the one set by the event handler', FEventToolSetOutput, ActualOutputJson);
-    AssertTrue('Output should contain "result" key', ActualOutputJson.IndexOfName('result') <> -1);
-    AssertEquals('Output result should be "success"', 'success', ActualOutputJson.Get('result',''));
-    AssertTrue('Output should contain "calculated_value" key', ActualOutputJson.IndexOfName('calculated_value') <> -1);
-    AssertEquals('Calculated value should be 50 (5 * 10)', 50, ActualOutputJson.Get('calculated_value',0));
+    lJSON:=GetJSON(lCont.Get('text','')) as TJSONObject;
+    AssertNotNull('Actual output JSON should not be nil', lJson);
+    AssertTrue('Output should contain "result" key', lJson.IndexOfName('result') <> -1);
+    AssertEquals('Output result should be "success"', 'success', lJson.Get('result',''));
+    AssertTrue('Output should contain "calculated_value" key', lJson.IndexOfName('calculated_value') <> -1);
+    AssertEquals('Calculated value should be 50 (5 * 10)', 50, lJson.Get('calculated_value',0));
   finally
+    lJSON.Free;
+    lOutput.Free;
     InputJson.Free;
     Tool.Free;
   end;
