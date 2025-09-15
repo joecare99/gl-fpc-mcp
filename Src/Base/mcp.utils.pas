@@ -35,9 +35,9 @@ type
     class function create(aOwnsObjects : Boolean) : TThreadSafeObjectHash;  static;
     procedure Destroy;
     Procedure GetObjectList(aList : TFPList);
-    procedure Add(aKey : String; aObject: TObject);
-    function Get(aKey : string) : TObject;
-    procedure Remove(aKey : string);
+    procedure Add(const aKey : String; aObject: TObject);
+    function Get(const aKey : string) : TObject;
+    procedure Remove(const aKey : string);
     procedure Lock;
     procedure Unlock;
     function Count : Integer;
@@ -45,6 +45,7 @@ type
 
 function EncodeBytes(data : TBytes) : string;
 function DecodeBytes(data : String) : TBytes;
+function CapString(const aString : String; aCap : Integer = 100) : string;
 
 implementation
 
@@ -90,6 +91,18 @@ begin
     lRes.Free;
   end;
 
+end;
+
+function CapString(const aString: String; aCap: Integer): string;
+begin
+  Result:=aString;
+  if aCap<3 then
+    aCap:=3;
+  if Length(Result)>aCap-3 then
+    begin
+    SetLength(Result,aCap-3);
+    Result:=Result+'...';
+    end;
 end;
 
 { TThreadSafeObjectHash }
@@ -145,7 +158,7 @@ begin
   // do not unlock!
 end;
 
-procedure TThreadSafeObjectHash.Add(aKey: String; aObject: TObject);
+procedure TThreadSafeObjectHash.Add(const aKey: String; aObject: TObject);
 begin
   Lock;
   try
@@ -155,17 +168,17 @@ begin
   end;
 end;
 
-function TThreadSafeObjectHash.Get(aKey: string): TObject;
+function TThreadSafeObjectHash.Get(const aKey: string): TObject;
 begin
   Lock;
   try
-    Result:=FList[aKey];
+    Result:=FList.Items[aKey];
   finally
     Unlock;
   end;
 end;
 
-procedure TThreadSafeObjectHash.Remove(aKey: string);
+procedure TThreadSafeObjectHash.Remove(const aKey: string);
 begin
   Lock;
   try
