@@ -22,22 +22,22 @@ interface
 uses
   Classes, SysUtils, fpjson, contnrs, mcp.transport.base, mcp.types, mcp.resources, mcp.tools, mcp.prompts;
 
-Type
+type
   TMCPController = class;
   TMCPControllerClass = class of TMCPController;
 
   { TMCPController }
 
-  TMCPController = class (TComponent)
+  TMCPController = class(TComponent)
   private
-    FNextID : Integer;
-    FProtocolVersion: String;
+    FNextID: integer;
+    FProtocolVersion: string;
     FServiceName: string;
     FServiceVersion: string;
-    FServiceInstructions : TStrings;
+    FServiceInstructions: TStrings;
     FTransports: TFPObjectList;
-    FCancelled : TFPStringHashTable;
-    class var _instance : TMCPController;
+    FCancelled: TFPStringHashTable;
+  class var _instance: TMCPController;
     class function GetController: TMCPController; static;
     procedure SendChange(Sender: TObject);
     procedure SetServiceInstructions(AValue: TStrings);
@@ -45,52 +45,52 @@ Type
     function GetPrompts: TMCPPromptRegistry; virtual;
     function GetResources: TMCPResourceRegistry; virtual;
     function GetTools: TMCPToolRegistry; virtual;
-  Public
-    constructor create(aOwner : TComponent); override;
-    destructor destroy; override;
-    procedure ClientInitialized(aParams : TJSONObject);
-    function NextMessageID : Integer;
+  public
+    constructor Create(aOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure ClientInitialized(aParams: TJSONObject);
+    function NextMessageID: integer;
     // Request cancellation
-    procedure CancelRequest(const aID : String);
-    function IsCancelled(const aID : string) : boolean;
-    procedure RegisterTransport(aTransport : TMCPMessageTransport);
-    procedure UnRegisterTransport(aTransport : TMCPMessageTransport);
-    procedure RequestDone(const aID : String);
+    procedure CancelRequest(const aID: string);
+    function IsCancelled(const aID: string): boolean;
+    procedure RegisterTransport(aTransport: TMCPMessageTransport);
+    procedure UnRegisterTransport(aTransport: TMCPMessageTransport);
+    procedure RequestDone(const aID: string);
     procedure SendNotification(aTransport: TMCPMessageTransport; const aMethod: string);
 
-    property Resources : TMCPResourceRegistry read GetResources;
-    property Prompts : TMCPPromptRegistry read GetPrompts;
-    property Tools : TMCPToolRegistry Read GetTools;
-    Property ProtocolVersion : String Read FProtocolVersion Write FProtocolVersion;
-    Property ServiceName : string Read FServiceName Write FServiceName;
-    Property ServiceVersion : string Read FServiceVersion Write FServiceVersion;
-    property ServiceInstructions : TStrings Read FServiceInstructions Write SetServiceInstructions;
+    property Resources: TMCPResourceRegistry read GetResources;
+    property Prompts: TMCPPromptRegistry read GetPrompts;
+    property Tools: TMCPToolRegistry read GetTools;
+    property ProtocolVersion: string read FProtocolVersion write FProtocolVersion;
+    property ServiceName: string read FServiceName write FServiceName;
+    property ServiceVersion: string read FServiceVersion write FServiceVersion;
+    property ServiceInstructions: TStrings read FServiceInstructions write SetServiceInstructions;
 
     class procedure Init(aClass: TMCPControllerClass);
-    Class Property Instance : TMCPController Read GetController;
+    class property Instance: TMCPController read GetController;
   end;
 
 
 
 implementation
 
-uses mcp.logging,mcp.strings;
+uses mcp.logging, mcp.strings;
 
-{ TMCPController }
+  { TMCPController }
 
 class function TMCPController.GetController: TMCPController; static;
 begin
-  if _Instance=Nil then
-    _instance:=TMCPController.Create(Nil);
-  Result:=_Instance;
+  if _Instance = nil then
+    _instance := TMCPController.Create(nil);
+  Result := _Instance;
 end;
 
-procedure TMCPController.SendNotification(aTransport : TMCPMessageTransport; const aMethod : string);
+procedure TMCPController.SendNotification(aTransport: TMCPMessageTransport; const aMethod: string);
 
 var
-  lMsg : TJSONObject;
+  lMsg: TJSONObject;
 begin
-  lMsg:=TJSONObject.Create(['jsonrpc','2.0','method',aMethod]);
+  lMsg := TJSONObject.Create(['jsonrpc', '2.0', 'method', aMethod]);
   try
     aTransport.SendMessage(lMsg);
   finally
@@ -100,94 +100,93 @@ end;
 
 procedure TMCPController.SendChange(Sender: TObject);
 var
-  lChange : String;
-  I : Integer;
-  lTransport : TMCPMessageTransport;
+  lChange: string;
+  I: integer;
+  lTransport: TMCPMessageTransport;
 
 begin
-  if sender is TMCPResourceRegistry then
-    lChange:='resources'
-  else if sender is TMCPPromptRegistry then
-    lChange:='prompts'
-  else if sender is TMCPToolRegistry then
-    lChange:='tools'
-  else
-    lChange:='';
+  if Sender is TMCPResourceRegistry then
+    lChange := 'resources'
+  else if Sender is TMCPPromptRegistry then
+      lChange := 'prompts'
+    else if Sender is TMCPToolRegistry then
+        lChange := 'tools'
+      else
+        lChange := '';
   if lChange<>'' then
+  begin
+    for I := 0 to FTransports.Count-1 do
     begin
-    for I:=0 to FTransports.Count-1 do
-      begin
-      lTransport:=TMCPMessageTransport(FTransports[i]);
-      SendNotification(lTransport,Format('notifications/%s/list_changed',[lChange]))
-      end;
-
-    end
-  else
-    begin
-    if Assigned(Sender) then
-      lChange:=Sender.ToString
-    else
-      lChange:='<Nil>';
-    MCPLogger.Error('Received change notification of unknown sender: %s',[lChange])
+      lTransport := TMCPMessageTransport(FTransports[i]);
+      SendNotification(lTransport, Format('notifications/%s/list_changed', [lChange]));
     end;
+  end
+  else
+  begin
+    if Assigned(Sender) then
+      lChange := Sender.ToString
+    else
+      lChange := '<Nil>';
+    MCPLogger.Error('Received change notification of unknown sender: %s', [lChange]);
+  end;
 end;
 
 function TMCPController.GetPrompts: TMCPPromptRegistry;
 begin
-  Result:=TMCPPromptRegistry.Instance
+  Result := TMCPPromptRegistry.Instance;
 end;
 
 function TMCPController.GetResources: TMCPResourceRegistry;
 begin
-  Result:=TMCPResourceRegistry.Instance;
+  Result := TMCPResourceRegistry.Instance;
 end;
 
 function TMCPController.GetTools: TMCPToolRegistry;
 begin
-  Result:=TMCPToolRegistry.Instance;
+  Result := TMCPToolRegistry.Instance;
 end;
 
 procedure TMCPController.SetServiceInstructions(AValue: TStrings);
 begin
-   FServiceInstructions.Assign(aValue);
+  FServiceInstructions.Assign(aValue);
 end;
 
-constructor TMCPController.create(aOwner: TComponent);
+constructor TMCPController.Create(aOwner: TComponent);
 begin
-  ProtocolVersion:='1';
-  FServiceInstructions:=TStringList.Create;
-  FCancelled:=TFPStringHashTable.Create;
-  FTransports:=TFPObjectList.Create(False);
+  ProtocolVersion := '1';
+  FServiceInstructions := TStringList.Create;
+  FCancelled := TFPStringHashTable.Create;
+  FTransports := TFPObjectList.Create(False);
 end;
 
-destructor TMCPController.destroy;
+destructor TMCPController.Destroy;
 begin
   FreeAndNil(FTransports);
   FreeAndNil(FServiceInstructions);
   FreeAndNil(FCancelled);
-  inherited destroy;
+  inherited Destroy;
 end;
 
 procedure TMCPController.ClientInitialized(aParams: TJSONObject);
 begin
-  Resources.OnChange:=@SendChange;
-  Prompts.OnChange:=@SendChange;
-  Tools.OnChange:=@SendChange;
+  Resources.OnChange := @SendChange;
+  Prompts.OnChange := @SendChange;
+  Tools.OnChange := @SendChange;
 end;
 
-function TMCPController.NextMessageID: Integer;
+function TMCPController.NextMessageID: integer;
 begin
-  Result:=InterlockedIncrement(FNextID)
+  Result := InterlockedIncrement(FNextID);
 end;
 
-procedure TMCPController.CancelRequest(const aID: String);
+procedure TMCPController.CancelRequest(const aID: string);
 begin
-  FCancelled.Add(aID,aID);
+  FCancelled.Add(aID, aID);
 end;
 
 function TMCPController.IsCancelled(const aID: string): boolean;
 begin
-  Result:=FCancelled.Items[aID]=aID;
+  Result := FCancelled.Items[aID] = aID;
 end;
 
 procedure TMCPController.RegisterTransport(aTransport: TMCPMessageTransport);
@@ -200,7 +199,7 @@ begin
   FTransports.Remove(aTransport);
 end;
 
-procedure TMCPController.RequestDone(const aID: String);
+procedure TMCPController.RequestDone(const aID: string);
 begin
   FCancelled.Delete(aID);
 end;
@@ -208,11 +207,10 @@ end;
 class procedure TMCPController.Init(aClass: TMCPControllerClass);
 begin
   if Assigned(_Instance) then
-    Raise EMCPException.Create(SErrControllerInitialized);
+    raise EMCPException.Create(SErrControllerInitialized);
   if not Assigned(aClass) then
-    Raise EMCPException.Create(SErrControllerClassEmpty);
-  _Instance:=aClass.create(Nil);
+    raise EMCPException.Create(SErrControllerClassEmpty);
+  _Instance := aClass.Create(nil);
 end;
 
 end.
-
