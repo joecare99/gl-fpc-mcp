@@ -3,7 +3,8 @@
 MCP is a Free Pascal implementation of the [Model Context Protocol](https://modelcontextprotocol.io/specification/2025-06-18)
 It offers classes to implement a MCP server as well as a MCP client.
 
-It also offers the start of a MCP tool server that will allow an AI agent to control Lazarus.
+It also offers the start of a MCP tool server that will allow an AI agent to control Lazarus, and a MCP server that allows a LLM to execute queries on a database.
+Any database supported by FPC's SQLDB is supported.
 
 ## License
 This code is licensed with the usual FPC LGPL with linking exception license.
@@ -18,7 +19,7 @@ the Pascal AI workshop organized by Blaise Pascal Magazine on 2025-07-12.
 * [Src/IDE] Contains the packages for Lazarus IDE integration
 * [Src/proxy] Contains the MCP proxy (using the private socket protocol)
 * [demo](demo) Contains a demo project. Simulates a weather service
-* [dbconnector](dbconnector) Contains a MCP server allowing to 
+* [dbconnector](dbconnector) Contains a MCP server allowing to execute SQL statements on a database/
 
 ## Installation
 
