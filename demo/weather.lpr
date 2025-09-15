@@ -39,7 +39,7 @@ Type
 {$endif}
     procedure DoRun; override;
   private
-    procedure GetForecast(aInput: TJSONData; aOutput: TJSONObject);
+    procedure GetForecast(aInput: TJSONData; var aOutput: TMCPToolResultArray);
   end;
 
   { TGetWeatherTool }
@@ -73,10 +73,6 @@ constructor TGetWeatherTool.create(const aName: string; const aDescription: stri
 begin
   inherited create(aName, aDescription);
   InputSchema.AddArgument('location',TJSONObject.Create(['type','string']),True);
-  OutputSchema.AddArgument('City',TJSONObject.Create(['type','string']),True);
-  OutputSchema.AddArgument('Forecast',TJSONObject.Create(['type','string']),True);
-  OutputSchema.AddArgument('Temperature',TJSONObject.Create(['type','string']),True);
-  OutputSchema.AddArgument('Humidity',TJSONObject.Create(['type','string']),True);
 end;
 
 { TApplication }
@@ -90,10 +86,6 @@ begin
   With TMCPEventTool.create('getforecast','Get tomorrow''s weather',@GetForecast) do
     begin
     InputSchema.AddArgument('location',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('City',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('Forecast',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('Temperature',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('Humidity',TJSONObject.Create(['type','string']),True);
     Register;
     end;
   // Show help for the server
@@ -105,15 +97,24 @@ begin
   inherited DoRun;
 end;
 
-procedure TApplication.GetForecast(aInput: TJSONData; aOutput: TJSONObject);
+procedure TApplication.GetForecast(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+var
+  lOutput : TJSONObject;
 begin
-  With aOutput do
-    begin
-    Add('City',(aInput as TJSONObject).get('location',''));
-    Add('Forecast','Sunny');
-    Add('T','30-35 degrees C');
-    Add('Humidity','80%');
-    end;
+  SetLength(aOutput,1);
+  lOutput:=TJSONObject.Create;
+  try
+    With lOutput do
+      begin
+      Add('City',(aInput as TJSONObject).get('location',''));
+      Add('Forecast','Sunny');
+      Add('T','30-35 degrees C');
+      Add('Humidity','80%');
+      end;
+    aOutput[0]:=TMCPToolResult.CreateText(lOutput);
+  finally
+    lOutput.Free;
+  end;
 end;
 
 begin
