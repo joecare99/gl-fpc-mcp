@@ -20,7 +20,7 @@ unit mcp.stdhandlers;
 interface
 
 uses
-  Classes, SysUtils, fpjson, mcp.types, mcp.handler, mcp.tools, mcp.prompts, mcp.resources;
+  Classes, SysUtils, fpjson, mcp.logging, mcp.types, mcp.handler, mcp.tools, mcp.prompts, mcp.resources;
 
 Type
 
@@ -103,8 +103,11 @@ Type
     procedure MCPExecute(const Params: TJSONObject; aResult: TJSONObject); override;
   end;
 
-  TMCPInitializedNotificationHandler = class(TMCPStdHandler)
+  { TMCPInitializedNotificationHandler }
 
+  TMCPInitializedNotificationHandler = class(TMCPStdHandler)
+    class function MCPMethodName: string; override;
+    procedure MCPExecute(const Params: TJSONObject; aResult: TJSONObject); override;
   end;
 
 procedure RegisterStandardHandlers;
@@ -131,7 +134,7 @@ begin
 
   TMCPInitializeHandler.Register;
 
-  //TMCPInitializedNotificationHandler.Register;
+  TMCPInitializedNotificationHandler.Register;
 
 end;
 
@@ -355,6 +358,7 @@ procedure TMCPInitializeHandler.MCPExecute(const Params: TJSONObject; aResult: T
 
 var
   Tmp, Tmp2: TJSONObject;
+  S : String;
 begin
   MCPController.ClientInitialized(Params);
   // Add server info
@@ -364,7 +368,10 @@ begin
   aResult.Add('serverInfo', Tmp);
 
   // Add protocol version
-  aResult.Add('protocolVersion', MCPContext.ProtocolVersion);
+  S:=Params.Get('protocolVersion','');
+  if S='' then
+    S:=MCPContext.ProtocolVersion;
+  aResult.Add('protocolVersion', S);
 
   // Add capabilities
   Tmp := TJSONObject.Create;
@@ -391,6 +398,17 @@ begin
 
   // Add instructions
   aResult.Add('instructions', MCPContext.ServiceInstructions);
+end;
+
+class function TMCPInitializedNotificationHandler.MCPMethodName: string;
+begin
+  result:='notifications/initialized';
+end;
+
+procedure TMCPInitializedNotificationHandler.MCPExecute(const Params: TJSONObject; aResult: TJSONObject);
+begin
+  MCPLogger.Info('Executing '+MCPMethodName);
+  // Nothing to do
 end;
 
 end.
