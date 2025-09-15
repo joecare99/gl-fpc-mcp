@@ -12,11 +12,25 @@ This code is licensed with the usual FPC LGPL with linking exception license.
 
 The [docs](docs) directory contains a presentation of the framework given at
 the Pascal AI workshop organized by Blaise Pascal Magazine on 2025-07-12.
-
+* [mcp.lpg](mcp.lpg) This is the project group containing all 
 * [Src/Base](Src/Base) contains the source code for all classes to create a
   MCP server
 * [Src/IDE] Contains the packages for Lazarus IDE integration
 * [Src/proxy] Contains the MCP proxy (using the private socket protocol)
+* [demo](demo) Contains a demo project. Simulates a weather service
+* [dbconnector](dbconnector) Contains a MCP server allowing to 
 
+## Installation
 
+* Open the Src/Base/mcpbase.lpk package in the lazarus IDE.
+* Open the Src/Base/mcpdesign.lpk package in the lazarus IDE and install it.
+  This will install 4 components on the component palette on tab MCP. 
+* if you wish to allow an LLM to control the lazarus IDE, compile and install Src/IDE/mcplazcontrol.lpk
+  to actually allow the LLM to control the IDE, you must use the mcpproxy.
 
+## Compiling the programs:
+
+After you have opened the mcpbase.lpk package; you can compile all three sample programs:
+* demo/weather.lpi
+* src/proxy/mcpproxy.lpi
+* dbconnector/mcpdbconnector.lpi
