@@ -117,10 +117,11 @@ var
   lObj : TJSONObject absolute Params;
   lResult: TJSONObject;
 begin
+  MCPLogger.Trace('[%s] DoExecute - start',[ClassName]);
   Result:=Nil;
   if (Params<>Nil) and not (Params is TJSONObject) then
     begin
-    MCPLogger.Error('Request with invalid parameters: %s',[Params.AsJSON]);
+    MCPLogger.Error('[%s] Request with invalid parameters: %s',[ClassName,Params.AsJSON]);
     Exit;
     end;
   if aContext is TMCPContext then
@@ -132,9 +133,14 @@ begin
     MCPExecute(lObj,lResult);
     Result:=lResult;
   except
-    lResult.Free;
-    Raise;
+    On E : exception do
+      begin
+      MCPLogger.LogException(E,'[%s] DoExecute exception %s : %s',[ClassName,E.ClassName,E.Message]);
+      lResult.Free;
+      Raise;
+      end;
   end;
+  MCPLogger.Trace('[%s] DoExecute - end',[ClassName]);
 end;
 
 
