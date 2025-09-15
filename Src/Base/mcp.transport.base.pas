@@ -20,7 +20,7 @@ unit mcp.transport.base;
 interface
 
 uses
-  SysUtils, classes, fpJSON;
+  SysUtils, classes, fpJSON, mcp.types;
 
 Type
 
@@ -31,6 +31,8 @@ Type
   }
   TMCPMessageTransport = class(TComponent)
   Protected
+    procedure DoLog(aLevel : TMCPLogType; const aMessage : string);
+    procedure DoLog(aLevel : TMCPLogType; const aFmt : string; const aArgs : Array of const);
     Procedure DoSendMessage(aMessage : TJSONData); virtual; abstract;
     Procedure DoSendDiagnostic(const aMessage : UTF8String); virtual; abstract;
   Public
@@ -46,6 +48,15 @@ uses mcp.logging;
 
 { TMCPMessageTransport }
 
+procedure TMCPMessageTransport.DoLog(aLevel: TMCPLogType; const aMessage: string);
+begin
+  MCPLogger.Log(aLevel,'['+ClassName+'] '+aMessage);
+end;
+
+procedure TMCPMessageTransport.DoLog(aLevel: TMCPLogType; const aFmt: string; const aArgs: array of const);
+begin
+  DoLog(aLevel,Format(aFmt,aArgs));
+end;
 
 class function TMCPMessageTransport.IsResponseValid(aResponse: TJSONData): boolean;
 var

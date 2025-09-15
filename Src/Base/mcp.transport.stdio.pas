@@ -20,7 +20,7 @@ unit mcp.transport.stdio;
 interface
 
 uses
-  Classes, SysUtils, fpjson, mcp.transport.base;
+  Classes, SysUtils, fpjson, mcp.Types, mcp.transport.base;
 
 Type
   PText = ^Text;
@@ -73,9 +73,9 @@ Var
 
 begin
   Result:=Nil;
-  MCPLogger.Debug('Reading request');
+  MCPLogger.Trace('[%s] Reading request - start',[ClassName]);
   ReadLn(FInput^,lContent);
-  MCPLogger.Debug('Read request: %s',[lContent]);
+  MCPLogger.Debug('[%s] Read request: %s',[ClassName,lContent]);
   if lContent<>'' then
     try
       lData:=GetJSON(lContent, True);
@@ -85,10 +85,11 @@ begin
     except
       on E : Exception do
         begin
-        MCPLogger.LogException(E,'Reading request from STDIN');
+        MCPLogger.LogException(E,'[%s] Reading request from STDIN',[ClassName]);
         SendDiagnostic('Exception %s while reading request from STDIN: %s',[E.ClassName,E.Message]);
         end;
     end;
+  MCPLogger.Trace('[%s] Reading request - end',[ClassName]);
 end;
 
 
@@ -99,6 +100,7 @@ var
   lResponse: TJSONObject;
 
 begin
+  MCPLogger.Trace('[%s] RunMessageLoop - start',[ClassName]);
   lResponse:=Nil;
   lRequest:=Nil;
   try
@@ -109,10 +111,11 @@ begin
         begin
         try
           aOnRequest(lRequest,lResponse);
+          MCPLogger.Trace('[%s] after request ',[ClassName]);
         except
           On e : exception do
             begin
-            MCPLogger.LogException(E,'Handling request: "%s"',[lRequest.AsJSON]);
+            MCPLogger.LogException(E,'[%s] Handling request: "%s"',[ClassName,lRequest.AsJSON]);
             SendDiagnostic('Exception %s (Message: "%s") handling request: %s',[E.ClassName,E.Message,lRequest.AsJSON]);
             end;
         end;
@@ -126,6 +129,7 @@ begin
     lResponse.free;
     lRequest.Free;
   end;
+  MCPLogger.Trace('[%s] RunMessageLoop - end',[ClassName]);
 end;
 
 { TTextLSPContext }
@@ -139,13 +143,15 @@ end;
 
 procedure TMCPStdioTransport.EmitMessage(aMessage: TJSONStringType);
 begin
+  MCPLogger.Trace('[%s] EmitMessage - start',[ClassName]);
   Try
     WriteLn(Foutput^,aMessage);
     Flush(Foutput^);
   except
     on e : exception do
-      MCPLogger.LogException(E,'EmitMessage');
+      MCPLogger.LogException(E,'[%s] EmitMessage',[ClassName]);
   end;
+  MCPLogger.Trace('[%s] EmitMessage - end',[ClassName]);
 end;
 
 procedure TMCPStdioTransport.DoSendMessage(aMessage: TJSONData);
@@ -154,19 +160,23 @@ Var
   Content : TJSONStringType;
 
 begin
+  MCPLogger.Trace('[%s] DoSendMessage - start',[ClassName]);
   Content:=aMessage.AsJSON;
   EmitMessage(Content);
+  MCPLogger.Trace('[%s] DoSendMessage - end',[ClassName]);
 end;
 
 procedure TMCPStdioTransport.DoSendDiagnostic(const aMessage: UTF8String);
 begin
+  MCPLogger.Trace('[%s] DoSendDiagnostic - start',[ClassName]);
   Try
-    WriteLn(FError^,aMessage);
+    WriteLn(FError^,'Diagnostic',aMessage);
     Flush(FError^);
   except
     on e : exception do
-      MCPLogger.LogException(E,'diagnostic output');
+      MCPLogger.LogException(E,'[%s] diagnostic output',[ClassName]);
   end;
+  MCPLogger.Trace('[%s] DoSendDiagnostic - start',[ClassName]);
 end;
 
 

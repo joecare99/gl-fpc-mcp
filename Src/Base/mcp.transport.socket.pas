@@ -34,7 +34,7 @@ Const
   MCPProtocolVersion = 1;
 
 Type
-  TMCPProtocolMessageType = (mpmtRequest,mpmtResponse, mpmtMessage, mpmtDiagnostic);
+  TMCPProtocolMessageType = (mpmtRequest, mpmtResponse, mpmtMessage, mpmtDiagnostic);
 
   { TMCPProtocolMessageTypeHelper }
 
