@@ -41,7 +41,7 @@ type
 
 implementation
 
-uses mcp.stdhandlers, mcp.controller,mcp.logging;
+uses mcp.stdhandlers, mcp.controller, mcp.logging;
 
 procedure TMCPStdIOApplication.doRun;
 
@@ -70,8 +70,11 @@ end;
 procedure TMCPStdIOApplication.HandleRequest(aRequest: TJSONObject; var aResponse: TJSONObject);
 var
   lResp,lID : TJSONData;
+  lHaveID : Boolean;
 begin
+  MCPLogger.Trace('[%s] Handlerequest - start',[ClassName]);
   aResponse:=Nil;
+  lHaveID:=aRequest.IndexOfName('id')<>-1;
   lResp:=FDispatcher.ExecuteRequest(aRequest);
   if lResp is TJSONObject then
     begin
@@ -90,9 +93,11 @@ begin
     end
   else
     begin
-    MCPLogger.Error('Invalid JSON response: %s',[lResp.AsJSON]);
+    if lHaveID and (lResp<>Nil) then
+      MCPLogger.Error('Invalid JSON response: %s',[lResp.AsJSON]);
     lResp.Free;
     end;
+  MCPLogger.Trace('[%s] Handlerequest - end',[ClassName]);
 end;
 
 end.
