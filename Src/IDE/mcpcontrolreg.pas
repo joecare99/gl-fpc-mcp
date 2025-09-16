@@ -31,11 +31,13 @@ type
   private
     FServer: TMCPServerTCPSocketDispatcher;
   protected
-    procedure MCPAddExistingUnit(aInput: TJSONData; aOutput: TJSONObject);
-    procedure MCPAddNewUnit(aInput: TJSONData; aOutput: TJSONObject);
-    procedure MCPCompileProject(aInput: TJSONData; aOutput: TJSONObject);
-    procedure MCPOpenProject(aInput: TJSONData; aOutput: TJSONObject);
-    procedure MCPNewProject(aInput: TJSONData; aOutput : TJSONObject);
+    function CreateJSONResult(const aContent: Array of const): TMCPToolResultArray;
+    function JSONToResult(aJSON: TJSONObject): TMCPToolResultArray;
+    procedure MCPAddExistingUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPAddNewUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPCompileProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPOpenProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPNewProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
   Public
     constructor create(aOwner: TComponent); override;
     Procedure StartController;
@@ -149,10 +151,32 @@ end;
 
 { TMCPToolController }
 
-procedure TMCPToolController.MCPAddExistingUnit(aInput: TJSONData; aOutput: TJSONObject);
+function TMCPToolController.CreateJSONResult(const aContent: array of const): TMCPToolResultArray;
+var
+  lObj : TJSONObject;
+begin
+  lObj:=TJSONObject.Create(aContent);
+  try
+    Result:=JSONToResult(lObj);
+  finally
+    lObj.Free;
+  end;
+
+end;
+
+function TMCPToolController.JSONToResult(aJSON: TJSONObject): TMCPToolResultArray;
+begin
+  Result:=[];
+  SetLength(Result,1);
+  Result[1]:=TMCPToolResult.CreateText(aJSON);
+  FreeAndNil(aJSON);
+end;
+
+procedure TMCPToolController.MCPAddExistingUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
 var
   OK: Boolean;
   lFilename : string;
+  lRes : TJSONObject;
 begin
   lFileName:=(aInput as TJSONObject).Get('filename','');
   if lFileName='' then
@@ -163,10 +187,11 @@ begin
     OK:=ExecuteResult;
     Free;
     end;
-  aOutput.Add('Success',OK)
+  lRes:=TJSONObject.Create(['Success',OK]);
+  aOutput:=JSONToResult(lRes)
 end;
 
-procedure TMCPToolController.MCPAddNewUnit(aInput: TJSONData; aOutput: TJSONObject);
+procedure TMCPToolController.MCPAddNewUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
 var
   OK: Boolean;
 begin
@@ -176,10 +201,10 @@ begin
     OK:=ExecuteResult;
     Free;
     end;
-  aOutput.Add('Success',OK)
+  aOutput:=CreateJSONResult(['Success',OK]);
 end;
 
-procedure TMCPToolController.MCPCompileProject(aInput: TJSONData; aOutput: TJSONObject);
+procedure TMCPToolController.MCPCompileProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
 var
   lReason : TCompileReason;
   Ok : Boolean;
@@ -194,10 +219,10 @@ begin
     OK:=ExecuteResult;
     Free;
     end;
-  aOutput.add('Success',OK);
+  aOutput:=CreateJSONResult(['Success',OK]);
 end;
 
-procedure TMCPToolController.MCPOpenProject(aInput: TJSONData; aOutput: TJSONObject);
+procedure TMCPToolController.MCPOpenProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
 var
   lFileName : string;
   OK : Boolean;
@@ -212,10 +237,10 @@ begin
     OK:=ExecuteResult;
     Free;
     end;
-  aOutput.Add('Success',OK);
+  aOutput:=CreateJSONResult(['Success',OK]);
 end;
 
-procedure TMCPToolController.MCPNewProject(aInput: TJSONData; aOutput: TJSONObject);
+procedure TMCPToolController.MCPNewProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
 var
   OK : Boolean;
 begin
@@ -225,7 +250,7 @@ begin
     OK:=ExecuteResult;
     Free;
     end;
-  aOutput.Add('Success',OK);
+  aOutput:=CreateJSONResult(['Success',OK]);
 end;
 
 constructor TMCPToolController.create(aOwner: TComponent);
@@ -253,30 +278,25 @@ begin
   With TMCPEventTool.create('openproject','Open a lazarus project',@MCPOpenProject) do
     begin
     InputSchema.AddArgument('projectfile',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('Success',TJSONObject.Create(['type','boolean']),True);
     Register;
     end;
   With TMCPEventTool.create('newproject','Create a new lazarus project',@MCPNewProject) do
     begin
-    OutputSchema.AddArgument('Success',TJSONObject.Create(['type','boolean']),True);
     Register;
     end;
   With TMCPEventTool.create('newnunit','Add a new unit to the project',@MCPAddNewUnit) do
     begin
     InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('Success',TJSONObject.Create(['type','boolean']),True);
     Register;
     end;
   With TMCPEventTool.create('addnunit','Add an existing unit to the project',@MCPAddExistingUnit) do
     begin
     InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
-    OutputSchema.AddArgument('Success',TJSONObject.Create(['type','boolean']),True);
     Register;
     end;
   With TMCPEventTool.create('compile','compile project',@MCPCompileProject) do
     begin
     InputSchema.AddArgument('build',TJSONObject.Create(['type','boolean']),True);
-    OutputSchema.AddArgument('Success',TJSONObject.Create(['type','boolean']),True);
     Register;
     end;
 end;
