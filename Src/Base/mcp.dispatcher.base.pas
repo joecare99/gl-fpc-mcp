@@ -117,11 +117,11 @@ end;
 function TJSONRPCDispatcher.ExecuteMethod(const AClassName, AMethodName: TJSONStringType;
     Params, ID: TJSONData; AContext: TJSONRPCCallContext): TJSONData;
 
-{$IFDEF VER3_2}
 Var
+  {$IFDEF VER3_2}
   lID : TJSONData;
+  {$ENDIF}
   lRes : TJSONObject;
-{$ENDIF}
 
 begin
   MCPLogger.Trace('[%s] ExecuteMethod "%s.%s" - start',[ClassName,AClassName,aMethodName]);

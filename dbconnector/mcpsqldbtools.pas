@@ -383,6 +383,15 @@ Const
     {ftFMTBcd} 'DECOMAL',
     {ftFixedWideChar} 'CHAR',
     {ftWideMemo} 'TEXT'
+{$IFNDEF VER3_2}
+    {ftOraTimeStamp} , 'TimeStamp',
+    { ftOraInterval} 'INTERVAL',
+    { ftLongWord }   'BIGINT',
+    { ftShortint }   'SMALLINT',
+    { ftByte }       'SMALLINT',
+    { ftExtended }   'DOUBLE',
+    { ftSingle }     'DOUBLE'
+{$ENDIF}
   );
 
 var
