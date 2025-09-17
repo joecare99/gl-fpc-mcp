@@ -128,8 +128,13 @@ end;
 {$ENDIF}
 
 initialization
+// If we need to install a signal handler...
+{$IFDEF INSTALLSIGHANDLER}
+// We load the libs that need this...
 {$IFDEF USE_FIREBIRD}
   InitialiseIBase60;
+{$ENDIF}
+// And we install the signal handler
   InstallCtrlCHandler
 {$ENDIF}
 end.
