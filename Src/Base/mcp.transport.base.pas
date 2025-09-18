@@ -76,7 +76,7 @@ begin
     DoSendMessage(aMessage)
   else
     begin
-    MCPLogger.Error('Not a valid JSON-RPC message:',[aMessage.AsJSON]);
+    MCPLogger.Error('[%s] Not a valid JSON-RPC message: %s',[ClassName,aMessage.AsJSON]);
     SendDiagnostic('invalid response message -> '+aMessage.AsJSON);
     end;
 end;
