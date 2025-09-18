@@ -23,7 +23,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, ssockets,
-  mcp.controller, mcp.handler, mcp.dispatcher, mcp.transport.base, mcp.transport.socket;
+  mcp.controller, mcp.handler, mcp.dispatcher.base, mcp.transport.base, mcp.transport.socket;
 
 Const
   DefaultMCPServerPort = 9876;
@@ -180,14 +180,17 @@ end;
 function TMCPServerSocketConnection.ExecuteRequest(aRequest: TJSONData
   ): TJSONData;
 begin
+  MCPLogger.Trace('%s ExecuteRequest - start',[ClassName]);
   if not assigned(FLocalDispatch) then
     exit;
   Result:=FLocalDispatch.ExecuteRequest(aRequest);
+  MCPLogger.Trace('%s ExecuteRequest - end',[ClassName]);
 end;
 
 constructor TMCPServerSocketConnection.create(aOwner: TComponent);
 
 begin
+  MCPLogger.Trace('%s Creating connection',[ClassName]);
   Inherited ;
 end;
 
@@ -203,10 +206,14 @@ procedure TMCPServerSocketConnection.RunLoop;
 
 Var
   Req,Resp : TJSONData;
-
+  lRes : String;
 begin
+  MCPLogger.Trace('%s RunLoop - start',[ClassName]);
   if not assigned(FLocalDispatch) then
+    begin
+    MCPLogger.Error('%s RunLoop - start but no local dispatcher',[ClassName]);
     Raise EMCPSocket.Create('No local dispatcher available yet');
+    end;
   Req:=Nil;
   Resp:=Nil;
   try
@@ -215,9 +222,18 @@ begin
       Req:=SocketTransport.ReceiveJSON(mpmtRequest);
       if Assigned(Req) then
         begin
+        MCPLogger.Trace('%s RunLoop - receive JSON: %s',[ClassName,Req.AsJSON]);
         Resp:=FLocalDispatch.ExecuteRequest(req);
+        if Assigned(Resp) then
+          lRes:=Resp.AsJSON
+        else
+          lRes:='<NIL>';
+        MCPLogger.Trace('%s RunLoop - sending result: %s',[ClassName,lRes]);
         if not SocketTransport.SendJSON(mpmtResponse,Resp) then
+          begin
+          MCPLogger.Debug('%s RunLoop - ending, response sent: %s',[ClassName,lRes]);
           Terminate;
+          end;
         end;
       FreeAndNil(Resp);
       FreeAndNil(Req);
@@ -228,6 +244,7 @@ begin
     Req.Free;
     Resp.Free;
   end;
+  MCPLogger.Trace('%s RunLoop - end',[ClassName]);
 end;
 
 procedure TMCPServerSocketConnection.Terminate;
