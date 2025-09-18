@@ -50,6 +50,8 @@ type
 
 implementation
 
+uses mcp.logging;
+
 { TSocketDispatcher }
 
 constructor TMCPClientSocketDispatcher.Create(aController: TMCPController);
@@ -83,16 +85,25 @@ Const
   Stage : Array[Boolean] of string = ('sending','receiving');
 
 begin
-  Writeln('Exception ',aException.ClassName,' during ',Stage[IsReceive],' : ',aException.Message);
+  MCPLogger.Error('Exception %s during %s : %s',[aException.ClassName, Stage[IsReceive], aException.Message]);
   Result:=True;
 end;
 
 function TMCPClientSocketDispatcher.ExecuteRequest(aRequest: TJSONData): TJSONData;
 
 begin
+  MCPLogger.Debug('Sending message: %s ',[aRequest.AsJSON]);
   Result:=Nil;
   if SocketTransport.SendJSON(mpmtRequest,aRequest) then
+    begin
     Result:=SocketTransport.ReceiveJSON(mpmtResponse);
+    if Assigned(Result) then
+      MCPLogger.Debug('Received message:  %s',[Result.AsJSON])
+    else
+      MCPLogger.Debug('Received nil message')
+    end
+  else
+    MCPLogger.Warning('Failed to send message %s',[aRequest.AsJSON]);
 end;
 
 end.
