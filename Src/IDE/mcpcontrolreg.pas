@@ -21,7 +21,7 @@ interface
 
 uses
   SysUtils, Controls, Classes, LazIDEIntf, ProjectIntf, CompOptsIntf, fpjson, mcp.types,
-  mcp.tools, mcp.dispatcher.serversocket, mcp.stdhandlers, mcp.controller;
+  mcp.tools, mcp.dispatcher.serversocket, mcp.stdhandlers, mcp.controller, mcp.logging;
 
 type
 
@@ -29,7 +29,9 @@ type
 
   TMCPToolController = class(TComponent)
   private
+    FLog : TFileStream;
     FServer: TMCPServerTCPSocketDispatcher;
+    procedure DoMCPLog(aType: TMCPLogLevel; const Msg: string);
   protected
     function CreateJSONResult(const aContent: Array of const): TMCPToolResultArray;
     function JSONToResult(aJSON: TJSONObject): TMCPToolResultArray;
@@ -40,6 +42,7 @@ type
     procedure MCPNewProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
   Public
     constructor create(aOwner: TComponent); override;
+    Destructor destroy; override;
     Procedure StartController;
     Procedure RegisterTools;
     Procedure Terminate;
@@ -124,7 +127,6 @@ end;
 procedure TCompileProjectCmd.execute;
 begin
   ExecuteResult:=LazarusIDE.DoBuildProject(Reason,[],True)=mrOK;
-
 end;
 
 { TAddUnit }
@@ -151,6 +153,15 @@ end;
 
 { TMCPToolController }
 
+procedure TMCPToolController.DoMCPLog(aType: TMCPLogLevel; const Msg: string);
+var
+  S : String;
+begin
+  WriteStr(S,aType);
+  S:='['+S+'] '+Msg+sLineBreak;
+  FLog.WriteBuffer(S[1],Length(S));
+end;
+
 function TMCPToolController.CreateJSONResult(const aContent: array of const): TMCPToolResultArray;
 var
   lObj : TJSONObject;
@@ -161,15 +172,13 @@ begin
   finally
     lObj.Free;
   end;
-
 end;
 
 function TMCPToolController.JSONToResult(aJSON: TJSONObject): TMCPToolResultArray;
 begin
   Result:=[];
   SetLength(Result,1);
-  Result[1]:=TMCPToolResult.CreateText(aJSON);
-  FreeAndNil(aJSON);
+  Result[0]:=TMCPToolResult.CreateText(aJSON);
 end;
 
 procedure TMCPToolController.MCPAddExistingUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
@@ -256,8 +265,16 @@ end;
 constructor TMCPToolController.create(aOwner: TComponent);
 begin
   inherited create(aOwner);
+  FLog:=TFileStream.Create('/home/michael/tmp/lazmcplog.log',fmCreate or fmShareDenyNone);
   FServer:=TMCPServerTCPSocketDispatcher.Create(Self);
   FServer.Controller:=TMCPController.Instance;
+end;
+
+destructor TMCPToolController.destroy;
+begin
+  DoMCPLog(mltTrace,'Shutting down');
+  FreeAndNil(FLog);
+  inherited destroy;
 end;
 
 procedure DoRunLoop;
@@ -267,6 +284,10 @@ end;
 
 procedure TMCPToolController.StartController;
 begin
+  MCPLogger.LogToConsole:=False;
+  MCPLogger.LogLevels:=[Low(TMCPLogLevel)..High(TMCPLogLevel)];
+  MCPLogger.AddLogHandler(@DoMCPLog);
+  MCPLogger.Enabled:=True;
   RegisterStandardHandlers;
   FServer.Port:=10987;
   FServer.InitSocket;
