@@ -218,16 +218,20 @@ end;
 
 procedure TMCPLocalDispatcher.ProcessClientMethodResult(aResponse: TJSONObject;const aID : String;  aResult: TJSONData);
 begin
+  MCPLogger.Trace('[%s] ProcessClientMethodResult - start',[ClassName]);
   if Assigned(OnMethodResult) then
     OnMethodResult(Self,aResponse,aID,aResult);
+  MCPLogger.Trace('[%s] ProcessClientMethodResult - end',[ClassName]);
 end;
 
 procedure TMCPLocalDispatcher.ProcessClientMethodError(aResponse: TJSONObject;
   const aID: String; aResult: TJSONData);
 
 begin
+  MCPLogger.Trace('[%s] ProcessClientMethodError - start',[ClassName]);
   if Assigned(OnMethodError) then
     OnMethodError(Self,aResponse,aID,aResult);
+  MCPLogger.Trace('[%s] ProcessClientMethodError - end',[ClassName]);
 end;
 
 function TMCPLocalDispatcher.ExecuteRequest(aRequest: TJSONData): TJSONData;
@@ -264,6 +268,8 @@ begin
     Ctx:=TMCPContext.Create(TMCPController.Instance);
     try
       Result:=FJSONDispatcher.Execute(aRequest,Ctx);
+      if Result=Nil then
+        MCPLogger.Debug('[%s] Execute request - nil response ',[ClassName]);
     finally
       Ctx.Free;
     end;
