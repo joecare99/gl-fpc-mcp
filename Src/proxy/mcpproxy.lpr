@@ -38,12 +38,16 @@ Type
 
   { TLSPProxyApplication }
 
+  { TMCPProxyApplication }
+
   TMCPProxyApplication = Class(TCustomApplication)
   Private
     const
       ShortOptions = 'hp:u:c:l:';
       LongOptions : Array of string = ('help','port:','unix:','config:','log:');
+    procedure DoMCPLog(aType: TMCPLogLevel; const Msg: string);
   Private
+    FLog : TFIleStream;
     FConfig : TMCPProxyConfig;
     FText : TMCPSTDIOTransport;
     FDisp : TMCPClientSocketDispatcher;
@@ -110,6 +114,7 @@ begin
   FreeAndNil(FText);
   FreeAndNil(FController);
   FreeAndNil(FDisp);
+  FreeAndNil(FLog);
   inherited Destroy;
 end;
 
@@ -181,6 +186,15 @@ begin
     lData.Free;
 end;
 
+procedure TMCPProxyApplication.DoMCPLog(aType: TMCPLogLevel; const Msg: string);
+var
+  S : String;
+begin
+  WriteStr(S,aType);
+  S:='['+S+'] '+Msg+sLineBreak;
+  FLog.WriteBuffer(S[1],Length(S));
+end;
+
 procedure TMCPProxyApplication.DoRun;
 
 var
@@ -201,11 +215,21 @@ begin
     end;
   // Controller is using remote transport
   FController:=TMCPController.Create(Self);
-  FController.RegisterTransport(SetupRemoteTransport);
+  if FConfig.LogFile<>'' then
+    begin
+    FLog:=TFileStream.Create(FConfig.LogFile,fmCreate or fmShareDenyNone);
+    MCPLogger.AddLogHandler(@DoMCPLog);
+    MCPLogger.LogToConsole:=False;
+    MCPLogger.LogLevels:=[Low(TMCPLogLevel)..High(TMCPLogLevel)];
+    MCPLogger.Enabled:=True;
+    end;
+  FText:=TMCPSTDIOTransport.Create(@Input,@Output,@StdErr);
+  FController.RegisterTransport(FText);
   // Dispatcher is using remote transport
   FDisp:=TMCPClientSocketDispatcher.Create(FController);
+  FDisp.Transport:=SetupRemoteTransport;
   // Set up text loop
-  FText:=TMCPSTDIOTransport.Create(@Input,@Output,@StdErr);
+
   FText.RunMessageLoop(@HandleRequest);
 end;
 
