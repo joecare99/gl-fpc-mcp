@@ -34,7 +34,7 @@ uses mcp.handler, mcp.dispatcher.serversocket, mcp.dispatcher.clientsocket, mcp.
 procedure Register;
 
 begin
-  RegisterComponents('MCP',[TMCPSocketServer,TMCPClientSocketDispatcher,TMCPSTDIOTransport,TMCPController]);
+  RegisterComponents('AI',[TMCPSocketServer,TMCPClientSocketDispatcher,TMCPSTDIOTransport,TMCPController]);
 end;
 
 initialization
