@@ -265,7 +265,7 @@ end;
 constructor TMCPToolController.create(aOwner: TComponent);
 begin
   inherited create(aOwner);
-  FLog:=TFileStream.Create('/home/michael/tmp/lazmcplog.log',fmCreate or fmShareDenyNone);
+  FLog:=TFileStream.Create(GetTempDir(False)+'lazmcplog.log',fmCreate or fmShareDenyNone);
   FServer:=TMCPServerTCPSocketDispatcher.Create(Self);
   FServer.Controller:=TMCPController.Instance;
 end;
