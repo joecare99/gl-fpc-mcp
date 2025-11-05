@@ -5,7 +5,7 @@ unit mcp.transport.http;
 interface
 
 uses
-  Classes, SysUtils, fpjson, contnrs, mcp.types, mcp.dispatcher.http, mcp.controller, mcp.transport.base, httpdefs, httproute;
+  Classes, SysUtils, fpjson, httpprotocol, contnrs, mcp.types, mcp.dispatcher.http, mcp.controller, mcp.transport.base, httpdefs, httproute;
 
 {$IF DECLARED(THTTPServerEvent)}
 {$DEFINE USE_EVENTS}
@@ -92,6 +92,31 @@ Type
   end;
 
 implementation
+
+{$IFDEF VER3_2_2}
+
+Type
+
+  { TResponseHelper }
+
+  TResponseHelper = class helper for TResponse
+    procedure SetStatus(const aStatus : Integer; aSend : Boolean);
+  end;
+
+{ TResponseHelper }
+
+procedure TResponseHelper.SetStatus(const aStatus: Integer; aSend: Boolean);
+begin
+  Code:=aStatus;
+  case aStatus of
+    400 : CodeText:='BAD REQUEST';
+    404 : CodeText:='NOT FOUND';
+    200 : CodeText:='OK';
+    204 : CodeText:='NO CONTENT';
+  end;
+end;
+
+{$ENDIF}
 
 { TMCPHTTPTransport }
 
@@ -238,16 +263,16 @@ begin
     aResponse.CodeText:='METHOD NOT ALLOWED';
     aResponse.SendResponse;
     end
-{$IFDEF USE_EVENTS}
   else
     begin
+    {$IFDEF USE_EVENTS}
     lSession:=GetOrCreateSession(aRequest.CustomHeaders.Values['Mcp-Session-Id']);
     lSession.Transport.Response:=aResponse;
     lSession.RegisterTransport;
     aResponse.CustomHeaders.Values['Mcp-Session-Id']:=lSession.SessionID;
+    aResponse.StartServerEvents;
+    {$ENDIF}
     end;
-{$ENDIF}
-  aResponse.StartServerEvents;
 end;
 
 function TMCPRoute.GetJSONRPC(aRequest : TRequest; out aMethod : string) : TJSONData;
