@@ -16,6 +16,18 @@
 program mcpdbconnector;
 
 { $define usesocket}
+{$define usehttp}
+
+{$IFDEF USESOCKET}
+{$DEFINE HAVEPORT}
+{$IFDEF USEHTTP}
+{$Error 'Cannot use HTTP and socket transport at the same time'}
+{$ENDIF}
+{$ENDIF}
+
+{$IFDEF USEHTTP}
+{$DEFINE HAVEPORT}
+{$ENDIF}
 
 uses
   {$IFDEF UNIX}
@@ -32,8 +44,12 @@ uses
   {$ifdef usesocket}
   mcp.application.socket,
   {$else}
+  {$ifdef usehttp}
+  mcp.application.http,
+  {$ELSE}
   mcp.application.stdio,
   {$endif}
+  {$ENDIF}
   mcp.types,
   mcp.logging,
   mcp.tools,
@@ -55,11 +71,16 @@ const
   keyType = 'type';
   keyQuiet = 'quiet';
   keyVerbose = 'verbose';
+  SServer = 'Server';
+  keyListen = 'listen';
+  keyAll = 'all';
+
+  DefaultListenPort = 3030;
 
   LongOptions : array of string = (
       keyConfig+':', KeyHost+':', KeyDatabase+':', KeyUser+':',
       keyPassword+':', keyPort+':', keyOption+':', keyWrite,
-      keyHelp,keyType+':',keyQuiet,keyVerbose);
+      keyHelp, keyType+':', keyQuiet, keyVerbose, keyListen+':', keyAll);
 
 
 Type
@@ -67,10 +88,15 @@ Type
   { TApplication }
 {$IFDEF usesocket}
   TApplication = class (TMCPSocketApplication)
-{$ELSE}
+{$ELSE usesocket}
+{$IFDEF usehttp}
+  TApplication = class (TMCPHTTPServerApplication)
+{$ELSE usehttp}
   TApplication = class (TMCPStdioApplication)
-{$endif}
+{$ENDIF usehttp}
+{$endif usesocket}
   private
+    FListen : integer;
     function DefaultDBtype: String;
     procedure DoMCPLog(aType: TMCPLogType; const aMessage: string);
     procedure ReadDBConfig(aInfo: TMCPDBConnectionInfo; aConfigFile: string);
@@ -79,8 +105,8 @@ Type
     procedure DoRun; override;
   public
     constructor Create(aOwner : TComponent); override;
-    destructor destroy; override;
-    procedure parseoptions;
+    destructor Destroy; override;
+    procedure ParseOptions;
     procedure Usage(aMsg : string);
   end;
 
@@ -90,7 +116,7 @@ procedure TApplication.DoRun;
 var
   S : String;
 begin
-  S:=CheckOptions('c:H:d:u:p:P:o:whvq',LongOptions);
+  S:=CheckOptions('c:H:d:u:p:P:o:whvqal:',LongOptions);
   if (s<>'') or HasOption('h',keyHelp) then
     begin
     Usage(S);
@@ -123,7 +149,7 @@ begin
   MCPLogger.LogToConsole:=False;
 end;
 
-destructor TApplication.destroy;
+destructor TApplication.Destroy;
 begin
   MCPLogger.RemoveLogHandler(@DoMCPLog);
   inherited destroy;
@@ -163,13 +189,16 @@ begin
       S:=ReadString(sDatabase,keyParams,'');
       if S<>'' then
         aInfo.Params:=SplitString(S,',');
+      FListen:=ReadInteger(SServer,keyListen,DefaultListenPort);
+      if ReadBool(SServer,KeyAll,False) then
+        Address:='';
       end;
   finally
     lIni.Free
   end;
 end;
 
-procedure TApplication.parseoptions;
+procedure TApplication.ParseOptions;
 var
   lInfo : TMCPDBConnectionInfo;
 begin
@@ -190,6 +219,15 @@ begin
     MCPLogger.LogLevels:=[Low(TMCPLogType)..High(TMCPLogType)];
   if HasOption('q','quiet') then
     MCPLogger.LogLevels:=[mltError];
+  if HasOption('l','listen') then
+    FListen:=StrToIntDef(GetOptionValue('l','listen'),DefaultListenPort)
+  else
+    FListen:=DefaultListenPort;
+  {$IFDEF HAVEPORT}
+  Port:=FListen;
+  if HasOption('a','all') then
+    Address:='';
+  {$ENDIF}
   TMCPToolConnectionManager.Instance.SetDefaultConnection(lInfo);
   TMCPToolConnectionManager.Instance.AllowModify:=HasOption('w',keyWrite);
 end;
@@ -204,11 +242,17 @@ begin
   Writeln(stdErr,'Usage: ',Paramstr(0),' [options]');
   Writeln(stdErr,'Where options is one or more of:');
   Writeln(stdErr,'-h --help             this help.');
+  {$IFDEF HAVEPORT}
+  Writeln(stdErr,'-a --all              listen on all local interfaces. Default is to listen on 127.0.0.1');
+  {$ENDIF}
   Writeln(stdErr,'-c --config=File      config file for database connection.');
   Writeln(stdErr,'-d --database=DBName  set connection database name.');
   Writeln(stdErr,'-H --host=HOST        set connection host.');
   Writeln(stdErr,'-p --password=PASSWD  set connection password.');
   Writeln(stdErr,'-P --port=NNN         set connection port ');
+  {$IFDEF HAVEPORT}
+  Writeln(stdErr,'-l --listen=NNN       listen on port NNN for MCP requests');
+  {$ENDIF}
   Writeln(stdErr,'-q --quiet            Write less log messages.');
   Writeln(stdErr,'-t --type=DBTYPE      type connection. Allowed types:');
   l:=TStringList.Create;
