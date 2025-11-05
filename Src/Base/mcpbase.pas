@@ -10,14 +10,9 @@ interface
 uses
   mcp.handler, mcp.application.stdio, mcp.transport.base, mcp.logging, mcp.dispatcher.base, mcp.transport.stdio, mcp.stdhandlers, 
   mcp.types, mcp.strings, mcp.resources, mcp.prompts, mcp.tools, mcp.utils, mcp.controller, mcp.dispatcher.serversocket, 
-  mcp.transport.socket, mcp.dispatcher.clientsocket, mcp.application.socket, LazarusPackageIntf;
+  mcp.transport.socket, mcp.dispatcher.clientsocket, mcp.application.socket, mcp.application.http, mcp.transport.http, 
+  mcp.dispatcher.http;
 
 implementation
 
-procedure Register;
-begin
-end;
-
-initialization
-  RegisterPackage('mcpbase', @Register);
 end.

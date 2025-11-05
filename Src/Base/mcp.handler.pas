@@ -29,6 +29,7 @@ Type
   TMCPContext = class(TJSONRPCCallContext)
   private
     FController : TMCPController;
+    FSessionID: String;
     function GetServiceInstructions: String;
     function GetServiceName : String;
     function GetServiceVersion : String;
@@ -41,6 +42,7 @@ Type
     Property ServiceVersion : string Read GetServiceVersion;
     Property ProtocolVersion : string Read GetProtocolVersion;
     property ServiceInstructions : String Read GetServiceInstructions;
+    property SessionID : String Read FSessionID Write FSessionID;
  end;
 
   { TMCPBaseHandler }
@@ -76,7 +78,7 @@ end;
 
 function TMCPContext.NextMessageID: Integer;
 begin
-  FController.NextMessageID;
+  Result:=FController.NextMessageID;
 end;
 
 function TMCPContext.GetServiceName: String;

@@ -79,8 +79,10 @@ Type
     procedure ProcessClientMethodResult(aResponse: TJSONObject; const aID : String; aResult: TJSONData); virtual;
     procedure ProcessClientMethodError(aResponse: TJSONObject; const aID : String; aResult: TJSONData); virtual;
     function GetTransport: TMCPMessageTransport; override;
+    function CreateContext : TMCPContext;  virtual;
+    property JSONDispatcher : TJSONRPCDispatcher read FJSONDispatcher;
   Public
-    Constructor Create(aController : TMCPController);
+    Constructor Create(aController : TMCPController); reintroduce;
     Destructor Destroy; override;
     Property Transport : TMCPMessageTransport Read FTransport Write SetTransport;
     function ExecuteRequest(aRequest : TJSONData): TJSONData; override;
@@ -197,8 +199,14 @@ begin
   Result:=FTransport;
 end;
 
+function TMCPLocalDispatcher.CreateContext: TMCPContext;
+begin
+  Result:=TMCPContext.Create(FController);
+end;
+
 constructor TMCPLocalDispatcher.Create(aController: TMCPController);
 begin
+  inherited create(aController);
   FController:=aController;
   FJSONDispatcher:=TJSONRPCDispatcher.Create(Nil);
   FJSONDispatcher.Transport:=Self.Transport;
@@ -265,7 +273,7 @@ begin
   else
     begin
     // We have a method call from the client to which we must reply
-    Ctx:=TMCPContext.Create(TMCPController.Instance);
+    Ctx:=CreateContext;
     try
       Result:=FJSONDispatcher.Execute(aRequest,Ctx);
       if Result=Nil then

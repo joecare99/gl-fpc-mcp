@@ -2,7 +2,6 @@
 <CONFIG>
   <Package Version="5">
     <Name Value="mcpbase"/>
-    <Type Value="RunAndDesignTime"/>
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
@@ -82,12 +81,19 @@
         <Filename Value="mcp.application.socket.pas"/>
         <UnitName Value="mcp.application.socket"/>
       </Item>
-    </Files>
-    <RequiredPkgs>
       <Item>
-        <PackageName Value="FCL"/>
+        <Filename Value="mcp.application.http.pas"/>
+        <UnitName Value="mcp.application.http"/>
       </Item>
-    </RequiredPkgs>
+      <Item>
+        <Filename Value="mcp.transport.http.pas"/>
+        <UnitName Value="mcp.transport.http"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.dispatcher.http.pas"/>
+        <UnitName Value="mcp.dispatcher.http"/>
+      </Item>
+    </Files>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>
     </UsageOptions>
