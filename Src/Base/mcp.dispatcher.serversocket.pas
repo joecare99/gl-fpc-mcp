@@ -107,13 +107,16 @@ Type
 
   TMCPServerTCPSocketDispatcher = Class (TMCPSocketServer)
   private
+    FAddress: String;
     FPort: Integer;
+    procedure SetAddress(AValue: String);
     procedure setPort(const aValue: Integer);
   Public
     Constructor Create(aOwner : TComponent); override;
     Procedure InitSocket; override;
   Published
-    Property Port : Integer Read FPort Write setPort;
+    Property Port : Integer Read FPort Write SetPort;
+    Property Address: String Read FAddress Write SetAddress;
   end;
 
   { TMCPThread }
@@ -398,6 +401,14 @@ begin
   FPort:=aValue;
 end;
 
+procedure TMCPServerTCPSocketDispatcher.SetAddress(AValue: String);
+begin
+  if FAddress=AValue then Exit;
+  if Assigned(Socket) then
+    Raise EMCPSocket.Create('Socket already initialized');
+  FAddress:=AValue;
+end;
+
 constructor TMCPServerTCPSocketDispatcher.Create(aOwner: TComponent);
 begin
   inherited Create(aOwner);
@@ -406,7 +417,7 @@ end;
 
 procedure TMCPServerTCPSocketDispatcher.InitSocket;
 begin
-  SetServer(TInetServer.Create(FPort));
+  SetServer(TInetServer.Create(FAddress,FPort));
   Socket.ReuseAddress:=True;
 end;
 
