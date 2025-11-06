@@ -24,6 +24,10 @@
         <Filename Value="mcpstrings.pas"/>
         <UnitName Value="mcpstrings"/>
       </Item>
+      <Item>
+        <Filename Value="frmmcpserveropts.pas"/>
+        <UnitName Value="frmmcpserveropts"/>
+      </Item>
     </Files>
     <RequiredPkgs>
       <Item>

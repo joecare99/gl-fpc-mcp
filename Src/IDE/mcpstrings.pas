@@ -6,6 +6,7 @@ interface
 
 const
   cMCPToolName = 'MCPTool';
+  cMCPServer = 'MCP Server';
   cDefaultToolClassName = 'TMyMCPTool';
 
 resourcestring
@@ -21,6 +22,8 @@ resourcestring
   rsToolDescriptionRequired = 'A tool description is required';
   rsToolReturnRequired = 'A tool return type is required';
   rsIncomplete = 'MCP Tool information incomplete';
+  rsMCPServerApplicationName = 'MCP server application';
+  rsMCPServerApplicationDescr = 'An MCP server application that can be called by an AI agent';
 
 implementation
 
