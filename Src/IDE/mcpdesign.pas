@@ -8,7 +8,7 @@ unit mcpdesign;
 interface
 
 uses
-  regmcp, LazarusPackageIntf;
+  regmcp, frmmcptoolopts, mcpstrings, LazarusPackageIntf;
 
 implementation
 
