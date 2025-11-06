@@ -61,15 +61,18 @@ Type
   end;
 
   { TMCPRoute }
+  TAuthenticateRequestEvent = Procedure (Sender : TObject; aRequest : TRequest; var aAllow : Boolean) of object;
 
   TMCPRoute = class(TComponent)
   Private
     class var _instance : TMCPRoute;
   private
     FAllowSSE: Boolean;
+    FOnAuthenticate: TAuthenticateRequestEvent;
     FRequireSessionID: Boolean;
     FSessions : TFPObjectHashTable;
   protected
+    function AuthenticateRequest(aRequest : TRequest; aResponse : TResponse): boolean; virtual;
     function AllocateSession: String; virtual;
     function GetOrCreateSession(const aSessionID : String) : TMCPSession;
     function FindSession(const aSessionID : String) : TMCPSession;
@@ -89,6 +92,8 @@ Type
     property AllowSSE : Boolean Read FAllowSSE Write FAllowSSE;
     // Require session ID ?
     property RequireSessionID : Boolean Read FRequireSessionID Write FRequireSessionID;
+    // Called for all requests
+    Property OnAuthenticate : TAuthenticateRequestEvent Read FOnAuthenticate Write FOnAuthenticate;
   end;
 
 implementation
@@ -109,11 +114,14 @@ procedure TResponseHelper.SetStatus(const aStatus: Integer; aSend: Boolean);
 begin
   Code:=aStatus;
   case aStatus of
-    400 : CodeText:='BAD REQUEST';
-    404 : CodeText:='NOT FOUND';
     200 : CodeText:='OK';
     204 : CodeText:='NO CONTENT';
+    400 : CodeText:='BAD REQUEST';
+    401 : CodeText:='UNAUTHORIZED';
+    404 : CodeText:='NOT FOUND';
   end;
+  if aSend then
+    SendResponse;
 end;
 
 {$ENDIF}
@@ -251,6 +259,8 @@ var
   lSession : TMCPSession;
 {$ENDIF}
 begin
+  if not AuthenticateRequest(aRequest,aResponse) then
+    exit;
 {$IFNDEF USE_EVENTS}
 // No streams in 3.2.2
   lAllow:=False;
@@ -317,6 +327,8 @@ var
 begin
   lSession:=Nil;
   lResponse:=Nil;
+  if not AuthenticateRequest(aRequest,aResponse) then
+    exit;
   // Get JSON-RPC request and extract method
   lRequest:=GetJSONRPC(aRequest,lMethod);
   try
@@ -354,6 +366,15 @@ destructor TMCPRoute.destroy;
 begin
   FreeAndNil(FSessions);
   inherited destroy;
+end;
+
+function TMCPRoute.AuthenticateRequest(aRequest: TRequest; aResponse: TResponse): boolean;
+begin
+  Result:=True;
+  if Assigned(OnAuthenticate) then
+    FOnAuthenticate(Self,aRequest,Result);
+  if not Result then
+    aResponse.SetStatus(401,True);
 end;
 
 function TMCPRoute.AllocateSession: String;
@@ -399,6 +420,8 @@ end;
 
 procedure TMCPRoute.HandleMCPDeleteRequest(ARequest: TRequest; AResponse: TResponse);
 begin
+  if not AuthenticateRequest(aRequest,aResponse) then
+    exit;
   {$IFNDEF USE_EVENTS}
     // No streams in 3.2.2
     aResponse.Code:=405;
