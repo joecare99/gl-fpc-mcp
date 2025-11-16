@@ -16,7 +16,7 @@
 program mcpdbconnector;
 
 { $define usesocket}
-{$define usehttp}
+{ $define usehttp}
 
 {$IFDEF USESOCKET}
 {$DEFINE HAVEPORT}
@@ -190,8 +190,10 @@ begin
       if S<>'' then
         aInfo.Params:=SplitString(S,',');
       FListen:=ReadInteger(SServer,keyListen,DefaultListenPort);
+      {$IFDEF HAVEPORT}
       if ReadBool(SServer,KeyAll,False) then
         Address:='';
+      {$ENDIF}
       end;
   finally
     lIni.Free
