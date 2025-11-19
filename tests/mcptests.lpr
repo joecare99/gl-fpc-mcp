@@ -3,6 +3,10 @@ program mcptests;
 {$mode objfpc}{$H+}
 
 uses
+  {$ifdef unix}
+  cwstring,
+  ffi.manager,
+  {$endif}
   Classes, consoletestrunner, jsonparser,
   mcp.types.test,
   mcp.resources.test,

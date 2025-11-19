@@ -5,22 +5,18 @@ unit mcp.tools.test;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, fpjson,
+  Classes, SysUtils, fpcunit, testregistry, types, fpjson,
   mcp.types,
   mcp.strings,
   mcp.tools;
 
+{$IF DECLARED(TMCPCallTool)}
+{$DEFINE USE_RTTI}
+{$ENDIF}
+
 type
-
-
-
-
-
   TMockToolRegistry = class(TMCPToolRegistry)
   end;
-
-
-
 
   { TTestConcreteTool }
 
@@ -62,6 +58,140 @@ type
     procedure TestToolRegistryLockUnlockList;
     procedure TestToolRegistryInitMethod;
   end;
+
+  {$IFDEF USE_RTTI}
+
+  { TTestCallTool }
+
+  TTestCallTool = Class(TTestCase)
+  public
+    function callTool(aClass: TMCPCallToolClass; aResult: string; aIsText : boolean = True): string;
+  published
+    Procedure TestStringResult;
+    Procedure TestCharResult;
+    Procedure TestAstringResult;
+    Procedure TestUCharResult;
+    Procedure TestWcharResult;
+    Procedure TestWStringResult;
+    Procedure TestIntegerResult;
+    Procedure TestInt64Result;
+    Procedure TestQWordResult;
+    Procedure TestBoolResult;
+    Procedure TestEnumerationResult;
+    Procedure TestFloatResult;
+    Procedure TestSetResult;
+    Procedure TestArrayResult;
+    Procedure TestClassResult;
+    Procedure TestClassRefResult;
+    Procedure TestMCPToolResult;
+    Procedure TestMCPToolArrayResult;
+  end;
+
+  {$RTTI EXPLICIT
+      PROPERTIES([vcPrivate,vcProtected,vcPublic,vcPublished])
+      FIELDS([vcPrivate,vcProtected,vcPublic,vcPublished])
+      METHODS([vcPrivate,vcProtected,vcPublic,vcPublished])}
+
+  TStringCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : shortstring;
+  end;
+
+  TAnsiStringCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : Ansistring;
+  end;
+
+  TMyEnum = (one,two,three);
+  TMyEnums = set of TMyEnum;
+
+  TEnumCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TMyEnum;
+  end;
+
+  TSetCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TMyEnums;
+  end;
+
+  TArrayCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TStringDynArray;
+  end;
+
+  TClassCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TObject;
+  end;
+
+  TClassRefCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TClass;
+  end;
+
+  TWideStringCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : WideString;
+  end;
+
+  TIntegerCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : Integer;
+  end;
+
+  TInt64CallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : Int64;
+  end;
+
+  TQWordCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : QWord;
+  end;
+
+  TBooleanCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : Boolean;
+  end;
+
+  TAnsiCharCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : Ansichar;
+  end;
+
+  TUnicodeCharCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : UnicodeChar;
+  end;
+
+  TWideCharCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : WideChar;
+  end;
+
+  TFloatCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : Double;
+  end;
+
+  { TMCPToolResultCallTool }
+
+  TMCPToolResultCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TMCPToolResult;
+  end;
+
+  { TMCPToolResultArrayCallTool }
+
+  TMCPToolResultArrayCallTool = class(TMCPCallTool)
+  Public
+    function Call(s : string) : TMCPToolResultArray;
+  end;
+
+  {$ENDIF}
+
+
 
 implementation
 
@@ -440,8 +570,7 @@ begin
   end;
 
 
-  FreeAndNil(PPointer(@TMCPToolRegistry._instance)^);
-
+  TMCPToolRegistry.Done;
 
   try
     TMCPToolRegistry.Init(nil);
@@ -450,11 +579,300 @@ begin
     on E: EMCPException do
       AssertEquals('Exception message should be SErrRegistryClassEmpty', SErrRegistryClassEmpty, E.Message);
   end;
+end;
 
+{$IFDEF USE_RTTI}
+function TAnsiStringCallTool.Call(s: string): Ansistring;
+var
+  l : String;
+begin
+  l:='Hello '+S;
+  Result:=l;
+end;
 
+{ TEnumCallTool }
+
+function TEnumCallTool.Call(s: string): TMyEnum;
+begin
+  Result:=Three;
+end;
+
+{ TSetCallTool }
+
+function TSetCallTool.Call(s: string): TMyEnums;
+begin
+  Result:=[one,two];
+end;
+
+{ TArrayCallTool }
+
+function TArrayCallTool.Call(s: string): TStringDynArray;
+begin
+  Result:=['one','two'];
+end;
+
+{ TClassCallTool }
+
+function TClassCallTool.Call(s: string): TObject;
+begin
+  Result:=Self;
+end;
+
+{ TClassRefCallTool }
+
+function TClassRefCallTool.Call(s: string): TClass;
+begin
+  Result:=Self.ClassType
+end;
+
+{ TWideStringCallTool }
+
+function TWideStringCallTool.Call(s: string): WideString;
+begin
+  Result:='Hello '+S;
+end;
+
+{ TAnsicharCallTool }
+
+function TAnsicharCallTool.Call(s: string): Ansichar;
+begin
+  Result:='z';
+end;
+
+{ TUnicodeCharCallTool }
+
+function TUnicodeCharCallTool.Call(s: string): UnicodeChar;
+begin
+  Result:=UTF8Decode('é')[1];
+end;
+
+{ TWideCharCallTool }
+
+function TWideCharCallTool.Call(s: string): WideChar;
+begin
+  Result:=UTF8Decode('é')[1];
+end;
+
+{ TFloatCallTool }
+
+function TFloatCallTool.Call(s: string): Double;
+begin
+  Result:=123;
+end;
+
+{ TMCPToolResultCallTool }
+
+function TMCPToolResultCallTool.Call(s: string): TMCPToolResult;
+begin
+  Result:=TMCPToolResult.CreateResource('blob','application/text',S);
+end;
+
+{ TMCPToolResultArrayCallTool }
+
+function TMCPToolResultArrayCallTool.Call(s: string): TMCPToolResultArray;
+begin
+  SetLength(Result,1);
+  Result[0]:=TMCPToolResult.CreateResource('blob','application/text',S);
+end;
+
+{ TAnsiStringCallTool }
+
+function TIntegerCallTool.Call(s: string): Integer;
+begin
+  Result:=123;
+end;
+
+{ TInt64CallTool }
+
+function TInt64CallTool.Call(s: string): Int64;
+begin
+  Result:=123
+end;
+
+{ TQWordCallTool }
+
+function TQWordCallTool.Call(s: string): QWord;
+begin
+  Result:=123;
+end;
+
+{ TBooleanCallTool }
+
+function TBooleanCallTool.Call(s: string): Boolean;
+begin
+  Result:=S<>'';
+end;
+
+{ TStringCallTool }
+
+function TStringCallTool.Call(s: string): shortstring;
+begin
+  Result:='';
+  Result:='Hello '+s;
 end;
 
 
+{ TTestCallTool }
+
+function TTestCallTool.callTool(aClass: TMCPCallToolClass; aResult: string; aIsText: boolean): string;
+var
+  lTool : TMCPCallTool;
+  lData : TJSONData;
+  lObj : TJSONObject absolute lData;
+  lInput,lOutput : TJSONObject;
+  S : String;
+begin
+  lInput:=Nil;
+  lTool:=aClass.create('test','descr');
+  try
+    lInput:=TJSONObject.Create(['s','input']);
+    lOutput:=TJSONObject.Create;
+    lTool.Execute(lInput,lOutput);
+    lData:=lOutput.Get('content',TJSONArray(Nil));
+    AssertNotNull('Have content',lData);
+    AssertEquals('Content element count',1,lData.Count);
+    lData:=lData.Items[0];
+    AssertEquals('Content 0 is object',TJSONObject,lData.ClassType);
+    if aIsText then
+      begin
+      AssertEquals('Object contains text','text',lObj.Get('type',''));
+      S:=lObj.Get('text','');
+      AssertEquals('Correct result content',aResult,S);
+      end;
+    Result:=lData.AsJSON;
+  finally
+    lTool.Free;
+    lInput.Free;
+    lOutput.Free;
+  end;
+end;
+
+procedure TTestCallTool.TestStringResult;
+begin
+  CallTool(TStringCallTool,'Hello input')
+end;
+
+procedure TTestCallTool.TestCharResult;
+begin
+  CallTool(TAnsiCharCallTool,'z')
+end;
+
+procedure TTestCallTool.TestAstringResult;
+begin
+  CallTool(TAnsiStringCallTool,'Hello input');
+end;
+
+procedure TTestCallTool.TestUCharResult;
+begin
+  CallTool(TUnicodeCharCallTool,'é')
+end;
+
+procedure TTestCallTool.TestWcharResult;
+begin
+  CallTool(TWideCharCallTool,'é')
+end;
+
+procedure TTestCallTool.TestWStringResult;
+begin
+  CallTool(TWidestringCallTool,'Hello input');
+end;
+
+procedure TTestCallTool.TestIntegerResult;
+begin
+  CallTool(TIntegerCallTool,'123')
+end;
+
+procedure TTestCallTool.TestInt64Result;
+begin
+  CallTool(TInt64CallTool,'123')
+end;
+
+procedure TTestCallTool.TestQWordResult;
+begin
+  CallTool(TQWordCallTool,'123')
+end;
+
+procedure TTestCallTool.TestBoolResult;
+begin
+  CallTool(TBooleanCallTool,'True')
+end;
+
+procedure TTestCallTool.TestEnumerationResult;
+begin
+  CallTool(TEnumCallTool,'three')
+end;
+
+procedure TTestCallTool.TestFloatResult;
+begin
+  CallTool(TFloatCallTool,'1.2300000000000000E+002')
+end;
+
+procedure TTestCallTool.TestSetResult;
+begin
+  CallTool(TSetCallTool,'[one,two]')
+end;
+
+procedure TTestCallTool.TestArrayResult;
+begin
+  CallTool(TArrayCallTool,'["one", "two"]')
+end;
+
+procedure TTestCallTool.TestClassResult;
+begin
+  CallTool(TClassCallTool,'TClassCallTool')
+end;
+
+procedure TTestCallTool.TestClassRefResult;
+begin
+  CallTool(TClassRefCallTool,'TClassRefCallTool')
+end;
+
+procedure TTestCallTool.TestMCPToolResult;
+var
+  S : String;
+  lData : TJSONData;
+  lJSON : TJSONObject absolute lData;
+  lRes : TJSONObject;
+begin
+  S:=CallTool(TMCPToolResultCallTool,'',False);
+  Writeln('S : ',S);
+  lData:=GetJSON(S);
+  try
+    AssertEquals('Object',TJSONObject,lData.ClassType);
+    AssertEquals('Type','resource',lJSON.Get('type',''));
+    lRes:=lJSON.get('resource',TJSONObject(nil));
+    AssertEquals('Mime type','application/text',lRes.Get('mimeType',''));
+    AssertEquals('Content','input',lRes.Get('text',''));
+  finally
+    lData.Free;
+  end;
+end;
+
+procedure TTestCallTool.TestMCPToolArrayResult;
+
+var
+  S : String;
+  lData : TJSONData;
+  lJSON : TJSONObject absolute lData;
+  lRes : TJSONObject;
+begin
+  S:=CallTool(TMCPToolResultArrayCallTool,'',False);
+  Writeln('S : ',S);
+  lData:=GetJSON(S);
+  try
+    AssertEquals('Object',TJSONObject,lData.ClassType);
+    AssertEquals('Type','resource',lJSON.Get('type',''));
+    lRes:=lJSON.get('resource',TJSONObject(nil));
+    AssertEquals('Mime type','application/text',lRes.Get('mimeType',''));
+    AssertEquals('Content','input',lRes.Get('text',''));
+  finally
+    lData.Free;
+  end;
+end;
+
+{$endif}
+
+
 initialization
-  RegisterTest(TMCPToolsTest);
+  RegisterTests([TMCPToolsTest, TTestCallTool]);
 end.

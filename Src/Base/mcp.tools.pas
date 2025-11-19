@@ -17,10 +17,17 @@ unit mcp.tools;
 
 {$mode objfpc}{$H+}
 {$modeswitch advancedrecords}
+
+{$IFNDEF VER3_2}
+{$DEFINE USE_RTTI}
+{$ENDIF}
+
 interface
 
 uses
-  Classes, SysUtils, fpJSON, contnrs, syncobjs, mcp.utils, mcp.types;
+  Classes, SysUtils, fpJSON, contnrs, syncobjs,
+  {$IFDEF USE_RTTI}typinfo, rtti, fpjsonvalue,{$ENDIF}
+  mcp.utils, mcp.types;
 
 type
   TMCPToolRegistry = class;
@@ -47,8 +54,10 @@ type
     Procedure ToJSON(aJSON : TJSONObject);
     Function ToJSON : TJSONObject;
   end;
+  PMCPToolResult = ^TMCPToolResult;
 
   TMCPToolResultArray = Array of TMCPToolResult;
+  PMCPToolResultArray = ^TMCPToolResultArray;
 
   TToolInvocationEvent = Procedure (aInput : TJSONData; var aOutput : TMCPToolResultArray) of object;
 
@@ -99,6 +108,21 @@ type
     constructor create(const aName,aDescription : String; aOnExecute : TToolInvocationEvent); reintroduce; virtual;
   end;
 
+  {$IFDEF USE_RTTI}
+
+  { TMCPCallTool }
+  TMCPCallTool = class(TMCPTool)
+  protected
+    // Looks for a method called 'Call' and executes it. Attempts to convert the result to a single string.
+    procedure DoExecute(aInput : TJSONObject; var aResult : TMCPToolResultArray); override;
+    function CallResultToToolResult(aResult: TValue; aType: TRttiType): TMCPToolResultArray; virtual;
+    class function JSONToValue(aData: TJSONData; aType: TRttiType): TValue;
+    class function ValueToJSON(const aValue: TValue; aType: TRttiType): TJSONData;
+  end;
+  TMCPCallToolClass = class of TMCPCallTool;
+  {$ENDIF}
+
+
   { TMCPToolRegistry }
 
   TMCPToolRegistry = Class(TObject)
@@ -136,7 +160,7 @@ Function ToolRegistry : TMCPToolRegistry;
 
 implementation
 
-uses base64, mcp.logging, mcp.strings;
+uses base64, dateutils, mcp.logging, mcp.strings;
 
 function ToolRegistry: TMCPToolRegistry;
 begin
@@ -275,6 +299,146 @@ begin
   FOnExecute:=AOnExecute;
 end;
 
+{$IFDEF USE_RTTI}
+
+{ TMCPCallTool }
+class function TMCPCallTool.ValueToJSON(const aValue: TValue; aType: TRttiType): TJSONData;
+begin
+  result:={$IFDEF FPC_DOTTEDUNITS}FpJson.Value{$ELSE}fpjsonvalue{$ENDIF}.ValueToJSON(aValue,aType);
+end;
+
+class function TMCPCallTool.JSONToValue  (aData: TJSONData; aType: TRttiType): TValue;
+
+begin
+  result:={$IFDEF FPC_DOTTEDUNITS}FpJson.Value{$ELSE}fpjsonvalue{$ENDIF}.JSONToValue(aData,aType);
+end;
+
+procedure TMCPCallTool.DoExecute(aInput: TJSONObject; var aResult: TMCPToolResultArray);
+var
+  lMethod : TRttiMethod;
+  Ctx : TRttiContext;
+  lType,lResultType : TRttiType;
+  lParams : specialize TArray<TRttiParameter>;
+  lParam : TRttiParameter;
+  lValue : TJSONData;
+  lArgs: array of TValue;
+  argIdx : Integer;
+  lRes : TValue;
+  lObj : TObject;
+
+begin
+  Ctx:=TRttiContext.Create(False);
+  lType:=Ctx.GetType(Self.ClassType);
+  lMethod:=lType.GetMethod('Call');
+  if (lMethod=Nil) then
+    Raise EMCPException.Create('No "Call" method found in MCP tool '+ClassName);
+  lParams := lMethod.GetParameters;
+  argIdx:=0;
+  Setlength(lArgs,Length(lParams));
+  for lParam in lParams do
+    begin
+    if pfHidden in lParam.Flags then
+      Continue
+    else
+      if ([pfVar,pfOut] * lParam.Flags)<>[] then
+        Raise EMCPException.Create('Call method cannot have var/out params');
+    lValue:=aInput.Elements[lParam.Name];
+    lArgs[argidx] := JSONToValue(lValue, lParam.ParamType);
+    Inc(argidx);
+    end;
+  SetLength(lArgs,argidx);
+  lRes:=TValue.Empty;
+  lObj:=Self;
+  lRes:=lMethod.Invoke(lObj,lArgs);
+  lResultType:=lMethod.ReturnType;
+  aResult:=CallResultToToolResult(lRes,lResultType);
+end;
+
+function TMCPCallTool.CallResultToToolResult(aResult: TValue; aType : TRttiType) : TMCPToolResultArray;
+
+var
+  S : String;
+  lData : TJSONData;
+  lInfo : PTypeInfo;
+begin
+  lInfo:=aType.Handle;
+  if lInfo=TypeInfo(TMCPToolResultArray) then
+    begin
+    Result:=PMCPToolResultArray(aResult.GetReferenceToRawData)^;
+    exit;
+    end;
+  if lInfo=TypeInfo(TMCPToolResult) then
+    begin
+    SetLength(Result,1);
+    Result[0]:=PMCPToolResult(aResult.GetReferenceToRawData)^;
+    exit;
+    end;
+  case lInfo^.Kind of
+    tkString :
+      S:=aResult.AsAnsiString;
+    tkChar:
+      S:=aResult.AsAnsiChar;
+    tkAstring:
+      S:=aResult.AsAnsiString;
+    tkUChar:
+      S:=UTF8Encode(aResult.AsWideChar);
+    tkUString:
+      S:=UTF8Encode(aResult.AsUnicodeString);
+    tkWchar:
+      S:=UTF8Encode(aResult.AsWideChar);
+    tkWString:
+      S:=UTF8Encode(aResult.AsUnicodeString);
+    tkInteger:
+      S:=IntToStr(aResult.AsInteger);
+    tkInt64:
+      S:=IntToStr(aResult.AsInt64);
+    tkQWord:
+      S:=IntToStr(aResult.AsInt64); // not so good
+    tkBool:
+      S:=BoolToStr(aResult.AsBoolean,'True','False');
+    tkEnumeration:
+      S:=GetEnumName(aType.Handle,aResult.AsOrdinal);
+    tkFloat:
+     begin
+     if (lInfo = TypeInfo(TDateTime))
+        or (lInfo = TypeInfo(TDate))
+        or (lInfo = TypeInfo(TTime)) then
+          begin
+          S:=DateToISO8601(aResult.AsDateTime,False);
+          end
+     else
+       begin
+       Str(aResult.AsDouble,S);
+       S:=TrimLeft(S);
+       end;
+     end;
+    tkSet:
+      S:=aResult.ToString;
+    tkArray,
+    tkDynArray:
+      begin
+      lData:=ValueToJSON(aResult,aType);
+      try
+        S:=lData.AsJSON;
+      finally
+        lData.Free;
+      end;
+      end;
+    tkClass:
+      begin
+      if GetTypeData(lInfo)^.ClassType.InheritsFrom(TJSONData) then
+        S:=TJSONData(aResult.AsObject).AsJSON
+      else
+        S:=aResult.AsObject.ToString;
+      end;
+    tkClassRef:
+      S:=aResult.AsClass.ClassName;
+  end;
+  SetLength(Result,1);
+  Result[0]:=TMCPToolResult.CreateText(S);
+end;
+
+{$ENDIF}
 { TMCPToolRegistry }
 
 class function TMCPToolRegistry.GetInstance: TMCPToolRegistry; static;
