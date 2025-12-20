@@ -272,6 +272,7 @@ procedure TMCPToolsTest.TestToolCreationAndProperties;
 var
   Tool: TTestConcreteTool;
   TestMeta: TJSONObject;
+  Annotation: TMCPAnnotation;
 begin
   Tool := TTestConcreteTool.Create('test_tool_name', 'This is a test tool description.');
   TestMeta := TJSONObject.Create;
@@ -285,8 +286,13 @@ begin
     AssertFalse('Annotations should be uninitialized by default', Tool.Annotations.Initialized);
     Tool._Meta := TestMeta;
     AssertSame('_Meta property should return the assigned object', TestMeta, Tool._Meta);
-    Tool.Annotations.Priority := True;
-    Tool.Annotations.Roles:=Tool.Annotations.Roles+[prAssistant];
+
+    // Create a complete annotation record and assign it
+    Annotation := Tool.Annotations; // Start with current annotation
+    Annotation.Priority := True;
+    Annotation.Roles := Annotation.Roles + [prAssistant];
+    Tool.Annotations := Annotation; // Assign the complete record back
+
     AssertTrue('Annotations.Priority should be true', Tool.Annotations.Priority);
     AssertTrue('Annotations.Roles should include prAssistant', prAssistant in Tool.Annotations.Roles);
   finally
@@ -874,5 +880,8 @@ end;
 
 
 initialization
-  RegisterTests([TMCPToolsTest, TTestCallTool]);
+  RegisterTests([TMCPToolsTest]);
+  {$IFDEF USE_RTTI}
+  RegisterTest([TTestCallTool]);
+  {$ENDIF}
 end.

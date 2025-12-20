@@ -14,7 +14,13 @@ uses
   mcp.prompts.test,
   mcp.promptregistry.test,
   mcp.tools.test,
-  mcp.toolregistry.test;
+  mcp.toolregistry.test,
+  mcp.client.rpcerror.test,
+  mcp.client.robustness.test,
+  mcp.client.initialize.test,
+  mcp.client.calls.test,
+  mcp.logging,
+  list_serialization_test;
 
 type
 
@@ -28,6 +34,7 @@ var
   Application: TMyTestRunner;
 
 begin
+  mcp.logging.MCPLogger.Enabled:=False;
   DefaultRunAllTests:=True;
   DefaultFormat:=fPlain;
   Application := TMyTestRunner.Create(nil);

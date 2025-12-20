@@ -210,10 +210,9 @@ begin
   try
     Resource.Title:='My Title';
     AssertEquals('Title should be settable and gettable', 'My Title', Resource.Title);
-    AssertEquals('Description should reflect Title', 'My Title', Resource.Description);
-    Resource.Description:='New Description';
-    AssertEquals('Description should be settable and gettable', 'New Description', Resource.Description);
-    AssertEquals('Title should reflect Description', 'New Description', Resource.Title);
+    Resource.Description:='My Description';
+    AssertEquals('Description should be settable and gettable', 'My Description', Resource.Description);
+    AssertEquals('Title and Description should be independent', 'My Title', Resource.Title);
     Resource.MimeType:='application/json';
     AssertEquals('MimeType should be settable and gettable', 'application/json', Resource.MimeType);
     Resource.Name:='NewName';
@@ -308,6 +307,7 @@ begin
   Resource:=TMCPResource.Create('http://json.test/res1', 'json1');
   try
     Resource.Title:='JSON Test Resource';
+    Resource.Description:='JSON Test Resource';
     Resource.MimeType:='text/plain';
     JSON:=Resource.ToJSON(False);
     AssertNotNull('ToJSON should return a JSON object', JSON);

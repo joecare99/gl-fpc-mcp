@@ -31,6 +31,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="mcpclient"/>
+      </Item>
+      <Item>
         <PackageName Value="mcpbase"/>
       </Item>
       <Item>
@@ -68,6 +71,26 @@
       </Unit>
       <Unit>
         <Filename Value="mcp.toolregistry.test.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="mcp.client.rpcerror.test.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="mcp.client.robustness.test.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="mcp.client.initialize.test.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="mcp.client.calls.test.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="list_serialization_test.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
