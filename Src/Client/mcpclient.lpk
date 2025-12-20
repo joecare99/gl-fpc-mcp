@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <Name Value="mcpclient"/>
+    <Type Value="RunAndDesignTime"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Files>
+      <Item>
+        <Filename Value="mcp.client.base.pas"/>
+        <UnitName Value="MCP.Client.Base"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.client.process.pas"/>
+        <UnitName Value="MCP.Client.Process"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.client.stdio.pas"/>
+        <UnitName Value="MCP.Client.StdIO"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.client.calls.pas"/>
+        <UnitName Value="MCP.Client.Calls"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="mcpbase"/>
+      </Item>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>
