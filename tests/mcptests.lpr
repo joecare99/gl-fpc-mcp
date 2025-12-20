@@ -20,7 +20,7 @@ uses
   mcp.client.initialize.test,
   mcp.client.calls.test,
   mcp.logging,
-  list_serialization_test;
+  mcp.listserialization.test;
 
 type
 

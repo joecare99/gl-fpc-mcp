@@ -90,7 +90,7 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="list_serialization_test.pas"/>
+        <Filename Value="mcp.listserialization.test.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
