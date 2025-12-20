@@ -35,40 +35,20 @@ type
 
 
   { TMCPTool }
-  TMCPToolContentType = (ctText,ctImage,ctAudio,ctResource);
-
-  { TMCPToolResult }
-
-  TMCPToolResult = record
-    ContentType : TMCPToolContentType;
-    MimeType : string;
-    Content: string; // uri in case of resource
-    Description : String;
-    constructor CreateText(aText : string);
-    constructor CreateText(aJSON : TJSONObject);
-    constructor CreateImage(aMime : string; aData : TBytes);
-    constructor CreateImage(aMime : string; aData : TStream);
-    constructor CreateAudio(aMime : string; aData : TBytes);
-    constructor CreateAudio(aMime : string; aData : TStream);
-    constructor CreateResource(aURI,aMime,aDescription : string);
-    Procedure ToJSON(aJSON : TJSONObject);
-    Function ToJSON : TJSONObject;
-  end;
-  PMCPToolResult = ^TMCPToolResult;
-
-  TMCPToolResultArray = Array of TMCPToolResult;
-  PMCPToolResultArray = ^TMCPToolResultArray;
+  // TMCPToolContentType, TMCPToolResult, TMCPToolResultArray now in mcp.types
 
   TToolInvocationEvent = Procedure (aInput : TJSONData; var aOutput : TMCPToolResultArray) of object;
 
   TMCPTool = class abstract (TObject)
   private
-    FAnnotations: TMCPAnnotation;
-    FDescription: String;
-    FInputSchema: TMCPSchema;
-    FMeta: TJSONObject;
-    FName: String;
-    FOutputSchema: TMCPSchema;
+    FInfo: TMCPToolInfo;
+    function GetName: String;
+    function GetDescription: String;
+    function GetInputSchema: TMCPSchema;
+    function GetOutputSchema: TMCPSchema;
+    function GetAnnotations: TMCPAnnotation;
+    function GetMeta: TJSONObject;
+    procedure SetAnnotations(AValue: TMCPAnnotation);
     procedure SetMeta(AValue: TJSONObject);
   protected
     // Send messages to log facility
@@ -85,14 +65,17 @@ type
     destructor destroy; override;
     procedure Register(aRegistry : TMCPToolRegistry = Nil);
     procedure Execute(aInput : TJSONObject; aResult : TJSONObject);
-    Property Name : String read FName;
-    property Description : String Read FDescription;
-    Property InputSchema : TMCPSchema Read FInputSchema;
-    Property Annotations : TMCPAnnotation Read FAnnotations Write FAnnotations;
+    Property Name : String read GetName;
+    property Description : String Read GetDescription;
+    Property InputSchema : TMCPSchema Read GetInputSchema;
+    Property OutputSchema : TMCPSchema Read GetOutputSchema;
+    Property Annotations : TMCPAnnotation Read GetAnnotations Write SetAnnotations;
     procedure ToJSON(aJSON : TJSONObject); virtual;
     function ToJSON() : TJSONObject;
     // Owned by the tool
-    Property _Meta : TJSONObject Read FMeta Write SetMeta;
+    Property _Meta : TJSONObject Read GetMeta Write SetMeta;
+    // Access to info object
+    Property Info: TMCPToolInfo read FInfo;
   end;
   TMCPToolArray = Array of TMCPTool;
 
@@ -169,11 +152,44 @@ end;
 
 { TMCPTool }
 
+function TMCPTool.GetName: String;
+begin
+  Result:=FInfo.Name;
+end;
+
+function TMCPTool.GetDescription: String;
+begin
+  Result:=FInfo.Description;
+end;
+
+function TMCPTool.GetInputSchema: TMCPSchema;
+begin
+  Result:=FInfo.InputSchema;
+end;
+
+function TMCPTool.GetOutputSchema: TMCPSchema;
+begin
+  Result:=FInfo.OutputSchema;
+end;
+
+function TMCPTool.GetAnnotations: TMCPAnnotation;
+begin
+  Result:=FInfo.FAnnotations;
+end;
+
+function TMCPTool.GetMeta: TJSONObject;
+begin
+  Result:=FInfo._Meta;
+end;
+
+procedure TMCPTool.SetAnnotations(AValue: TMCPAnnotation);
+begin
+  FInfo.FAnnotations:=AValue;
+end;
+
 procedure TMCPTool.SetMeta(AValue: TJSONObject);
 begin
-  if FMeta=AValue then Exit;
-  FreeAndNil(FMeta);
-  FMeta:=AValue;
+  FInfo._Meta:=AValue;
 end;
 
 procedure TMCPTool.DoLog(aType: TMCPLogType; const aMessage: String);
@@ -218,17 +234,12 @@ end;
 
 constructor TMCPTool.create(const aName: string; const aDescription: string);
 begin
-  FInputSchema:=TMCPSchema.Create;
-  FOutputSchema:=TMCPSchema.Create;
-  FName:=aName;
-  FDescription:=aDescription;
+  FInfo:=TMCPToolInfo.Create(aName,aDescription);
 end;
 
 destructor TMCPTool.destroy;
 begin
-  _Meta:=Nil;
-  FreeAndNil(FInputSchema);
-  FreeAndNil(FOutputSchema);
+  FreeAndNil(FInfo);
   inherited destroy;
 end;
 
@@ -261,26 +272,13 @@ begin
 end;
 
 procedure TMCPTool.ToJSON(aJSON: TJSONObject);
-var
-  Anns : TJSONObject;
 begin
-  aJSON.Add('name',Name);
-  aJSON.Add('description',Description);
-  Anns:=Annotations.ToJSON;
-  if assigned(Anns) then
-    aJSON.Add('annotations',Anns);
-  aJSON.Add('inputSchema',InputSchema.ToJSON);
+  FInfo.ToJSON(aJSON);
 end;
 
 function TMCPTool.ToJSON: TJSONObject;
 begin
-  Result:=TJSONObject.Create;
-  try
-    ToJSON(Result);
-  except
-    Result.Free;
-    Raise;
-  end;
+  Result:=FInfo.ToJSON;
 end;
 
 { TMCPEventTool }
@@ -332,7 +330,7 @@ begin
   lMethod:=lType.GetMethod('Call');
   if (lMethod=Nil) then
     Raise EMCPException.Create('No "Call" method found in MCP tool '+ClassName);
-  lParams := lMethod.GetParameters;
+  lParams:=lMethod.GetParameters;
   argIdx:=0;
   Setlength(lArgs,Length(lParams));
   for lParam in lParams do
@@ -343,7 +341,7 @@ begin
       if ([pfVar,pfOut] * lParam.Flags)<>[] then
         Raise EMCPException.Create('Call method cannot have var/out params');
     lValue:=aInput.Elements[lParam.Name];
-    lArgs[argidx] := JSONToValue(lValue, lParam.ParamType);
+    lArgs[argidx]:=JSONToValue(lValue, lParam.ParamType);
     Inc(argidx);
     end;
   SetLength(lArgs,argidx);
@@ -543,137 +541,6 @@ end;
 class procedure TMCPToolRegistry.Done;
 begin
   FreeAndNil(_instance);
-end;
-
-{ TMCPToolResult }
-
-constructor TMCPToolResult.CreateText(aText: string);
-begin
-  ContentType:=ctText;
-  Content:=aText;
-  MimeType:='text/plain';
-end;
-
-constructor TMCPToolResult.CreateText(aJSON: TJSONObject);
-begin
-  ContentType:=ctText;
-  Content:=aJSON.AsJSON;
-  MimeType:='text/plain'; // or
-end;
-
-Function StreamToBase64(aStream : TStream) : String;
-var
-  Enc : TBase64EncodingStream;
-  S : TStringStream;
-
-begin
-  Enc:=Nil;
-  S:=TStringStream.Create;
-  try
-    Enc:=TBase64EncodingStream.Create(S);
-    Enc.CopyFrom(aStream,0);
-    Enc.Flush;
-    Result:=S.DataString;
-  finally
-    Enc.Free;
-    S.Free;
-  end;
-
-end;
-
-Function BytesToBase64(aBytes : TBytes) : String;
-
-var
-  Enc : TBase64EncodingStream;
-  S : TStringStream;
-
-begin
-  Enc:=Nil;
-  S:=TStringStream.Create;
-  try
-    Enc:=TBase64EncodingStream.Create(S);
-    Enc.WriteBuffer(aBytes[0],length(aBytes));
-    Enc.Flush;
-    Result:=S.DataString;
-  finally
-    Enc.Free;
-    S.Free;
-  end;
-end;
-
-constructor TMCPToolResult.CreateImage(aMime: string; aData: TBytes);
-begin
-  ContentType:=ctImage;
-  MimeType:=aMime;
-  Content:=BytesToBase64(aData);
-end;
-
-constructor TMCPToolResult.CreateImage(aMime: string; aData: TStream);
-begin
-  ContentType:=ctImage;
-  MimeType:=aMime;
-  Content:=StreamToBase64(aData);
-end;
-
-constructor TMCPToolResult.CreateAudio(aMime: string; aData: TBytes);
-begin
-  ContentType:=ctAudio;
-  MimeType:=aMime;
-  Content:=BytesToBase64(aData);
-end;
-
-constructor TMCPToolResult.CreateAudio(aMime: string; aData: TStream);
-begin
-  ContentType:=ctAudio;
-  MimeType:=aMime;
-  Content:=StreamToBase64(aData);
-end;
-
-constructor TMCPToolResult.CreateResource(aURI, aMime, aDescription: string);
-begin
-  ContentType:=ctResource;
-  MimeType:=aMime;
-  Content:=aURI;
-  Description:=aDescription;
-end;
-
-procedure TMCPToolResult.ToJSON(aJSON: TJSONObject);
-
-Const
-  ResTypes : array[TMCPToolContentType] of string = ('text','image','audio','resource');
-
-begin
-  aJSON.Add('type',ResTypes[ContentType]);
-  case ContentType of
-    ctText :
-      aJSON.Add('text',Content);
-    ctAudio,
-    ctImage :
-      begin
-      aJSON.Add('mimeType',mimeType);
-      aJSON.Add('data',Content);
-      end;
-    ctResource:
-      begin
-      aJSON.Add('resource',TJSONObject.Create([
-        'uri',Content,
-        'mimeType',mimeType,
-        'text',Description
-      ]));
-      end;
-  end;
-
-end;
-
-function TMCPToolResult.ToJSON: TJSONObject;
-begin
-  Result:=TJSONObject.Create;
-  try
-    ToJSON(Result);
-  except
-    Result.Free;
-    Raise;
-  end;
 end;
 
 finalization

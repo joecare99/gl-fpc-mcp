@@ -33,18 +33,6 @@ type
 
 { TMCPPrompt }
 
-  { TPromptArgument }
-
-  TPromptArgument = record
-    Name : string;
-    Description : string;
-    Required : boolean;
-    Constructor create(const aName: String; const aDescription : String; aRequired : Boolean = true);
-    procedure ToJSON(aJSON: TJSONObject);
-    function ToJSON : TJSONObject;
-  end;
-  TPromptArgumentArray = array of TPromptArgument;
-
   { TMCPPromptMessage }
 
   TMCPPromptMessage = record
@@ -77,19 +65,22 @@ type
   TMCPPromptCompletionEvent = Procedure(Sender: TMCPPrompt; Const aArgName : string ; aPreviousCompletions, aCompletions : TStrings) of object;
   TMCPPrompt = Class(TObject)
   private
-    FName: string;
+    FInfo: TMCPPromptInfo;
     FOnCompletion: TMCPPromptCompletionEvent;
-    FTitle: string;
-    FDescription : string;
-    FArguments : TPromptArgumentArray;
     function GetArgument(aIndex : integer): TPromptArgument;
     function GetArgumentCount: integer;
+    function GetName: String;
+    function GetTitle: String;
+    function GetDescription: String;
     procedure SetName(const AValue: String);
+    procedure SetTitle(const AValue: String);
+    procedure SetDescription(const AValue: String);
   protected
     procedure ToJSON(aJSON : TJSONObject); virtual;
     Procedure GetCompletions(const aArgName : string ; aPreviousCompletions, aCompletions : TStrings); virtual;
   Public
     constructor Create(const aName,aTitle : String; aDescription: String = '');
+    destructor Destroy; override;
     procedure Register(aRegistry : TMCPPromptRegistry = Nil);
     function GetCompletions(const aArgName : String; aPreviousCompletions : TStrings) : TStringDynArray;
     procedure AddArgument(const aName,aDescription : String; aRequired : Boolean = true);
@@ -99,10 +90,12 @@ type
     function ToJSON() : TJSONObject;
     property Arguments[aIndex : integer] : TPromptArgument Read GetArgument;
     property ArgumentCount : integer Read GetArgumentCount;
-    property Title : string Read FTitle Write FTitle;
-    Property Description : string read FDescription Write FDescription;
-    Property Name : string Read FName Write SetName;
-    Property OnCompletion : TMCPPromptCompletionEvent Read FOnCompletion Write FOnCOmpletion;
+    property Title : string Read GetTitle Write SetTitle;
+    Property Description : string read GetDescription Write SetDescription;
+    Property Name : string Read GetName Write SetName;
+    Property OnCompletion : TMCPPromptCompletionEvent Read FOnCompletion Write FOnCompletion;
+    // Access to info object
+    Property Info: TMCPPromptInfo read FInfo;
   end;
 
   { TMCPTemplatePrompt }
@@ -274,33 +267,6 @@ begin
   FreeAndNil(_instance);
 end;
 
-{ TPromptArgument }
-
-constructor TPromptArgument.create(const aName : String; const aDescription: String;
-  aRequired: Boolean);
-begin
-  Name:=aName;
-  Description:=aDescription;
-  Required:=aRequired;
-end;
-
-procedure TPromptArgument.ToJSON(aJSON: TJSONObject);
-begin
-  aJSON.Add('name',Name);
-  aJSON.Add('description',Description);
-  aJSON.Add('required',Required);
-end;
-
-function TPromptArgument.ToJSON: TJSONObject;
-begin
-  Result:=TJSONObject.Create;
-  try
-    ToJSON(Result);
-  except
-    Result.Free;
-    Raise;
-  end;
-end;
 
 { TMCPPromptMessage }
 
@@ -423,35 +389,49 @@ begin
 
 end;
 
-procedure TMCPPrompt.SetName(const AValue: String);
+function TMCPPrompt.GetArgument(aIndex: integer): TPromptArgument;
 begin
-  if aValue='' then
-    Raise EMCPException.Create(SErrPromptNameRequired);
-  FName:=AValue;
-end;
-
-function TMCPPrompt.GetArgument(aIndex : integer): TPromptArgument;
-begin
-  Result:=FArguments[aIndex];
+  Result:=FInfo.Arguments[aIndex];
 end;
 
 function TMCPPrompt.GetArgumentCount: integer;
 begin
-  Result:=Length(FArguments);
+  Result:=FInfo.ArgumentCount;
+end;
+
+function TMCPPrompt.GetName: String;
+begin
+  Result:=FInfo.Name;
+end;
+
+function TMCPPrompt.GetTitle: String;
+begin
+  Result:=FInfo.Title;
+end;
+
+function TMCPPrompt.GetDescription: String;
+begin
+  Result:=FInfo.Description;
+end;
+
+procedure TMCPPrompt.SetName(const AValue: String);
+begin
+  FInfo.Name:=AValue;
+end;
+
+procedure TMCPPrompt.SetTitle(const AValue: String);
+begin
+  FInfo.Title:=AValue;
+end;
+
+procedure TMCPPrompt.SetDescription(const AValue: String);
+begin
+  FInfo.Description:=AValue;
 end;
 
 procedure TMCPPrompt.ToJSON(aJSON: TJSONObject);
-var
-  Arr : TJSONArray;
-  I : Integer;
 begin
-  aJSON.Add('name',Name);
-  aJSON.Add('title',Title);
-  aJSON.Add('description',Description);
-  Arr:=TJSONArray.Create;
-  aJSON.Add('arguments',Arr);
-  For I:=0 to Length(FArguments)-1 do
-    Arr.Add(FArguments[i].ToJSON);
+  FInfo.ToJSON(aJSON);
 end;
 
 procedure TMCPPrompt.GetCompletions(const aArgName: string;
@@ -461,12 +441,15 @@ begin
     FOnCompletion(Self,aArgName,aPreviousCompletions,aCompletions);
 end;
 
-constructor TMCPPrompt.Create(const aName, aTitle: String; aDescription: String
-  );
+constructor TMCPPrompt.Create(const aName, aTitle: String; aDescription: String);
 begin
-  Name:=aName;
-  FTitle:=aTitle;
-  FDescription:=aDescription;
+  FInfo:=TMCPPromptInfo.Create(aName, aTitle, aDescription);
+end;
+
+destructor TMCPPrompt.Destroy;
+begin
+  FInfo.Free;
+  inherited Destroy;
 end;
 
 procedure TMCPPrompt.Register(aRegistry : TMCPPromptRegistry = Nil);
@@ -494,16 +477,12 @@ end;
 procedure TMCPPrompt.AddArgument(const aName, aDescription: String;
   aRequired: Boolean);
 begin
-  AddArgument(TPromptArgument.Create(aName,aDescription,aRequired));
+  FInfo.AddArgument(aName, aDescription, aRequired);
 end;
 
 procedure TMCPPrompt.AddArgument(const aArgument: TPromptArgument);
-var
-  len : Integer;
 begin
-  Len:=Length(FArguments);
-  SetLength(FArguments,Len+1);
-  FArguments[Len]:=aArgument;
+  FInfo.AddArgument(aArgument);
 end;
 
 function TMCPPrompt.GetPromptDescription(aArguments: TStrings): String;
@@ -532,13 +511,15 @@ end;
 
 function TMCPTemplatePrompt.GetPrompt(aArguments: TStrings): TMCPPromptMessageArray;
 var
+  I: Integer;
   lArg : TPromptArgument;
   lValue, lPrompt : string;
 
 begin
   lPrompt:=Template;
-  for lArg in FArguments do
+  for I:=0 to FInfo.ArgumentCount - 1 do
     begin
+    lArg:=FInfo.Arguments[I];
     lValue:=aArguments.Values[lArg.Name];
     lPrompt:=ReplaceValue(lPrompt,lArg.Name,lValue);
     end;

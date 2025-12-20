@@ -43,6 +43,29 @@ type
     function Count : Integer;
   end;
 
+  { TGFPObjectList }
+  // Included here to be able to compile with 3.2.X
+  generic TGFPObjectList<T : TObject> = class (TFPObjectList)
+  private
+    Type
+       { TObjectEnum }
+       TObjectEnum = Class
+         FList : TFPObjectList;
+         FIdx : Integer;
+         constructor create(aList : TFPObjectList);
+         function GetCurrent : T;
+         function MoveNext: Boolean;
+         property Current : T read GetCurrent;
+       end;
+    function GetElement(aIndex: Integer): T;
+    procedure SetElement(aIndex: Integer; AValue: T);
+  Public
+    function getenumerator : TObjectEnum;
+    function add(aElement : T) : integer;
+    property Elements[aIndex: Integer] : T read GetElement Write SetElement; default;
+  end;
+
+
 function EncodeBytes(data : TBytes) : string;
 function DecodeBytes(data : String) : TBytes;
 function CapString(const aString : String; aCap : Integer = 100) : string;
@@ -73,24 +96,24 @@ function DecodeBytes(data: String): TBytes;
 var
   lRes : TMemoryStream;
   lDec : TBase64DecodingStream;
+  lOut : TBytesStream;
 
 begin
   Result:=Nil;
   if Data='' then
     exit;
   lDec:=Nil;
-  lRes:=TMemoryStream.Create;
+  lRes:=TStringStream.Create(data);
   try
     lDec:=TBase64DecodingStream.Create(lRes);
-    LDec.WriteBuffer(Data[1],Length(Data));
-    SetLength(Result,lRes.Size);
-    if lRes.Size>0 then
-      Move(lRes.Memory^,Result[0],lRes.Size);
+    lOut:=TBytesStream.Create(nil);
+    lOut.CopyFrom(lDec,lDec.Size);
+    Result:=Copy(lOut.Bytes,0,lOut.Size);
   finally
+    lOut.Free;
     lDec.Free;
     lRes.Free;
   end;
-
 end;
 
 function CapString(const aString: String; aCap: Integer): string;
@@ -201,6 +224,53 @@ end;
 function TThreadSafeObjectHash.Count: Integer;
 begin
   Result:=FList.Count;
+end;
+
+{ TGFPObjectList }
+
+function TGFPObjectList.GetElement(aIndex: Integer): T;
+
+begin
+  Result:=T(Items[aIndex]);
+end;
+
+procedure TGFPObjectList.SetElement(aIndex: Integer; AValue: T);
+
+begin
+  Items[aIndex]:=aValue;
+end;
+
+function TGFPObjectList.getenumerator: TObjectEnum;
+
+begin
+  Result:=TObjectEnum.Create(Self);
+end;
+
+function TGFPObjectList.add(aElement: T): integer;
+begin
+  Result:=Inherited add(aElement);
+end;
+
+{ TGFPObjectList.TObjectEnum }
+
+constructor TGFPObjectList.TObjectEnum.create(aList: TFPObjectList);
+begin
+  FList:=aList;
+  FIdx:=-1;
+end;
+
+function TGFPObjectList.TObjectEnum.GetCurrent: T;
+begin
+  If FIdx<0 then
+    Result:=Nil
+  else
+    Result:=T(FList[FIdx]);
+end;
+
+function TGFPObjectList.TObjectEnum.MoveNext: Boolean;
+begin
+  Inc(FIdx);
+  Result:=FIdx<FList.Count;
 end;
 
 end.

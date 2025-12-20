@@ -34,43 +34,51 @@ Type
 
   TMCPResource = Class(TObject)
   private
-    FData: TBytes;
-    FKind: TMCPResourceKind;
-    FMimeType: string;
-    FName: string;
+    FInfo: TMCPResourceInfo;
     FOnData: TMCPResourceGetDataCallBack;
-    FText: String;
-    FTitle: string;
-    FUri: String;
-    FSIze : Integer;
+    function GetData: TBytes;
+    function GetText: String;
+    function GetKind: TMCPResourceKind;
     function GetSize: Integer;
+    function GetUri: String;
+    function GetName: string;
+    function GetTitle: string;
+    function GetDescription: string;
+    function GetMimeType: string;
     procedure SetData(AValue: TBytes);
-    procedure SetSize(AValue: Integer);
     procedure SetText(AValue: String);
     procedure SetUri(AValue: String);
+    procedure SetSize(AValue: Integer);
+    procedure SetName(AValue: string);
+    procedure SetTitle(AValue: string);
+    procedure SetDescription(AValue: string);
+    procedure SetMimeType(AValue: string);
   protected
-    function GetData: TBytes; virtual;
-    function GetText: String; virtual;
-    function GetKind : TMCPResourceKind; virtual;
+    function GetDataVirtual: TBytes; virtual;
+    function GetTextVirtual: String; virtual;
+    function GetKindVirtual: TMCPResourceKind; virtual;
   Public
     constructor Create(const aURI,aName : String);
     constructor Create(const aURI,aName : String; aText : String);
     constructor Create(const aURI,aName : String; aData : TBytes);
     constructor Create(const aURI,aName : String; aKind : TMCPResourceKind; aCallBack : TMCPResourceGetDataCallBack);
+    destructor Destroy; override;
     procedure Register(aRegistry : TMCPResourceRegistry = Nil);
     procedure ToJSON(aJSON : TJSONObject; withData : Boolean); virtual;
     function ToJSON(withData : Boolean) : TJSONObject;
-    Property Uri : String read FUri Write SetUri;
-    property Title : string Read FTitle Write FTitle;
-    Property Description : string read FTitle Write FTitle;
-    Property MimeType: string read FMimeType Write FMimeType;
-    Property Name : string Read FName Write FName;
+    Property Uri : String read GetUri Write SetUri;
+    property Title : string Read GetTitle Write SetTitle;
+    Property Description : string read GetDescription Write SetDescription;
+    Property MimeType: string read GetMimeType Write SetMimeType;
+    Property Name : string Read GetName Write SetName;
     Property Text : String Read GetText Write SetText;
     Property Data : TBytes Read GetData Write SetData;
     Property Size : Integer Read GetSize Write SetSize;
-    Property Kind: TMCPResourceKind Read FKind;
+    Property Kind: TMCPResourceKind Read GetKind;
     // Allow to dynamically update  the data.
     Property OnData : TMCPResourceGetDataCallBack Read FOnData Write FOnData;
+    // Access to info object
+    Property Info: TMCPResourceInfo read FInfo;
   end;
 
   { TMCPResourceRegistry }
@@ -121,47 +129,115 @@ end;
 
 procedure TMCPResource.SetData(AValue: TBytes);
 begin
-  if FData=AValue then Exit;
-  FData:=AValue;
-  FText:='';
-  FKind:=rkData;
+  FInfo.Data:=AValue;
 end;
 
 function TMCPResource.GetSize: Integer;
 begin
-  Result:=0;
-  if FSize<>0 then
-    Result:=FSize
-  else if Kind=rkData then
-    Result:=Length(FData)
-  else if kind=rkText then
-    Result:=Length(FText);
+  Result:=FInfo.GetSize;
 end;
 
 procedure TMCPResource.SetSize(AValue: Integer);
 begin
-  FSIze:=aValue;
+  FInfo.Size:=aValue;
 end;
 
 function TMCPResource.GetData: TBytes;
 begin
-  Result:=FData;
+  Result:=GetDataVirtual;
 end;
 
 function TMCPResource.GetText: String;
 begin
-  Result:=FText;
+  Result:=GetTextVirtual;
 end;
 
 function TMCPResource.GetKind: TMCPResourceKind;
 begin
-  Result:=FKind;
+  Result:=GetKindVirtual;
+end;
+
+function TMCPResource.GetUri: String;
+begin
+  Result:=FInfo.Uri;
+end;
+
+function TMCPResource.GetName: string;
+begin
+  Result:=FInfo.Name;
+end;
+
+function TMCPResource.GetTitle: string;
+begin
+  Result:=FInfo.Title;
+end;
+
+function TMCPResource.GetDescription: string;
+begin
+  Result:=FInfo.Description;
+end;
+
+function TMCPResource.GetMimeType: string;
+begin
+  Result:=FInfo.MimeType;
+end;
+
+procedure TMCPResource.SetUri(AValue: String);
+begin
+  FInfo.Uri:=AValue;
+end;
+
+procedure TMCPResource.SetName(AValue: string);
+begin
+  FInfo.Name:=AValue;
+end;
+
+procedure TMCPResource.SetTitle(AValue: string);
+begin
+  FInfo.Title:=AValue;
+end;
+
+procedure TMCPResource.SetDescription(AValue: string);
+begin
+  FInfo.Description:=AValue;
+end;
+
+procedure TMCPResource.SetMimeType(AValue: string);
+begin
+  FInfo.MimeType:=AValue;
+end;
+
+procedure TMCPResource.SetText(AValue: String);
+begin
+  FInfo.Text:=AValue;
+end;
+
+function TMCPResource.GetDataVirtual: TBytes;
+begin
+  if Assigned(FOnData) then
+  begin
+    FOnData(Self);
+  end;
+  Result:=FInfo.Data;
+end;
+
+function TMCPResource.GetTextVirtual: String;
+begin
+  if Assigned(FOnData) then
+  begin
+    FOnData(Self);
+  end;
+  Result:=FInfo.Text;
+end;
+
+function TMCPResource.GetKindVirtual: TMCPResourceKind;
+begin
+  Result:=FInfo.GetKind;
 end;
 
 constructor TMCPResource.Create(const aURI, aName: String);
 begin
-  Uri:=aURI;
-  Name:=aName;
+  FInfo:=TMCPResourceInfo.Create(aURI, aName);
 end;
 
 
@@ -181,7 +257,7 @@ constructor TMCPResource.Create(const aURI,aName: String; aKind: TMCPResourceKin
   aCallBack: TMCPResourceGetDataCallBack);
 begin
   Create(aURI,aName);
-  FKind:=aKind;
+  FInfo.SetKind(aKind);
   FOnData:=aCallBack;
 end;
 
@@ -203,49 +279,15 @@ begin
   end;
 end;
 
-procedure TMCPResource.SetText(AValue: String);
+destructor TMCPResource.Destroy;
 begin
-  if FText=AValue then Exit;
-  FText:=AValue;
-  FData:=Nil;
-  FKind:=rkText;
-end;
-
-procedure TMCPResource.SetUri(AValue: String);
-begin
-  if FUri=AValue then Exit;
-  if aValue='' then
-    Raise EMCPException.Create(SErrUriCannotBeEmpty);
-  FUri:=AValue;
+  FInfo.Free;
+  inherited Destroy;
 end;
 
 procedure TMCPResource.ToJSON(aJSON: TJSONObject; WithData : Boolean);
-
-  Procedure MaybeAdd(const aName,aValue : string);
-  begin
-    if aValue<>'' then
-      aJSON.Add(aName,aValue);
-  end;
-var
-  lData : string;
-
 begin
-  aJSON.Add('uri',FUri);
-  aJSON.Add('name',Name);
-  aJSON.Add('title',Title);
-  aJSON.Add('description',Description);
-  aJSON.Add('mimetype',MimeType);
-  if not WithData then
-    exit;
-
-  case Kind of
-  rkText:
-    lData:=Text;
-  rkData:
-    lData:=EncodeBytes(Self.Data);
-  end;
-
-  aJSON.Add('text',lData);
+  FInfo.ToJSON(aJSON, WithData);
 end;
 
   { TMCPResourceRegistry }
