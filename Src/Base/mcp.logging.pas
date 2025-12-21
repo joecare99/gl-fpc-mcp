@@ -46,6 +46,7 @@ Type
     constructor create; virtual;
     Class procedure InitLogger(aClass : TMCPLoggerClass);
     class function LogLeveltoString(aLevel : TMCPLogLevel) : string;
+    class destructor done;
     Procedure Log(aType : TMCPLogLevel; Const Msg : String);
     Procedure Log(aType : TMCPLogLevel; Const Fmt : String; Const Args : Array of const);
     // Shortcuts
@@ -116,6 +117,11 @@ class function TMCPLogger.LogLeveltoString(aLevel: TMCPLogLevel): string;
 
 begin
   Result:=LogLevelNames[aLevel];
+end;
+
+class destructor TMCPLogger.done;
+begin
+  FreeAndNil(_Instance);
 end;
 
 procedure TMCPLogger.Log(aType: TMCPLogLevel; const Msg: String);
