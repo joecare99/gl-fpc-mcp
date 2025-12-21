@@ -246,10 +246,37 @@ Type
     procedure FromJSON(aJSON: TJSONObject);
     procedure Clear;
   end;
-  PMCPToolResult = ^TMCPToolResult;
+
+  { TMCPProtocolLogLevel }
+
+  TMCPProtocolLogLevel = (
+    mclError,    // error
+    mclWarn,     // warn
+    mclInfo,     // info
+    mclDebug     // debug
+  );
+
+  { Type helper for TMCPProtocolLogLevel }
+
+  TMCPProtocolLogLevelHelper = type helper for TMCPProtocolLogLevel
+    function AsString: string;
+    class function FromString(const aStr: string): TMCPProtocolLogLevel; static;
+  end;
+
 
   TMCPToolResultArray = Array of TMCPToolResult;
   PMCPToolResultArray = ^TMCPToolResultArray;
+
+  // The caller frees the list if the callee didn't set it to nil.
+  TListToolsResponseEvent = procedure (aSender: TObject; var aList: TMCPToolInfoList) of object;
+  TPromptListResponseEvent = procedure (aSender: TObject; var aList: TMCPPromptInfoList) of object;
+  TResourceListResponseEvent = procedure (aSender: TObject; var aList: TMCPResourceInfoList) of object;
+
+  TGetResourceResponseEvent = procedure (aSender: TObject; aResource: TMCPResourceInfo) of object;
+  TCompletionCompleteEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
+  TSetLogLevelEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
+  TToolCallEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
+
 
 implementation
 
@@ -1171,6 +1198,32 @@ begin
   MimeType:='';
   Content:='';
   Description:='';
+end;
+
+{ TMCPProtocolLogLevelHelper }
+
+function TMCPProtocolLogLevelHelper.AsString: string;
+begin
+  case Self of
+    mclError: Result:='error';
+    mclWarn: Result:='warn';
+    mclInfo: Result:='info';
+    mclDebug: Result:='debug';
+  else
+    Result:='error'; // Default fallback
+  end;
+end;
+
+class function TMCPProtocolLogLevelHelper.FromString(const aStr: string): TMCPProtocolLogLevel;
+var
+  lStr: string;
+begin
+  lStr:=LowerCase(aStr);
+  if lStr = 'error' then Result:=mclError
+  else if lStr = 'warn' then Result:=mclWarn
+  else if lStr = 'info' then Result:=mclInfo
+  else if lStr = 'debug' then Result:=mclDebug
+  else Result:=mclError; // Default fallback
 end;
 
 end.

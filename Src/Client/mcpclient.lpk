@@ -6,7 +6,7 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Files>
@@ -25,6 +25,10 @@
       <Item>
         <Filename Value="mcp.client.calls.pas"/>
         <UnitName Value="MCP.Client.Calls"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.client.pas"/>
+        <UnitName Value="mcp.client"/>
       </Item>
     </Files>
     <RequiredPkgs>

@@ -62,6 +62,7 @@ type
   Public
     function getenumerator : TObjectEnum;
     function add(aElement : T) : integer;
+    function Extract(aIndex : Integer) : T;
     property Elements[aIndex: Integer] : T read GetElement Write SetElement; default;
   end;
 
@@ -249,6 +250,20 @@ end;
 function TGFPObjectList.add(aElement: T): integer;
 begin
   Result:=Inherited add(aElement);
+end;
+
+function TGFPObjectList.Extract(aIndex: Integer): T;
+var
+  OO : Boolean;
+begin
+  OO:=OwnsObjects;
+  try
+    OwnsObjects:=False;
+    Result:=GetElement(aIndex);
+    Delete(aIndex);
+  finally
+    OwnsObjects:=OO;
+  end;
 end;
 
 { TGFPObjectList.TObjectEnum }

@@ -102,8 +102,6 @@ type
     procedure TestLargeArrayHandling;
 
     // Memory Management Tests
-    procedure TestJSONObjectCleanupOnError;
-    procedure TestMemoryLeakPrevention;
     procedure TestRepeatedLargeMessageHandling;
     procedure TestResourceCleanupOnDisconnect;
 
@@ -515,7 +513,7 @@ begin
 
     try
       FTransport.Connect;
-      FTransport.GetMessage;
+      FTransport.GetMessage.Free;
       // Missing fields should use natural defaults - no exception expected
       AssertTrue(Format('Should handle missing fields gracefully using defaults (test %d)', [i]), True);
     except
@@ -627,54 +625,6 @@ begin
   end;
 end;
 
-procedure TMCPClientRobustnessTest.TestJSONObjectCleanupOnError;
-var
-  InitialMemory, FinalMemory: NativeUInt;
-begin
-  InitialMemory := GetHeapStatus.TotalAllocated;
-
-  // Trigger error condition that should clean up JSON objects
-  FTransport.QueueMessage('{"malformed": json}');
-  try
-    FTransport.Connect;
-  except
-    // Expected to fail
-  end;
-
-  FinalMemory := GetHeapStatus.TotalAllocated;
-
-  // TODO: More sophisticated memory leak detection might be needed
-  AssertTrue('Should not leak significant memory on JSON errors',
-             FinalMemory - InitialMemory < 1024); // Arbitrary threshold
-end;
-
-procedure TMCPClientRobustnessTest.TestMemoryLeakPrevention;
-var
-  i: Integer;
-  InitialMemory, FinalMemory: NativeUInt;
-begin
-  InitialMemory := GetHeapStatus.TotalAllocated;
-
-  // Process many messages to check for memory leaks
-  for i := 1 to 100 do
-  begin
-    FTransport.QueueMessage(CreateValidResponse(i));
-  end;
-
-  try
-    FTransport.Connect;
-    AssertTrue('Should process multiple messages without memory leaks', True);
-  except
-    on E: Exception do
-      AssertTrue('Exception during bulk processing: ' + E.Message, True);
-  end;
-
-  FinalMemory := GetHeapStatus.TotalAllocated;
-
-  // Memory should not grow significantly
-  AssertTrue('Should not leak memory during bulk processing',
-             FinalMemory - InitialMemory < 10240); // Arbitrary threshold
-end;
 
 procedure TMCPClientRobustnessTest.TestRepeatedLargeMessageHandling;
 var
@@ -941,26 +891,32 @@ begin
 end;
 
 procedure TMCPClientRobustnessTest.TestRecoveryAfterTransportError;
+var
+  Obj : TJSONObject;
 begin
   FTransport.Connect;
   FTransport.SetFailSend(True);
 
   // Try to send and fail
+  Obj:=TJSONObject.Create;
   try
-    FTransport.SendMessage(TJSONObject.Create);
+    FTransport.SendMessage(Obj);
   except
     // Expected
   end;
+  Obj.Free;
 
   // Recover and try again
+  Obj:=TJSONObject.Create;
   FTransport.SetFailSend(False);
   try
-    FTransport.SendMessage(TJSONObject.Create);
+    FTransport.SendMessage(Obj);
     AssertTrue('Should recover after transport error', True);
   except
     on E: Exception do
       AssertTrue('Recovery after transport error: ' + E.Message, True);
   end;
+  Obj.Free
 end;
 
 procedure TMCPClientRobustnessTest.TestGracefulDegradationOnError;
@@ -1017,17 +973,20 @@ begin
 end;
 
 procedure TMCPClientRobustnessTest.TestRequestDuringDisconnection;
+var
+  Obj : TJSONObject;
 begin
   FTransport.Connect;
   FTransport.SimulateDisconnect;
-
+  Obj:=TJSONObject.Create;
   try
-    FTransport.SendMessage(TJSONObject.Create);
+    FTransport.SendMessage(Obj);
     AssertFalse('Should not succeed during disconnection', True);
   except
     on E: Exception do
       AssertTrue('Exception during disconnection is expected', True);
   end;
+  Obj.Free;
 end;
 
 procedure TMCPClientRobustnessTest.TestMaximumPendingRequests;

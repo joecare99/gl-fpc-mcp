@@ -60,8 +60,6 @@ type
   end;
 
 
-  TResourceListResponseEvent = procedure (aSender : TObject; aList : TMCPResourceInfoList) of object;
-
    { TMCPReadResourceList }
 
   TMCPReadResourceList = class(TMCPCall)
@@ -69,7 +67,7 @@ type
     FOnReply: TResourceListResponseEvent;
   protected
     procedure Reply(aData: TJSONObject); override;
-    procedure HandleReply(ResourceList: TMCPResourceInfoList); virtual;
+    procedure HandleReply(var ResourceList: TMCPResourceInfoList); virtual;
     procedure HandleError(aError: TRPCError); override;
   public
     class function methodname : string; override;
@@ -115,7 +113,6 @@ type
     property OnReply : TGetResourceResponseEvent Read FOnReply Write FOnReply;
   end;
 
-  TPromptListResponseEvent = procedure (aSender : TObject; aList : TMCPPromptInfoList) of object;
   { TMCPReadPromptList }
 
   TMCPReadPromptList = class(TMCPCall)
@@ -123,7 +120,7 @@ type
     FOnReply: TPromptListResponseEvent;
   protected
     procedure Reply(aData: TJSONObject); override;
-    procedure HandleReply(PromptList: TMCPPromptInfoList); virtual;
+    procedure HandleReply(var PromptList: TMCPPromptInfoList); virtual;
     Procedure HandleError(aError: TRPCError); override;
   public
     class function methodname : string; override;
@@ -188,7 +185,7 @@ type
     FOnReply: TListToolsResponseEvent;
   protected
     procedure Reply(aData: TJSONObject); override;
-    procedure HandleReply(ToolList: TMCPToolInfoList); virtual;
+    procedure HandleReply(var ToolList: TMCPToolInfoList); virtual;
     procedure HandleError(aError: TRPCError); override;
   public
     class function methodname: string; override;
@@ -300,25 +297,6 @@ type
 
   { Client Integration Types }
 
-  TCompletionCompleteEvent = procedure(aSender: TObject; aResponse: TMCPCompletionResponse) of object;
-
-{ Logging/SetLevel Types }
-
-  { TMCPProtocolLogLevel }
-
-  TMCPProtocolLogLevel = (
-    mclError,    // error
-    mclWarn,     // warn
-    mclInfo,     // info
-    mclDebug     // debug
-  );
-
-  { Type helper for TMCPProtocolLogLevel }
-
-  TMCPProtocolLogLevelHelper = type helper for TMCPProtocolLogLevel
-    function AsString: string;
-    class function FromString(const aStr: string): TMCPProtocolLogLevel; static;
-  end;
 
   { TMCPSetLogLevelRequest }
 
@@ -369,15 +347,15 @@ type
 
   { Client Integration Types }
 
-  TSetLogLevelEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
-
 { Tools/Call Types }
 
   { TMCPToolCallArguments }
 
   TMCPToolCallArguments = record
     Arguments: TJSONObject;
-    procedure Initialize(aArguments: TJSONObject = nil);
+    class operator Initialize(var Rec : TMCPToolCallArguments);
+    class operator finalize(var Rec : TMCPToolCallArguments);
+    class function Create(aArguments: TJSONObject) : TMCPToolCallArguments; static;
     procedure Clear;
     procedure ToJSON(aJSON: TJSONObject);
     procedure FromJSON(aJSON: TJSONObject);
@@ -425,7 +403,6 @@ type
 
   { Client Integration Types }
 
-  TToolCallEvent = procedure(aSender: TObject; aResponse: TMCPToolCallResponse) of object;
 
 { Helper Functions }
 
@@ -522,20 +499,24 @@ var
   tmp : TJSONObject;
 begin
   args:=TJSONObject.Create;
-  tmp:=TJSONObject.create;
-  args.Add('capabilities',tmp);
-  if coRoots in Client.Options then
-   tmp.add('roots',TJSONObject.create(['list_changed',True]));
-  if coSampling in Client.Options then
-   tmp.add('sampling',TJSONObject.create);
-  if coElicitation in Client.Options then
-   tmp.add('elicitation',TJSONObject.create);
-  args.add('protocolversion',client.protocolversion);
-  tmp:=TJSONObject.create();
-  tmp.add('name',client.clientname);
-  tmp.add('version',client.clientversion);
-  args.add('clientInfo',tmp);
-  Result:=Inherited call(args);
+  try
+    tmp:=TJSONObject.create;
+    args.Add('capabilities',tmp);
+    if coRoots in Client.Options then
+     tmp.add('roots',TJSONObject.create(['list_changed',True]));
+    if coSampling in Client.Options then
+     tmp.add('sampling',TJSONObject.create);
+    if coElicitation in Client.Options then
+     tmp.add('elicitation',TJSONObject.create);
+    args.add('protocolversion',client.protocolversion);
+    tmp:=TJSONObject.create();
+    args.add('clientInfo',tmp);
+    tmp.add('name',client.clientname);
+    tmp.add('version',client.clientversion);
+    Result:=Inherited call(args);
+  finally
+    args.Free;
+  end;
 end;
 
 
@@ -572,13 +553,12 @@ begin
     end;
 
     HandleReply(ResourceList);
-  except
+  finally
     ResourceList.Free;
-    raise;
   end;
 end;
 
-procedure TMCPReadResourceList.HandleReply(ResourceList: TMCPResourceInfoList);
+procedure TMCPReadResourceList.HandleReply(var ResourceList: TMCPResourceInfoList);
 begin
   if Assigned(FOnReply) then
   begin
@@ -593,10 +573,13 @@ begin
 end;
 
 procedure TMCPReadResourceList.HandleError(aError: TRPCError);
+var
+  L: TMCPResourceInfoList;
 begin
+  L:=Nil;
   inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, nil); // Pass nil list on error
+    FOnReply(Self, L); // Pass nil list on error
 end;
 
 class function TMCPReadResourceList.methodname: string;
@@ -605,8 +588,15 @@ begin
 end;
 
 procedure TMCPReadResourceList.Call();
+var
+  Obj : TJSONObject;
 begin
-  inherited call(TJSONObject.Create());
+  Obj:=TJSONObject.Create();
+  try
+    inherited call(Obj);
+  finally
+    Obj.Free;
+  end;
 end;
 
 { TMCPReadResource }
@@ -643,8 +633,12 @@ var
   lArgs : TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  lArgs.Add('uri', aUri);
-  inherited call(lArgs);
+  try
+    lArgs.Add('uri', aUri);
+    inherited call(lArgs);
+  finally
+    lArgs.Free;
+  end;
 end;
 
 procedure TMCPGetPrompt.Call(const aName: String; aArguments: TJSONObject);
@@ -652,10 +646,14 @@ var
   lObj: TJSONObject;
 begin
   lObj:=TJSONObject.Create;
-  lObj.Add('name', aName);
-  if Assigned(aArguments) then
-    lObj.Add('arguments', aArguments.Clone);
-  inherited Call(lObj);
+  try
+    lObj.Add('name', aName);
+    if Assigned(aArguments) then
+      lObj.Add('arguments', aArguments.Clone);
+    inherited Call(lObj);
+  finally
+    lObj.Free;
+  end;
 end;
 
 { TMCPGetResource }
@@ -706,8 +704,12 @@ var
   lArgs: TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  lArgs.Add('uri', aURI);
-  inherited call(lArgs);
+  try
+    lArgs.Add('uri', aURI);
+    inherited call(lArgs);
+  finally
+    lArgs.Free;
+  end;
 end;
 
 { TMCPReadPromptList }
@@ -743,31 +745,25 @@ begin
     end;
 
     HandleReply(PromptList);
-  except
+  finally
     PromptList.Free;
-    raise;
   end;
 end;
 
-procedure TMCPReadPromptList.HandleReply(PromptList: TMCPPromptInfoList);
+procedure TMCPReadPromptList.HandleReply(var PromptList: TMCPPromptInfoList);
 begin
   if Assigned(FOnReply) then
-  begin
-    // Call the event handler - it's responsible for freeing the list
     FOnReply(Self, PromptList);
-  end
-  else
-  begin
-    // If no handler, free the list to prevent memory leak
-    PromptList.Free;
-  end;
 end;
 
 procedure TMCPReadPromptList.HandleError(aError: TRPCError);
+var
+  L : TMCPPromptInfoList;
 begin
+  L:=nil;
   inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, nil); // Pass nil list on error
+    FOnReply(Self, L); // Pass nil list on error
 end;
 
 class function TMCPReadPromptList.methodname: string;
@@ -776,8 +772,15 @@ begin
 end;
 
 procedure TMCPReadPromptList.Call();
+var
+  lArgs : TJSONObject;
 begin
-  Inherited Call(TJSONObject.Create())
+  lArgs:=TJSONObject.Create;
+  try
+    Inherited Call(lArgs)
+  finally
+    lArgs.Free;
+  end;
 end;
 
 { TMCPContentBlock }
@@ -864,6 +867,7 @@ var
 
 begin
   lObj:=TJSONObject.Create;
+  try
   lObj.Add('name',aName);
   if aArguments.Count>0 then
     begin
@@ -875,9 +879,11 @@ begin
       if N<>'' then
         lArgs.Add(N,V);
       end;
-
     end;
   Inherited Call(lObj);
+  finally
+    lObj.Free;
+  end;
 end;
 
 procedure TMCPGetPrompt.Call(const aName: String; aArguments: array of string);
@@ -934,33 +940,26 @@ begin
           end;
         end;
     end;
-
     HandleReply(ToolList);
-  except
+  finally
     ToolList.Free;
-    raise;
   end;
 end;
 
-procedure TMCPListTools.HandleReply(ToolList: TMCPToolInfoList);
+procedure TMCPListTools.HandleReply(var ToolList: TMCPToolInfoList);
 begin
   if Assigned(FOnReply) then
-  begin
-    // Call the event handler - it's responsible for freeing the list
     FOnReply(Self, ToolList);
-  end
-  else
-  begin
-    // If no handler, free the list to prevent memory leak
-    ToolList.Free;
-  end;
 end;
 
 procedure TMCPListTools.HandleError(aError: TRPCError);
+var
+  L : TMCPToolInfoList;
 begin
+  L:=nil;
   inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, nil); // Pass nil list on error
+    FOnReply(Self, L); // Pass nil list on error
 end;
 
 class function TMCPListTools.methodname: string;
@@ -969,8 +968,15 @@ begin
 end;
 
 procedure TMCPListTools.Call();
+var
+  Obj: TJSONObject;
 begin
-  inherited Call(TJSONObject.Create());
+  Obj:=TJSONObject.Create();
+  try
+    inherited Call(Obj);
+  finally
+    Obj.Free;
+  end;
 end;
 
 { TMCPCompletionRefTypeHelper }
@@ -1192,9 +1198,8 @@ begin
       lObj.Add('context', aContext.ToJSON);
 
     inherited Call(lObj);
-  except
+  finally
     lObj.Free;
-    raise;
   end;
 end;
 
@@ -1273,31 +1278,6 @@ begin
   Result.FromJSON(aJSON);
 end;
 
-{ TMCPProtocolLogLevelHelper }
-
-function TMCPProtocolLogLevelHelper.AsString: string;
-begin
-  case Self of
-    mclError: Result:='error';
-    mclWarn: Result:='warn';
-    mclInfo: Result:='info';
-    mclDebug: Result:='debug';
-  else
-    Result:='error'; // Default fallback
-  end;
-end;
-
-class function TMCPProtocolLogLevelHelper.FromString(const aStr: string): TMCPProtocolLogLevel;
-var
-  lStr: string;
-begin
-  lStr:=LowerCase(aStr);
-  if lStr = 'error' then Result:=mclError
-  else if lStr = 'warn' then Result:=mclWarn
-  else if lStr = 'info' then Result:=mclInfo
-  else if lStr = 'debug' then Result:=mclDebug
-  else Result:=mclError; // Default fallback
-end;
 
 { TMCPSetLogLevelRequest }
 
@@ -1425,12 +1405,19 @@ end;
 
 { TMCPToolCallArguments }
 
-procedure TMCPToolCallArguments.Initialize(aArguments: TJSONObject);
+class operator TMCPToolCallArguments.Initialize(var Rec: TMCPToolCallArguments);
 begin
-  if Assigned(aArguments) then
-    Arguments:=aArguments.Clone as TJSONObject
-  else
-    Arguments:=TJSONObject.Create;
+  Rec.Arguments:=Nil;
+end;
+
+class operator TMCPToolCallArguments.finalize(var Rec: TMCPToolCallArguments);
+begin
+  Rec.Clear;
+end;
+
+class function TMCPToolCallArguments.Create(aArguments: TJSONObject): TMCPToolCallArguments;
+begin
+  Result.Arguments:=aArguments.Clone as TJSONObject;
 end;
 
 procedure TMCPToolCallArguments.Clear;
@@ -1583,9 +1570,8 @@ begin
     if Assigned(aArguments.Arguments) then
       lObj.Add('arguments', aArguments.Arguments.Clone);
     inherited Call(lObj);
-  except
+  finally
     lObj.Free;
-    raise;
   end;
 end;
 
@@ -1593,7 +1579,7 @@ procedure TMCPToolCall.Call(const aToolName: string; aArguments: TJSONObject);
 var
   ToolArgs: TMCPToolCallArguments;
 begin
-  ToolArgs.Initialize(aArguments);
+  ToolArgs:=TMCPToolCallArguments.Create(aArguments);
   try
     Call(aToolName, ToolArgs);
   finally
@@ -1626,7 +1612,7 @@ end;
 // Tools/Call helper functions
 function CreateToolCallArguments(aArguments: TJSONObject): TMCPToolCallArguments;
 begin
-  Result.Initialize(aArguments);
+  Result:=TMCPToolCallArguments.Create(aArguments);
 end;
 
 function CreateToolCallResponseFromJSON(aJSON: TJSONObject): TMCPToolCallResponse;

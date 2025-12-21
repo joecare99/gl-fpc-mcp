@@ -49,20 +49,9 @@ Type
 
   { TMCPClientRequest }
   TMCPClientErrorEvent = Procedure(Sender : TObject; aRequest : TMCPCall; const aError : TRPCError) of object;
-  TListToolsResponseEvent = procedure (aSender: TObject; aList: TMCPToolInfoList) of object;
-  TPromptListResponseEvent = procedure (aSender: TObject; aList: TMCPPromptInfoList) of object;
-  TResourceListResponseEvent = procedure (aSender: TObject; aList: TMCPResourceInfoList) of object;
-  TGetResourceResponseEvent = procedure (aSender: TObject; aResource: TMCPResourceInfo) of object;
 
   { Forward declarations }
 
-  TCompletionCompleteEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
-
-  // Forward declarations for logging types - will be defined in mcp.client.calls
-  TSetLogLevelEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
-
-  // Forward declarations for tools/call types - will be defined in mcp.client.calls
-  TToolCallEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
 
   { TMCPClientCall }
 
@@ -77,7 +66,7 @@ Type
     Procedure HandleError(aError : TRPCError); virtual;
   Public
     constructor create(aClient : TMCPCustomClient);
-    destructor Destroy;
+    destructor Destroy; override;
     class function MethodName: string; virtual; abstract ;
     function Call(aArguments : TJSONObject) : TRequestID;
     property Client : TMCPCustomClient Read FClient;
@@ -160,27 +149,27 @@ Type
     // Check whether messages arrived and dispatch them
     Function CheckMessages : integer;
     // List available tools
-    function ListTools(aOnReply: TListToolsResponseEvent): TMCPCall;
+    function ListTools(aOnReply: TListToolsResponseEvent): TMCPCall;virtual; abstract;
     // List available prompts
-    function ListPrompts(aOnReply: TPromptListResponseEvent): TMCPCall;
+    function ListPrompts(aOnReply: TPromptListResponseEvent): TMCPCall; virtual; abstract;
     // List available resources
-    function ListResources(aOnReply: TResourceListResponseEvent): TMCPCall;
+    function ListResources(aOnReply: TResourceListResponseEvent): TMCPCall; virtual; abstract;
     // Get a specific resource by URI
-    function GetResource(const aURI: String; aOnReply: TGetResourceResponseEvent): TMCPCall;
+    function GetResource(const aURI: String; aOnReply: TGetResourceResponseEvent): TMCPCall; virtual; abstract;
     // Get completion suggestions
     function CompletePromptArgument(const aPromptName: string;
                                    const aArgumentName: string;
                                    const aPartialValue: string;
                                    aOnReply: TCompletionCompleteEvent;
-                                   aContext: TJSONObject = nil): TMCPCall;
+                                   aContext: TJSONObject = nil): TMCPCall; virtual; abstract;
     function CompleteResourceArgument(const aResourcePattern: string;
                                      const aArgumentName: string;
                                      const aPartialValue: string;
                                      aOnReply: TCompletionCompleteEvent;
-                                     aContext: TJSONObject = nil): TMCPCall;
+                                     aContext: TJSONObject = nil): TMCPCall; virtual; abstract;
     // Set logging level
     function SetLogLevel(const aLevel: string;
-                        aOnReply: TSetLogLevelEvent): TMCPCall;
+                        aOnReply: TSetLogLevelEvent): TMCPCall; virtual; abstract;
 
     // Convenience methods for setting log levels
     function SetErrorLogLevel(aOnReply: TSetLogLevelEvent): TMCPCall;
@@ -190,9 +179,9 @@ Type
 
     // Call a tool
     function CallTool(const aToolName: string; aArguments: TJSONObject;
-                     aOnReply: TToolCallEvent): TMCPCall;
+                     aOnReply: TToolCallEvent): TMCPCall; virtual; abstract;
     function CallTool(const aToolName: string; const aArguments: array of string;
-                     aOnReply: TToolCallEvent): TMCPCall;
+                     aOnReply: TToolCallEvent): TMCPCall; virtual; abstract;
     // protocol version to report to server
     property Protocolversion : string read FProtocolVersion write FProtocolVersion;
     // Options
@@ -206,18 +195,6 @@ Type
     // Called before all other installed handlers are called.
     Property OnServerNotification : TMCPNotificationEvent Read FOnServerNotification Write FOnServerNotification;
   end;
-
-  TMCPClient = Class (TMCPCustomClient)
-  Published
-    Property Transport;
-    Property OnServerNotification;
-    property ClientVersion;
-    property ClientName;
-    Property Options;
-    property Protocolversion;
-  end;
-
-  { TMCPClientProcessTransport }
 
 
 Const
@@ -283,6 +260,8 @@ Var
   D : TJSONData;
 
 begin
+  if not Assigned(aJSON) then
+    Raise Exception.Create('Need JSON object');
   aJSON.Integers['code']:=Code;
   aJSON.Strings['message']:=Message;
   if Data<>'' then
@@ -700,83 +679,6 @@ begin
     end;
 end;
 
-function TMCPCustomClient.ListTools(aOnReply: TListToolsResponseEvent): TMCPCall;
-var
-  ListToolsCall: TMCPListTools;
-begin
-  ListToolsCall := TMCPListTools.Create(Self);
-  ListToolsCall.OnReply := aOnReply;
-  ListToolsCall.Call();
-  Result := ListToolsCall;
-end;
-
-function TMCPCustomClient.ListPrompts(aOnReply: TPromptListResponseEvent): TMCPCall;
-var
-  ListPromptsCall: TMCPReadPromptList;
-begin
-  ListPromptsCall := TMCPReadPromptList.Create(Self);
-  ListPromptsCall.OnReply := aOnReply;
-  ListPromptsCall.Call();
-  Result := ListPromptsCall;
-end;
-
-function TMCPCustomClient.ListResources(aOnReply: TResourceListResponseEvent): TMCPCall;
-var
-  ListResourcesCall: TMCPReadResourceList;
-begin
-  ListResourcesCall := TMCPReadResourceList.Create(Self);
-  ListResourcesCall.OnReply := aOnReply;
-  ListResourcesCall.Call();
-  Result := ListResourcesCall;
-end;
-
-function TMCPCustomClient.GetResource(const aURI: String; aOnReply: TGetResourceResponseEvent): TMCPCall;
-var
-  GetResourceCall: TMCPGetResource;
-begin
-  GetResourceCall := TMCPGetResource.Create(Self);
-  GetResourceCall.OnReply := aOnReply;
-  GetResourceCall.Call(aURI);
-  Result := GetResourceCall;
-end;
-
-function TMCPCustomClient.CompletePromptArgument(const aPromptName: string;
-                                               const aArgumentName: string;
-                                               const aPartialValue: string;
-                                               aOnReply: TCompletionCompleteEvent;
-                                               aContext: TJSONObject): TMCPCall;
-begin
-  // For now, return a basic TMCPCall until proper callback integration is implemented
-  Result := TMCPCall.Create(Self);
-  // TODO: Implement proper completion call with callback support
-end;
-
-function TMCPCustomClient.CompleteResourceArgument(const aResourcePattern: string;
-                                                  const aArgumentName: string;
-                                                  const aPartialValue: string;
-                                                  aOnReply: TCompletionCompleteEvent;
-                                                  aContext: TJSONObject): TMCPCall;
-begin
-  // For now, return a basic TMCPCall until proper callback integration is implemented
-  Result := TMCPCall.Create(Self);
-  // TODO: Implement proper completion call with callback support
-end;
-
-function TMCPCustomClient.SetLogLevel(const aLevel: string;
-                                     aOnReply: TSetLogLevelEvent): TMCPCall;
-var
-  SetLogLevelCall: TMCPSetLogLevel;
-  LogLevel: TMCPProtocolLogLevel;
-begin
-  SetLogLevelCall := TMCPSetLogLevel.Create(Self);
-
-  // Convert string to enum
-  LogLevel := TMCPProtocolLogLevel.FromString(aLevel);
-
-  // For now, simple implementation without callback until proper integration is added
-  SetLogLevelCall.Call(LogLevel);
-  Result := SetLogLevelCall;
-end;
 
 function TMCPCustomClient.SetErrorLogLevel(aOnReply: TSetLogLevelEvent): TMCPCall;
 begin
@@ -798,27 +700,6 @@ begin
   Result := SetLogLevel('debug', aOnReply);
 end;
 
-function TMCPCustomClient.CallTool(const aToolName: string; aArguments: TJSONObject;
-                                  aOnReply: TToolCallEvent): TMCPCall;
-var
-  ToolCall: TMCPToolCall;
-begin
-  ToolCall := TMCPToolCall.Create(Self);
-  // For now, simple implementation without direct callback integration
-  ToolCall.Call(aToolName, aArguments);
-  Result := ToolCall;
-end;
-
-function TMCPCustomClient.CallTool(const aToolName: string; const aArguments: array of string;
-                                  aOnReply: TToolCallEvent): TMCPCall;
-var
-  ToolCall: TMCPToolCall;
-begin
-  ToolCall := TMCPToolCall.Create(Self);
-  // For now, simple implementation without direct callback integration
-  ToolCall.Call(aToolName, aArguments);
-  Result := ToolCall;
-end;
 
 end.
 

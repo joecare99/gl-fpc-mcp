@@ -19,6 +19,8 @@ type
     function DoGetMessage(out J: TJSONStringType): Boolean; override;
   end;
 
+  { TMockCall }
+
   { TMockClient }
   TMockClient = class(TMCPCustomClient)
   private
@@ -29,10 +31,21 @@ type
   protected
     procedure DoRequest(aRequest: TMCPCall; aRequestID: TRequestID; aArgs: TJSONObject); override;
   public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure SimulateResponse(aRequestID: TRequestID; aResponse: TJSONObject);
     procedure SimulateError(aRequestID: TRequestID; const aError: TRPCError);
+    function CallTool(const aToolName: string; const aArguments: array of string; aOnReply: TToolCallEvent): TMCPCall; override;
+    function CallTool(const aToolName: string; aArguments: TJSONObject; aOnReply: TToolCallEvent): TMCPCall; override;
+    function CompletePromptArgument(const aPromptName: string; const aArgumentName: string; const aPartialValue: string;
+      aOnReply: TCompletionCompleteEvent; aContext: TJSONObject=nil): TMCPCall; override;
+    function CompleteResourceArgument(const aResourcePattern: string; const aArgumentName: string; const aPartialValue: string;
+      aOnReply: TCompletionCompleteEvent; aContext: TJSONObject=nil): TMCPCall; override;
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    function GetResource(const aURI: String; aOnReply: TGetResourceResponseEvent): TMCPCall; override;
+    function ListPrompts(aOnReply: TPromptListResponseEvent): TMCPCall; override;
+    function ListResources(aOnReply: TResourceListResponseEvent): TMCPCall; override;
+    function ListTools(aOnReply: TListToolsResponseEvent): TMCPCall; override;
+    function SetLogLevel(const aLevel: string; aOnReply: TSetLogLevelEvent): TMCPCall; override;
     property LastRequestArgs: TJSONObject read FLastRequestArgs;
     property LastRequest: TMCPCall read FLastRequest;
     property LastRequestID: TRequestID read FLastRequestID;
@@ -54,8 +67,8 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnListToolsReply(aSender: TObject; aList: TMCPToolInfoList);
-    procedure OnSecondListToolsReply(aSender: TObject; aList: TMCPToolInfoList);
+    procedure OnListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
+    procedure OnSecondListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
     function CreateMockToolsResponse: TJSONObject;
     function CreateEmptyToolsResponse: TJSONObject;
     function CreateMalformedToolsResponse: TJSONObject;
@@ -111,8 +124,8 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnListPromptsReply(aSender: TObject; aList: TMCPPromptInfoList);
-    procedure OnSecondListPromptsReply(aSender: TObject; aList: TMCPPromptInfoList);
+    procedure OnListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
+    procedure OnSecondListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
     function CreateMockPromptsResponse: TJSONObject;
     function CreateEmptyPromptsResponse: TJSONObject;
     function CreateMalformedPromptsResponse: TJSONObject;
@@ -168,8 +181,8 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnListResourcesReply(aSender: TObject; aList: TMCPResourceInfoList);
-    procedure OnSecondListResourcesReply(aSender: TObject; aList: TMCPResourceInfoList);
+    procedure OnListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
+    procedure OnSecondListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
     function CreateMockResourcesResponse: TJSONObject;
     function CreateEmptyResourcesResponse: TJSONObject;
     function CreateMalformedResourcesResponse: TJSONObject;
@@ -293,6 +306,7 @@ begin
   Result := False; // No messages available
 end;
 
+
 { TMockClient }
 
 constructor TMockClient.Create(AOwner: TComponent);
@@ -311,6 +325,66 @@ begin
   inherited Destroy;
 end;
 
+function TMockClient.GetResource(const aURI: String; aOnReply: TGetResourceResponseEvent): TMCPCall;
+var
+  Info : TMCPResourceInfo;
+begin
+  Result:=TMCPGetResource.Create(Self);
+  Info:=TMCPResourceInfo.Create('file:///test/resource.txt','b');
+  aOnReply(Self,Info)
+end;
+
+function TMockClient.ListPrompts(aOnReply: TPromptListResponseEvent): TMCPCall;
+var
+  aList : TMCPPromptInfoList;
+begin
+  Result:=TMCPReadPromptList.Create(Self);
+  aList:=TMCPPromptInfoList.Create(True);
+  try
+    aList.add(TMCPPromptInfo.Create('a','b'));
+    aList.add(TMCPPromptInfo.Create('c','d'));
+    aOnReply(Self,aList);
+  finally
+ //   aList.Free;
+  end;
+
+end;
+
+function TMockClient.ListResources(aOnReply: TResourceListResponseEvent): TMCPCall;
+var
+  aList : TMCPResourceInfoList;
+begin
+  Result:=TMCPReadResourceList.Create(Self);
+  aList:=TMCPResourceInfoList.Create(True);
+  try
+    aList.add(TMCPResourceInfo.Create('a','b'));
+    aList.add(TMCPResourceInfo.Create('c','d'));
+    aOnReply(Self,aList);
+  finally
+ //   aList.Free;
+  end;
+end;
+
+function TMockClient.ListTools(aOnReply: TListToolsResponseEvent): TMCPCall;
+var
+  aList : TMCPToolInfoList;
+begin
+  Result:=TMCPListTools.Create(Self);
+  aList:=TMCPToolInfoList.Create(True);
+  try
+    aList.add(TMCPToolInfo.Create('a','b'));
+    aList.add(TMCPToolInfo.Create('c','d'));
+    aOnReply(Self,aList);
+  finally
+ //   aList.Free;
+  end;
+end;
+
+function TMockClient.SetLogLevel(const aLevel: string; aOnReply: TSetLogLevelEvent): TMCPCall;
+begin
+  Result:=TMCPSetLogLevel.Create(Self);
+end;
+
 procedure TMockClient.DoRequest(aRequest: TMCPCall; aRequestID: TRequestID; aArgs: TJSONObject);
 begin
   FLastRequestArgs.Free;
@@ -318,6 +392,29 @@ begin
   FLastRequest := aRequest;
   FLastRequestID := aRequestID;
   // Don't call inherited - we don't want actual network operations
+end;
+
+function TMockClient.CallTool(const aToolName: string; const aArguments: array of string; aOnReply: TToolCallEvent): TMCPCall;
+begin
+  Result:=TMCPToolCall.Create(Self);
+end;
+
+function TMockClient.CallTool(const aToolName: string; aArguments: TJSONObject; aOnReply: TToolCallEvent): TMCPCall;
+begin
+  Result:=TMCPToolCall.Create(Self);
+end;
+
+function TMockClient.CompletePromptArgument(const aPromptName: string; const aArgumentName: string; const aPartialValue: string;
+  aOnReply: TCompletionCompleteEvent; aContext: TJSONObject): TMCPCall;
+begin
+  Result:=TMCPCompletionComplete.Create(Self);
+end;
+
+function TMockClient.CompleteResourceArgument(const aResourcePattern: string; const aArgumentName: string;
+  const aPartialValue: string; aOnReply: TCompletionCompleteEvent; aContext: TJSONObject): TMCPCall;
+
+begin
+  Result:=TMCPCompletionComplete.Create(Self);
 end;
 
 procedure TMockClient.SimulateResponse(aRequestID: TRequestID; aResponse: TJSONObject);
@@ -363,20 +460,22 @@ begin
   inherited TearDown;
 end;
 
-procedure TMCPListToolsTest.OnListToolsReply(aSender: TObject; aList: TMCPToolInfoList);
+procedure TMCPListToolsTest.OnListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
   FLastToolList.Free; // Free previous list if any
   FLastToolList := aList; // Take ownership
+  aList:=Nil;
   Inc(FResponseCount);
 end;
 
-procedure TMCPListToolsTest.OnSecondListToolsReply(aSender: TObject; aList: TMCPToolInfoList);
+procedure TMCPListToolsTest.OnSecondListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
 begin
   FSecondCallbackExecuted := True;
   FSecondToolList.Free; // Free previous list if any
   FSecondToolList := aList; // Take ownership
+  aList:=Nil;
 end;
 
 function TMCPListToolsTest.CreateMockToolsResponse: TJSONObject;
@@ -650,13 +749,19 @@ begin
 end;
 
 procedure TMCPListToolsTest.TestCallbackExecution;
+var
+  lResp : TJSONObject;
 begin
   FListTools.OnReply := @OnListToolsReply;
   FListTools.Call();
 
   AssertFalse('Callback should not be executed yet', FCallbackExecuted);
-
-  FClient.SimulateResponse(FClient.LastRequestID, CreateEmptyToolsResponse);
+  lResp:=CreateEmptyToolsResponse;
+  try
+    FClient.SimulateResponse(FClient.LastRequestID, lResp);
+  finally
+    lResp.Free;
+  end;
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
   AssertTrue('Sender should be the TMCPListTools instance', FCallbackSender = FListTools);
@@ -682,24 +787,31 @@ end;
 procedure TMCPListToolsTest.TestMultipleCallbacks;
 var
   SecondListTools: TMCPListTools;
+  lObj1,lObj2 : TJSONObject;
 begin
   FListTools.OnReply := @OnListToolsReply;
   FListTools.Call();
 
+  lObj1:=Nil;
+  lObj2:=Nil;
   SecondListTools := TMCPListTools.Create(FClient);
   try
     SecondListTools.OnReply := @OnSecondListToolsReply;
     SecondListTools.Call();
 
+    lObj1:=CreateEmptyToolsResponse;
+    lObj2:=CreateMockToolsResponse;
     // Simulate responses
-    FClient.SimulateResponse(FClient.LastRequestID - 1, CreateEmptyToolsResponse);
-    FClient.SimulateResponse(FClient.LastRequestID, CreateMockToolsResponse);
+    FClient.SimulateResponse(FClient.LastRequestID - 1, lObj1);
+    FClient.SimulateResponse(FClient.LastRequestID, lObj2);
 
     AssertTrue('First callback should have been executed', FCallbackExecuted);
     AssertTrue('Second callback should have been executed', FSecondCallbackExecuted);
     AssertEquals('First should get empty list', 0, FLastToolList.Count);
     AssertEquals('Second should get tools', 2, FSecondToolList.Count);
   finally
+    lObj1.Free;
+    lObj2.Free;
     SecondListTools.Free;
   end;
 end;
@@ -806,18 +918,25 @@ end;
 procedure TMCPListToolsTest.TestClientListToolsMethod;
 var
   ListToolsCall: TMCPCall;
+  lObj : TJSONObject;
 begin
+  lObj:=Nil;
   ListToolsCall := FClient.ListTools(@OnListToolsReply);
+  try
+    AssertNotNull('Should return a call object', ListToolsCall);
+    AssertTrue('Should be TMCPListTools type', ListToolsCall is TMCPListTools);
 
-  AssertNotNull('Should return a call object', ListToolsCall);
-  AssertTrue('Should be TMCPListTools type', ListToolsCall is TMCPListTools);
+    // Simulate response
+    lObj:=CreateMockToolsResponse;
+    FClient.SimulateResponse(FClient.LastRequestID, lObj);
 
-  // Simulate response
-  FClient.SimulateResponse(FClient.LastRequestID, CreateMockToolsResponse);
-
-  AssertTrue('Client callback should have been executed', FCallbackExecuted);
-  AssertNotNull('Result list should not be nil', FLastToolList);
-  AssertEquals('Should have 2 tools from client method', 2, FLastToolList.Count);
+    AssertTrue('Client callback should have been executed', FCallbackExecuted);
+    AssertNotNull('Result list should not be nil', FLastToolList);
+    AssertEquals('Should have 2 tools from client method', 2, FLastToolList.Count);
+  finally
+    lObj.Free;
+    ListToolsCall.Free;
+  end;
 end;
 
 procedure TMCPListToolsTest.TestClientListToolsReturnType;
@@ -826,14 +945,18 @@ var
   ListToolsInstance: TMCPListTools;
 begin
   ListToolsCall := FClient.ListTools(@OnListToolsReply);
+  try
+    AssertNotNull('Should return a call object', ListToolsCall);
+    AssertTrue('Should be TMCPListTools instance', ListToolsCall is TMCPListTools);
 
-  AssertNotNull('Should return a call object', ListToolsCall);
-  AssertTrue('Should be TMCPListTools instance', ListToolsCall is TMCPListTools);
+    // Type cast should work
+    ListToolsInstance := TMCPListTools(ListToolsCall);
+    AssertNotNull('Type cast should succeed', ListToolsInstance);
+    AssertEquals('Method name should be correct', 'tools/list', ListToolsInstance.MethodName);
+  finally
+    ListToolsCall.Free;
+  end;
 
-  // Type cast should work
-  ListToolsInstance := TMCPListTools(ListToolsCall);
-  AssertNotNull('Type cast should succeed', ListToolsInstance);
-  AssertEquals('Method name should be correct', 'tools/list', ListToolsInstance.MethodName);
 end;
 
 { TMCPReadPromptListTest }
@@ -860,20 +983,22 @@ begin
   inherited TearDown;
 end;
 
-procedure TMCPReadPromptListTest.OnListPromptsReply(aSender: TObject; aList: TMCPPromptInfoList);
+procedure TMCPReadPromptListTest.OnListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
   FLastPromptList.Free; // Free previous list if any
   FLastPromptList := aList; // Take ownership
+  aList:=Nil;
   Inc(FResponseCount);
 end;
 
-procedure TMCPReadPromptListTest.OnSecondListPromptsReply(aSender: TObject; aList: TMCPPromptInfoList);
+procedure TMCPReadPromptListTest.OnSecondListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
 begin
   FSecondCallbackExecuted := True;
   FSecondPromptList.Free; // Free previous list if any
   FSecondPromptList := aList; // Take ownership
+  aList:=Nil;
 end;
 
 function TMCPReadPromptListTest.CreateMockPromptsResponse: TJSONObject;
@@ -1146,13 +1271,19 @@ begin
 end;
 
 procedure TMCPReadPromptListTest.TestCallbackExecution;
+var
+  lObj : TJSONObject;
 begin
   FReadPromptList.OnReply := @OnListPromptsReply;
   FReadPromptList.Call();
 
   AssertFalse('Callback should not be executed yet', FCallbackExecuted);
-
-  FClient.SimulateResponse(FClient.LastRequestID, CreateEmptyPromptsResponse);
+  lObj:=CreateEmptyPromptsResponse;
+  try
+    FClient.SimulateResponse(FClient.LastRequestID, lObj);
+  finally
+    lObj.Free;
+  end;
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
   AssertTrue('Sender should be the TMCPReadPromptList instance', FCallbackSender = FReadPromptList);
@@ -1178,24 +1309,30 @@ end;
 procedure TMCPReadPromptListTest.TestMultipleCallbacks;
 var
   SecondReadPromptList: TMCPReadPromptList;
+  lObj1,lObj2 : TJSONObject;
 begin
   FReadPromptList.OnReply := @OnListPromptsReply;
   FReadPromptList.Call();
-
+  lObj1:=Nil;
+  lObj2:=Nil;
   SecondReadPromptList := TMCPReadPromptList.Create(FClient);
   try
     SecondReadPromptList.OnReply := @OnSecondListPromptsReply;
     SecondReadPromptList.Call();
 
     // Simulate responses
-    FClient.SimulateResponse(FClient.LastRequestID - 1, CreateEmptyPromptsResponse);
-    FClient.SimulateResponse(FClient.LastRequestID, CreateMockPromptsResponse);
+    lObj1:=CreateEmptyPromptsResponse;
+    lObj2:=CreateMockPromptsResponse;
+    FClient.SimulateResponse(FClient.LastRequestID - 1, lObj1);
+    FClient.SimulateResponse(FClient.LastRequestID, lObj2);
 
     AssertTrue('First callback should have been executed', FCallbackExecuted);
     AssertTrue('Second callback should have been executed', FSecondCallbackExecuted);
     AssertEquals('First should get empty list', 0, FLastPromptList.Count);
     AssertEquals('Second should get prompts', 2, FSecondPromptList.Count);
   finally
+    lObj1.Free;
+    lObj2.Free;
     SecondReadPromptList.Free;
   end;
 end;
@@ -1302,18 +1439,26 @@ end;
 procedure TMCPReadPromptListTest.TestClientListPromptsMethod;
 var
   ListPromptsCall: TMCPCall;
+  lObj : TJSONObject;
 begin
+  lObj:=Nil;
   ListPromptsCall := FClient.ListPrompts(@OnListPromptsReply);
+  try
+    AssertNotNull('Should return a call object', ListPromptsCall);
+    AssertTrue('Should be TMCPReadPromptList type', ListPromptsCall is TMCPReadPromptList);
 
-  AssertNotNull('Should return a call object', ListPromptsCall);
-  AssertTrue('Should be TMCPReadPromptList type', ListPromptsCall is TMCPReadPromptList);
+    // Simulate response
+    lObj:=CreateMockPromptsResponse;
+    FClient.SimulateResponse(FClient.LastRequestID, lObj);
 
-  // Simulate response
-  FClient.SimulateResponse(FClient.LastRequestID, CreateMockPromptsResponse);
+    AssertTrue('Client callback should have been executed', FCallbackExecuted);
+    AssertNotNull('Result list should not be nil', FLastPromptList);
+    AssertEquals('Should have 2 prompts from client method', 2, FLastPromptList.Count);
+  finally
+    lObj.Free;
+    ListPromptsCall.Free;
+  end;
 
-  AssertTrue('Client callback should have been executed', FCallbackExecuted);
-  AssertNotNull('Result list should not be nil', FLastPromptList);
-  AssertEquals('Should have 2 prompts from client method', 2, FLastPromptList.Count);
 end;
 
 procedure TMCPReadPromptListTest.TestClientListPromptsReturnType;
@@ -1322,14 +1467,17 @@ var
   ListPromptsInstance: TMCPReadPromptList;
 begin
   ListPromptsCall := FClient.ListPrompts(@OnListPromptsReply);
+  try
+    AssertNotNull('Should return a call object', ListPromptsCall);
+    AssertTrue('Should be TMCPReadPromptList instance', ListPromptsCall is TMCPReadPromptList);
 
-  AssertNotNull('Should return a call object', ListPromptsCall);
-  AssertTrue('Should be TMCPReadPromptList instance', ListPromptsCall is TMCPReadPromptList);
-
-  // Type cast should work
-  ListPromptsInstance := TMCPReadPromptList(ListPromptsCall);
-  AssertNotNull('Type cast should succeed', ListPromptsInstance);
-  AssertEquals('Method name should be correct', 'prompts/list', ListPromptsInstance.MethodName);
+    // Type cast should work
+    ListPromptsInstance := TMCPReadPromptList(ListPromptsCall);
+    AssertNotNull('Type cast should succeed', ListPromptsInstance);
+    AssertEquals('Method name should be correct', 'prompts/list', ListPromptsInstance.MethodName);
+  finally
+    ListPromptsCall.Free;
+  end;
 end;
 
 { TMCPReadResourceListTest }
@@ -1356,20 +1504,22 @@ begin
   inherited TearDown;
 end;
 
-procedure TMCPReadResourceListTest.OnListResourcesReply(aSender: TObject; aList: TMCPResourceInfoList);
+procedure TMCPReadResourceListTest.OnListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
   FLastResourceList.Free; // Free previous list if any
   FLastResourceList := aList; // Take ownership
+  aList:=Nil;
   Inc(FResponseCount);
 end;
 
-procedure TMCPReadResourceListTest.OnSecondListResourcesReply(aSender: TObject; aList: TMCPResourceInfoList);
+procedure TMCPReadResourceListTest.OnSecondListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
 begin
   FSecondCallbackExecuted := True;
   FSecondResourceList.Free; // Free previous list if any
   FSecondResourceList := aList; // Take ownership
+  aList:=Nil;
 end;
 
 function TMCPReadResourceListTest.CreateMockResourcesResponse: TJSONObject;
@@ -1653,16 +1803,22 @@ begin
 end;
 
 procedure TMCPReadResourceListTest.TestCallbackExecution;
+var
+  lObj : TJSONObject;
 begin
   FReadResourceList.OnReply := @OnListResourcesReply;
   FReadResourceList.Call();
 
   AssertFalse('Callback should not be executed yet', FCallbackExecuted);
+  lObj:=CreateEmptyResourcesResponse;
+  try
+    FClient.SimulateResponse(FClient.LastRequestID, lObj);
 
-  FClient.SimulateResponse(FClient.LastRequestID, CreateEmptyResourcesResponse);
-
-  AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertTrue('Sender should be the TMCPReadResourceList instance', FCallbackSender = FReadResourceList);
+    AssertTrue('Callback should have been executed', FCallbackExecuted);
+    AssertTrue('Sender should be the TMCPReadResourceList instance', FCallbackSender = FReadResourceList);
+  finally
+    lObj.Free;
+  end;
 end;
 
 procedure TMCPReadResourceListTest.TestCallbackWithNilList;
@@ -1685,24 +1841,30 @@ end;
 procedure TMCPReadResourceListTest.TestMultipleCallbacks;
 var
   SecondReadResourceList: TMCPReadResourceList;
+  lObj1,lObj2 : TJSONObject;
 begin
   FReadResourceList.OnReply := @OnListResourcesReply;
   FReadResourceList.Call();
-
+  lObj1:=Nil;
+  lObj2:=Nil;
   SecondReadResourceList := TMCPReadResourceList.Create(FClient);
   try
     SecondReadResourceList.OnReply := @OnSecondListResourcesReply;
     SecondReadResourceList.Call();
 
     // Simulate responses
-    FClient.SimulateResponse(FClient.LastRequestID - 1, CreateEmptyResourcesResponse);
-    FClient.SimulateResponse(FClient.LastRequestID, CreateMockResourcesResponse);
+    lObj1:=CreateEmptyResourcesResponse;
+    lObj2:=CreateMockResourcesResponse;
+    FClient.SimulateResponse(FClient.LastRequestID - 1, lObj1);
+    FClient.SimulateResponse(FClient.LastRequestID, lObj2);
 
     AssertTrue('First callback should have been executed', FCallbackExecuted);
     AssertTrue('Second callback should have been executed', FSecondCallbackExecuted);
     AssertEquals('First should get empty list', 0, FLastResourceList.Count);
     AssertEquals('Second should get resources', 2, FSecondResourceList.Count);
   finally
+    lObj1.Free;
+    lObj2.Free;
     SecondReadResourceList.Free;
   end;
 end;
@@ -1809,18 +1971,25 @@ end;
 procedure TMCPReadResourceListTest.TestClientListResourcesMethod;
 var
   ListResourcesCall: TMCPCall;
+  lObj : TJSONObject;
 begin
+  lObj:=NIl;
   ListResourcesCall := FClient.ListResources(@OnListResourcesReply);
+  try
+    AssertNotNull('Should return a call object', ListResourcesCall);
+    AssertTrue('Should be TMCPReadResourceList type', ListResourcesCall is TMCPReadResourceList);
 
-  AssertNotNull('Should return a call object', ListResourcesCall);
-  AssertTrue('Should be TMCPReadResourceList type', ListResourcesCall is TMCPReadResourceList);
+    // Simulate response
+    lObj:=CreateMockResourcesResponse;
+    FClient.SimulateResponse(FClient.LastRequestID, lObj);
 
-  // Simulate response
-  FClient.SimulateResponse(FClient.LastRequestID, CreateMockResourcesResponse);
-
-  AssertTrue('Client callback should have been executed', FCallbackExecuted);
-  AssertNotNull('Result list should not be nil', FLastResourceList);
-  AssertEquals('Should have 2 resources from client method', 2, FLastResourceList.Count);
+    AssertTrue('Client callback should have been executed', FCallbackExecuted);
+    AssertNotNull('Result list should not be nil', FLastResourceList);
+    AssertEquals('Should have 2 resources from client method', 2, FLastResourceList.Count);
+  finally
+    ListResourcesCall.Free;
+    lObj.Free;
+  end;
 end;
 
 procedure TMCPReadResourceListTest.TestClientListResourcesReturnType;
@@ -1829,14 +1998,17 @@ var
   ListResourcesInstance: TMCPReadResourceList;
 begin
   ListResourcesCall := FClient.ListResources(@OnListResourcesReply);
+  try
+    AssertNotNull('Should return a call object', ListResourcesCall);
+    AssertTrue('Should be TMCPReadResourceList instance', ListResourcesCall is TMCPReadResourceList);
 
-  AssertNotNull('Should return a call object', ListResourcesCall);
-  AssertTrue('Should be TMCPReadResourceList instance', ListResourcesCall is TMCPReadResourceList);
-
-  // Type cast should work
-  ListResourcesInstance := TMCPReadResourceList(ListResourcesCall);
-  AssertNotNull('Type cast should succeed', ListResourcesInstance);
-  AssertEquals('Method name should be correct', 'resources/list', ListResourcesInstance.MethodName);
+    // Type cast should work
+    ListResourcesInstance := TMCPReadResourceList(ListResourcesCall);
+    AssertNotNull('Type cast should succeed', ListResourcesInstance);
+    AssertEquals('Method name should be correct', 'resources/list', ListResourcesInstance.MethodName);
+  finally
+    ListResourcesCall.Free;
+  end;
 end;
 
 { TMCPGetResourceTest }
@@ -2093,13 +2265,19 @@ begin
 end;
 
 procedure TMCPGetResourceTest.TestCallbackExecution;
+var
+  lObj : TJSONObject;
 begin
   FGetResource.OnReply := @OnGetResourceReply;
   FGetResource.Call('file:///test.txt');
 
   AssertFalse('Callback should not be executed yet', FCallbackExecuted);
-
-  FClient.SimulateResponse(FClient.LastRequestID, CreateMockResourceResponse);
+  lObj:=CreateMockResourceResponse;
+  try
+    FClient.SimulateResponse(FClient.LastRequestID, lObj);
+  finally
+    lObj.Free;
+  end;
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
   AssertTrue('Sender should be the TMCPGetResource instance', FCallbackSender = FGetResource);
@@ -2125,30 +2303,30 @@ end;
 procedure TMCPGetResourceTest.TestMultipleCallbacks;
 var
   SecondGetResource: TMCPGetResource;
-  MockResponse: TJSONObject;
+  lObj2,MockResponse: TJSONObject;
 begin
   FGetResource.OnReply := @OnGetResourceReply;
   FGetResource.Call('file:///first.txt');
-
+  MockResponse :=nil;
+  lObj2:=Nil;
   SecondGetResource := TMCPGetResource.Create(FClient);
   try
     SecondGetResource.OnReply := @OnSecondGetResourceReply;
     SecondGetResource.Call('file:///second.txt');
 
     // Simulate responses
+    lObj2:=CreateMockResourceWithDataResponse;
     MockResponse := CreateMockResourceResponse;
-    try
-      FClient.SimulateResponse(FClient.LastRequestID - 1, MockResponse);
-      FClient.SimulateResponse(FClient.LastRequestID, CreateMockResourceWithDataResponse);
+    FClient.SimulateResponse(FClient.LastRequestID - 1, MockResponse);
+    FClient.SimulateResponse(FClient.LastRequestID, lObj2);
 
-      AssertTrue('First callback should have been executed', FCallbackExecuted);
-      AssertTrue('Second callback should have been executed', FSecondCallbackExecuted);
-      AssertNotNull('First resource should not be nil', FLastResource);
-      AssertNotNull('Second resource should not be nil', FSecondResource);
-    finally
-      MockResponse.Free;
-    end;
+    AssertTrue('First callback should have been executed', FCallbackExecuted);
+    AssertTrue('Second callback should have been executed', FSecondCallbackExecuted);
+    AssertNotNull('First resource should not be nil', FLastResource);
+    AssertNotNull('Second resource should not be nil', FSecondResource);
   finally
+    lObj2.Free;
+    MockResponse.Free;
     SecondGetResource.Free;
   end;
 end;
@@ -2257,20 +2435,22 @@ var
   GetResourceCall: TMCPCall;
   MockResponse: TJSONObject;
 begin
+  MockResponse:=Nil;
   GetResourceCall := FClient.GetResource('file:///client-test.txt', @OnGetResourceReply);
-
-  AssertNotNull('Should return a call object', GetResourceCall);
-  AssertTrue('Should be TMCPGetResource type', GetResourceCall is TMCPGetResource);
-
-  // Simulate response
-  MockResponse := CreateMockResourceResponse;
   try
+
+    AssertNotNull('Should return a call object', GetResourceCall);
+    AssertTrue('Should be TMCPGetResource type', GetResourceCall is TMCPGetResource);
+
+    // Simulate response
+    MockResponse := CreateMockResourceResponse;
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Client callback should have been executed', FCallbackExecuted);
     AssertNotNull('Result resource should not be nil', FLastResource);
     AssertEquals('Should get correct resource from client method', 'file:///test/resource.txt', FLastResource.URI);
   finally
+    GetResourceCall.Free;
     MockResponse.Free;
   end;
 end;
@@ -2281,14 +2461,17 @@ var
   GetResourceInstance: TMCPGetResource;
 begin
   GetResourceCall := FClient.GetResource('file:///type-test.txt', @OnGetResourceReply);
+  try
+    AssertNotNull('Should return a call object', GetResourceCall);
+    AssertTrue('Should be TMCPGetResource instance', GetResourceCall is TMCPGetResource);
 
-  AssertNotNull('Should return a call object', GetResourceCall);
-  AssertTrue('Should be TMCPGetResource instance', GetResourceCall is TMCPGetResource);
-
-  // Type cast should work
-  GetResourceInstance := TMCPGetResource(GetResourceCall);
-  AssertNotNull('Type cast should succeed', GetResourceInstance);
-  AssertEquals('Method name should be correct', 'resources/read', GetResourceInstance.MethodName);
+    // Type cast should work
+    GetResourceInstance := TMCPGetResource(GetResourceCall);
+    AssertNotNull('Type cast should succeed', GetResourceInstance);
+    AssertEquals('Method name should be correct', 'resources/read', GetResourceInstance.MethodName);
+  finally
+    GetResourceCall.Free;
+  end;
 end;
 
 
