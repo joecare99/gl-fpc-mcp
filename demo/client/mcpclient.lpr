@@ -48,10 +48,12 @@ type
     FResourcesList: TMCPResourceInfoList;
     FResourceGetResponse: TMCPReadResourceResponse;
     FCompletionResponse: TMCPCompletionResponse;
+    FProcessTransport: TMCPClientStdioTransport;
 
     // Configuration management
     function GetCompletionContext(aFileName: string; out aContext: TMCPCompletionContext): Boolean;
     procedure LoadConfiguration;
+    // Get config for a particular server Do not free aServerconfig!
     procedure ParseServerConfig(const aServerName: string; out aServerConfig: TJSONObject);
     function ParseOptions: Boolean;
     function ValidateOptions: Boolean;
@@ -147,6 +149,7 @@ begin
   FreeAndNil(FToolsList);
   FreeAndNil(FPromptsList);
   FreeAndNil(FResourcesList);
+  FreeAndNil(FProcessTransport);
   FToolCallResponse.Clear; // Clean up tool call response
   inherited Destroy;
 end;
@@ -398,7 +401,6 @@ function TMCPClientApplication.CreateAndConnectClient(aServerConfig: TJSONObject
 var
   Command: string;
   Args: TJSONArray;
-  ProcessTransport: TMCPClientStdioTransport;
   ArgsList: TStrings;
 begin
   Result := False;
@@ -414,14 +416,14 @@ begin
 
   try
     // Create process-based transport
-    ProcessTransport := TMCPClientStdioTransport.Create(nil);
+    FProcessTransport := TMCPClientStdioTransport.Create(nil);
 
-    ProcessTransport.Executable := Command;
+    FProcessTransport.Executable := Command;
     if Assigned(Args) then
       begin
       ArgsList := JSONArrayToStringList(Args);
       try
-        ProcessTransport.Arguments.Assign(ArgsList);
+        FProcessTransport.Arguments.Assign(ArgsList);
       finally
         ArgsList.Free;
       end;
@@ -430,12 +432,12 @@ begin
     FClient := TMCPCustomClient.Create(nil);
     FClient.ClientName := 'mcpclient-demo';
     FClient.ClientVersion := '1.0';
-    FClient.Transport := ProcessTransport;
+    FClient.Transport := FProcessTransport;
 
     // Connect
     LogInfo('Starting server process: ' + Command);
-    ProcessTransport.Connect;
-    Result := ProcessTransport.Connected;
+    FProcessTransport.Connect;
+    Result := FProcessTransport.Connected;
 
     if Result then
       LogInfo('Connected to MCP server')
@@ -456,10 +458,10 @@ begin
   if Assigned(FClient) then
     begin
     if Assigned(FClient.Transport) then
-    begin
+      begin
       FClient.Transport.Disconnect;
       LogInfo('Disconnected from MCP server');
-    end;
+      end;
     FreeAndNil(FClient);
     end;
 end;
@@ -540,10 +542,10 @@ begin
 
   // Copy meta data if present
   if Assigned(aResponse.Meta) then
-  begin
+    begin
     FToolCallResponse.Meta.Free;
     FToolCallResponse.Meta := aResponse.Meta.Clone as TJSONObject;
-  end;
+    end;
 
   FLastResponse := rtToolCall;
 end;
@@ -933,10 +935,10 @@ end;
 procedure TMCPClientApplication.Usage(const aErr: string);
 begin
   if aErr <> '' then
-  begin
+    begin
     LogError(aErr);
     WriteLn;
-  end;
+    end;
 
   WriteLn('Usage: ', ExeName, ' <command> [options]');
   WriteLn;
@@ -984,21 +986,21 @@ begin
 
   // Check options validity - exit immediately if invalid
   if not ValidateOptions then
-  begin
+    begin
     ExitCode := 1;
     Exit;
-  end;
+    end;
 
   // Load configuration for all commands except help
   try
     LoadConfiguration;
   except
     on E: EMCPClientApp do
-    begin
+      begin
       LogError(E.Message);
       ExitCode := 1;
       Exit;
-    end;
+      end;
   end;
 
   // Execute command
@@ -1006,15 +1008,15 @@ begin
     ExecuteCommand;
   except
     on E: EMCPClientApp do
-    begin
+      begin
       LogError(E.Message);
       ExitCode := 1;
-    end;
+      end;
     on E: Exception do
-    begin
+      begin
       LogError('Unexpected error: ' + E.Message);
       ExitCode := 1;
-    end;
+      end;
   end;
 end;
 
