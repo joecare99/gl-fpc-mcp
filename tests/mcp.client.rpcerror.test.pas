@@ -5,7 +5,7 @@ unit mcp.client.rpcerror.test;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.client.base;
+  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.types;
 
 type
 

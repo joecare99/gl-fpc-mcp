@@ -844,21 +844,17 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://resource', 'test_resource');
+  JSON := ResourceInfo.ToJSON(False);
   try
-    JSON := ResourceInfo.ToJSON(False);
-    try
-      AssertNotNull('ToJSON should return a JSON object', JSON);
-      AssertEquals('JSON should contain uri', 'test://resource', JSON.Get('uri', ''));
-      AssertEquals('JSON should contain name', 'test_resource', JSON.Get('name', ''));
-      AssertEquals('JSON should contain title', '', JSON.Get('title', ''));
-      AssertEquals('JSON should contain description', '', JSON.Get('description', ''));
-      AssertEquals('JSON should contain mimetype', '', JSON.Get('mimetype', ''));
-      AssertFalse('JSON should not contain text data', JSON.IndexOfName('text') >= 0);
-    finally
-      JSON.Free;
-    end;
+    AssertNotNull('ToJSON should return a JSON object', JSON);
+    AssertEquals('JSON should contain uri', 'test://resource', JSON.Get('uri', ''));
+    AssertEquals('JSON should contain name', 'test_resource', JSON.Get('name', ''));
+    AssertEquals('JSON should contain title', '', JSON.Get('title', ''));
+    AssertEquals('JSON should contain description', '', JSON.Get('description', ''));
+    AssertEquals('JSON should contain mimetype', '', JSON.Get('mimetype', ''));
+    AssertFalse('JSON should not contain text data', JSON.IndexOfName('text') >= 0);
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -868,25 +864,21 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://text', 'text_resource');
-  try
-    ResourceInfo.Text := 'Hello, World!';
-    ResourceInfo.Title := 'Test Text Resource';
-    ResourceInfo.MimeType := 'text/plain';
+  ResourceInfo.Text := 'Hello, World!';
+  ResourceInfo.Title := 'Test Text Resource';
+  ResourceInfo.MimeType := 'text/plain';
 
-    JSON := ResourceInfo.ToJSON(True);
-    try
-      AssertNotNull('ToJSON should return a JSON object', JSON);
-      AssertEquals('JSON should contain uri', 'test://text', JSON.Get('uri', ''));
-      AssertEquals('JSON should contain name', 'text_resource', JSON.Get('name', ''));
-      AssertEquals('JSON should contain title', 'Test Text Resource', JSON.Get('title', ''));
-      AssertEquals('JSON should contain mimetype', 'text/plain', JSON.Get('mimetype', ''));
-      AssertTrue('JSON should contain text data', JSON.IndexOfName('text') >= 0);
-      AssertEquals('JSON text should match', 'Hello, World!', JSON.Get('text', ''));
-    finally
-      JSON.Free;
-    end;
+  JSON := ResourceInfo.ToJSON(True);
+  try
+    AssertNotNull('ToJSON should return a JSON object', JSON);
+    AssertEquals('JSON should contain uri', 'test://text', JSON.Get('uri', ''));
+    AssertEquals('JSON should contain name', 'text_resource', JSON.Get('name', ''));
+    AssertEquals('JSON should contain title', 'Test Text Resource', JSON.Get('title', ''));
+    AssertEquals('JSON should contain mimetype', 'text/plain', JSON.Get('mimetype', ''));
+    AssertTrue('JSON should contain text data', JSON.IndexOfName('text') >= 0);
+    AssertEquals('JSON text should match', 'Hello, World!', JSON.Get('text', ''));
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -898,33 +890,29 @@ var
   ExpectedEncoded: String;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://binary', 'binary_resource');
-  try
     // Create some test binary data
-    SetLength(BinaryData, 3);
-    BinaryData[0] := $48; // 'H'
-    BinaryData[1] := $69; // 'i'
-    BinaryData[2] := $21; // '!'
-    ResourceInfo.Data := BinaryData;
-    ResourceInfo.Title := 'Test Binary Resource';
-    ResourceInfo.MimeType := 'application/octet-stream';
+  SetLength(BinaryData, 3);
+  BinaryData[0] := $48; // 'H'
+  BinaryData[1] := $69; // 'i'
+  BinaryData[2] := $21; // '!'
+  ResourceInfo.Data := BinaryData;
+  ResourceInfo.Title := 'Test Binary Resource';
+  ResourceInfo.MimeType := 'application/octet-stream';
 
-    // Expected Base64 encoding of "Hi!"
-    ExpectedEncoded := 'SGkh';
+  // Expected Base64 encoding of "Hi!"
+  ExpectedEncoded := 'SGkh';
 
-    JSON := ResourceInfo.ToJSON(True);
-    try
-      AssertNotNull('ToJSON should return a JSON object', JSON);
-      AssertEquals('JSON should contain uri', 'test://binary', JSON.Get('uri', ''));
-      AssertEquals('JSON should contain name', 'binary_resource', JSON.Get('name', ''));
-      AssertEquals('JSON should contain title', 'Test Binary Resource', JSON.Get('title', ''));
-      AssertEquals('JSON should contain mimetype', 'application/octet-stream', JSON.Get('mimetype', ''));
-      AssertTrue('JSON should contain text data (encoded)', JSON.IndexOfName('text') >= 0);
-      AssertEquals('JSON text should be base64 encoded', ExpectedEncoded, JSON.Get('text', ''));
-    finally
-      JSON.Free;
-    end;
+  JSON := ResourceInfo.ToJSON(True);
+  try
+    AssertNotNull('ToJSON should return a JSON object', JSON);
+    AssertEquals('JSON should contain uri', 'test://binary', JSON.Get('uri', ''));
+    AssertEquals('JSON should contain name', 'binary_resource', JSON.Get('name', ''));
+    AssertEquals('JSON should contain title', 'Test Binary Resource', JSON.Get('title', ''));
+    AssertEquals('JSON should contain mimetype', 'application/octet-stream', JSON.Get('mimetype', ''));
+    AssertTrue('JSON should contain text data (encoded)', JSON.IndexOfName('text') >= 0);
+    AssertEquals('JSON text should be base64 encoded', ExpectedEncoded, JSON.Get('text', ''));
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -934,25 +922,21 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://nodata', 'nodata_resource');
-  try
-    ResourceInfo.Title := 'A resource with no content';
-    ResourceInfo.Description := 'A resource with no content';
-    ResourceInfo.MimeType := 'text/plain';
+  ResourceInfo.Title := 'A resource with no content';
+  ResourceInfo.Description := 'A resource with no content';
+  ResourceInfo.MimeType := 'text/plain';
 
-    JSON := ResourceInfo.ToJSON(False);
-    try
-      AssertNotNull('ToJSON should return a JSON object', JSON);
-      AssertEquals('JSON should contain uri', 'test://nodata', JSON.Get('uri', ''));
-      AssertEquals('JSON should contain name', 'nodata_resource', JSON.Get('name', ''));
-      AssertEquals('JSON should contain title', 'A resource with no content', JSON.Get('title', ''));
-      AssertEquals('JSON should contain description', 'A resource with no content', JSON.Get('description', ''));
-      AssertEquals('JSON should contain mimetype', 'text/plain', JSON.Get('mimetype', ''));
-      AssertFalse('JSON should not contain text when withData=False', JSON.IndexOfName('text') >= 0);
-    finally
-      JSON.Free;
-    end;
+  JSON := ResourceInfo.ToJSON(False);
+  try
+    AssertNotNull('ToJSON should return a JSON object', JSON);
+    AssertEquals('JSON should contain uri', 'test://nodata', JSON.Get('uri', ''));
+    AssertEquals('JSON should contain name', 'nodata_resource', JSON.Get('name', ''));
+    AssertEquals('JSON should contain title', 'A resource with no content', JSON.Get('title', ''));
+    AssertEquals('JSON should contain description', 'A resource with no content', JSON.Get('description', ''));
+    AssertEquals('JSON should contain mimetype', 'text/plain', JSON.Get('mimetype', ''));
+    AssertFalse('JSON should not contain text when withData=False', JSON.IndexOfName('text') >= 0);
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -962,25 +946,21 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://proc', 'proc_resource');
+  ResourceInfo.Text := 'Procedure test';
+  ResourceInfo.Title := 'Test Procedure Version';
+
+  JSON := TJSONObject.Create;
   try
-    ResourceInfo.Text := 'Procedure test';
-    ResourceInfo.Title := 'Test Procedure Version';
+    ResourceInfo.ToJSON(JSON, True);
 
-    JSON := TJSONObject.Create;
-    try
-      ResourceInfo.ToJSON(JSON, True);
-
-      AssertNotNull('JSON should be populated', JSON);
-      AssertEquals('JSON should contain uri', 'test://proc', JSON.Get('uri', ''));
-      AssertEquals('JSON should contain name', 'proc_resource', JSON.Get('name', ''));
-      AssertEquals('JSON should contain title', 'Test Procedure Version', JSON.Get('title', ''));
-      AssertTrue('JSON should contain text data', JSON.IndexOfName('text') >= 0);
-      AssertEquals('JSON text should match', 'Procedure test', JSON.Get('text', ''));
-    finally
-      JSON.Free;
-    end;
+    AssertNotNull('JSON should be populated', JSON);
+    AssertEquals('JSON should contain uri', 'test://proc', JSON.Get('uri', ''));
+    AssertEquals('JSON should contain name', 'proc_resource', JSON.Get('name', ''));
+    AssertEquals('JSON should contain title', 'Test Procedure Version', JSON.Get('title', ''));
+    AssertTrue('JSON should contain text data', JSON.IndexOfName('text') >= 0);
+    AssertEquals('JSON text should match', 'Procedure test', JSON.Get('text', ''));
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -989,20 +969,16 @@ var
   ResourceInfo: TMCPResourceInfo;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://create', 'create_test');
-  try
-    AssertNotNull('ResourceInfo should be created', ResourceInfo);
-    AssertEquals('Uri should be set', 'test://create', ResourceInfo.Uri);
-    AssertEquals('Name should be set', 'create_test', ResourceInfo.Name);
-    AssertEquals('Title should be empty by default', '', ResourceInfo.Title);
-    AssertEquals('Description should be empty by default', '', ResourceInfo.Description);
-    AssertEquals('MimeType should be empty by default', '', ResourceInfo.MimeType);
-    AssertEquals('Text should be empty by default', '', ResourceInfo.Text);
-    AssertEquals('Data should be empty by default', 0, Length(ResourceInfo.Data));
-    AssertEquals('Size should be 0 by default', 0, ResourceInfo.Size);
-    AssertEquals('Kind should be rkUnknown by default', rkUnknown, ResourceInfo.GetKind);
-  finally
-    ResourceInfo.Free;
-  end;
+
+  AssertEquals('Uri should be set', 'test://create', ResourceInfo.Uri);
+  AssertEquals('Name should be set', 'create_test', ResourceInfo.Name);
+  AssertEquals('Title should be empty by default', '', ResourceInfo.Title);
+  AssertEquals('Description should be empty by default', '', ResourceInfo.Description);
+  AssertEquals('MimeType should be empty by default', '', ResourceInfo.MimeType);
+  AssertEquals('Text should be empty by default', '', ResourceInfo.Text);
+  AssertEquals('Data should be empty by default', 0, Length(ResourceInfo.Data));
+  AssertEquals('Size should be 0 by default', 0, ResourceInfo.Size);
+  AssertEquals('Kind should be rkUnknown by default', rkUnknown, ResourceInfo.GetKind);
 end;
 
 procedure TMCPResourceInfoTest.TestPropertyAccess;
@@ -1011,36 +987,32 @@ var
   TestData: TBytes;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://prop', 'prop_test');
-  try
-    // Test property write access
-    ResourceInfo.Uri := 'test://newuri';
-    ResourceInfo.Name := 'new_name';
-    ResourceInfo.Title := 'New Title';
-    ResourceInfo.Description := 'New Description';
-    ResourceInfo.MimeType := 'text/plain';
-    ResourceInfo.Text := 'Some text';
-    ResourceInfo.Size := 100;
+  // Test property write access
+  ResourceInfo.Uri := 'test://newuri';
+  ResourceInfo.Name := 'new_name';
+  ResourceInfo.Title := 'New Title';
+  ResourceInfo.Description := 'New Description';
+  ResourceInfo.MimeType := 'text/plain';
+  ResourceInfo.Text := 'Some text';
+  ResourceInfo.Size := 100;
 
-    // Test property read access
-    AssertEquals('Uri should be changeable', 'test://newuri', ResourceInfo.Uri);
-    AssertEquals('Name should be changeable', 'new_name', ResourceInfo.Name);
-    AssertEquals('Title should be changeable', 'New Title', ResourceInfo.Title);
-    AssertEquals('Description should be changeable', 'New Description', ResourceInfo.Description);
-    AssertEquals('MimeType should be changeable', 'text/plain', ResourceInfo.MimeType);
-    AssertEquals('Text should be changeable', 'Some text', ResourceInfo.Text);
-    AssertEquals('Size should be changeable', 100, ResourceInfo.Size);
+  // Test property read access
+  AssertEquals('Uri should be changeable', 'test://newuri', ResourceInfo.Uri);
+  AssertEquals('Name should be changeable', 'new_name', ResourceInfo.Name);
+  AssertEquals('Title should be changeable', 'New Title', ResourceInfo.Title);
+  AssertEquals('Description should be changeable', 'New Description', ResourceInfo.Description);
+  AssertEquals('MimeType should be changeable', 'text/plain', ResourceInfo.MimeType);
+  AssertEquals('Text should be changeable', 'Some text', ResourceInfo.Text);
+  AssertEquals('Size should be changeable', 100, ResourceInfo.Size);
 
-    // Test data property
-    SetLength(TestData, 2);
-    TestData[0] := $41; // 'A'
-    TestData[1] := $42; // 'B'
-    ResourceInfo.Data := TestData;
-    AssertEquals('Data should be settable', 2, Length(ResourceInfo.Data));
-    AssertEquals('Data[0] should match', $41, ResourceInfo.Data[0]);
-    AssertEquals('Data[1] should match', $42, ResourceInfo.Data[1]);
-  finally
-    ResourceInfo.Free;
-  end;
+  // Test data property
+  SetLength(TestData, 2);
+  TestData[0] := $41; // 'A'
+  TestData[1] := $42; // 'B'
+  ResourceInfo.Data := TestData;
+  AssertEquals('Data should be settable', 2, Length(ResourceInfo.Data));
+  AssertEquals('Data[0] should match', $41, ResourceInfo.Data[0]);
+  AssertEquals('Data[1] should match', $42, ResourceInfo.Data[1]);
 end;
 
 procedure TMCPResourceInfoTest.TestFromJSONWithMinimalData;
@@ -1049,26 +1021,22 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('', '');
+  JSON := TJSONObject.Create;
   try
-    JSON := TJSONObject.Create;
-    try
-      JSON.Add('uri', 'test://fromjson');
-      JSON.Add('name', 'fromjson_resource');
+    JSON.Add('uri', 'test://fromjson');
+    JSON.Add('name', 'fromjson_resource');
 
-      ResourceInfo.FromJSON(JSON);
+    ResourceInfo.FromJSON(JSON);
 
-      AssertEquals('Uri should be loaded from JSON', 'test://fromjson', ResourceInfo.Uri);
-      AssertEquals('Name should be loaded from JSON', 'fromjson_resource', ResourceInfo.Name);
-      AssertEquals('Title should be empty', '', ResourceInfo.Title);
-      AssertEquals('Description should be empty', '', ResourceInfo.Description);
-      AssertEquals('MimeType should be empty', '', ResourceInfo.MimeType);
-      AssertEquals('Text should be empty', '', ResourceInfo.Text);
-      AssertEquals('Data should be empty', 0, Length(ResourceInfo.Data));
-    finally
-      JSON.Free;
-    end;
+    AssertEquals('Uri should be loaded from JSON', 'test://fromjson', ResourceInfo.Uri);
+    AssertEquals('Name should be loaded from JSON', 'fromjson_resource', ResourceInfo.Name);
+    AssertEquals('Title should be empty', '', ResourceInfo.Title);
+    AssertEquals('Description should be empty', '', ResourceInfo.Description);
+    AssertEquals('MimeType should be empty', '', ResourceInfo.MimeType);
+    AssertEquals('Text should be empty', '', ResourceInfo.Text);
+    AssertEquals('Data should be empty', 0, Length(ResourceInfo.Data));
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -1078,31 +1046,27 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('', '');
+  JSON := TJSONObject.Create;
   try
-    JSON := TJSONObject.Create;
-    try
-      JSON.Add('uri', 'test://textfromjson');
-      JSON.Add('name', 'text_from_json');
-      JSON.Add('title', 'Text From JSON');
-      JSON.Add('description', 'A text resource loaded from JSON');
-      JSON.Add('mimetype', 'text/plain');
-      JSON.Add('text', 'Hello from JSON!');
+    JSON.Add('uri', 'test://textfromjson');
+    JSON.Add('name', 'text_from_json');
+    JSON.Add('title', 'Text From JSON');
+    JSON.Add('description', 'A text resource loaded from JSON');
+    JSON.Add('mimetype', 'text/plain');
+    JSON.Add('text', 'Hello from JSON!');
 
-      ResourceInfo.FromJSON(JSON);
+    ResourceInfo.FromJSON(JSON);
 
-      AssertEquals('Uri should be loaded', 'test://textfromjson', ResourceInfo.Uri);
-      AssertEquals('Name should be loaded', 'text_from_json', ResourceInfo.Name);
-      AssertEquals('Title should be loaded (from title field only)', 'Text From JSON', ResourceInfo.Title);
-      AssertEquals('Description should be loaded from description field', 'A text resource loaded from JSON', ResourceInfo.Description);
-      AssertEquals('MimeType should be loaded', 'text/plain', ResourceInfo.MimeType);
-      AssertEquals('Text should be loaded', 'Hello from JSON!', ResourceInfo.Text);
-      AssertEquals('Kind should be rkText', rkText, ResourceInfo.GetKind);
-      AssertEquals('Size should be calculated', Length('Hello from JSON!'), ResourceInfo.GetSize);
-    finally
-      JSON.Free;
-    end;
+    AssertEquals('Uri should be loaded', 'test://textfromjson', ResourceInfo.Uri);
+    AssertEquals('Name should be loaded', 'text_from_json', ResourceInfo.Name);
+    AssertEquals('Title should be loaded (from title field only)', 'Text From JSON', ResourceInfo.Title);
+    AssertEquals('Description should be loaded from description field', 'A text resource loaded from JSON', ResourceInfo.Description);
+    AssertEquals('MimeType should be loaded', 'text/plain', ResourceInfo.MimeType);
+    AssertEquals('Text should be loaded', 'Hello from JSON!', ResourceInfo.Text);
+    AssertEquals('Kind should be rkText', rkText, ResourceInfo.GetKind);
+    AssertEquals('Size should be calculated', Length('Hello from JSON!'), ResourceInfo.GetSize);
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -1113,45 +1077,41 @@ var
   ExpectedData: TBytes;
 begin
   ResourceInfo := TMCPResourceInfo.Create('', '');
+  JSON := TJSONObject.Create;
   try
-    JSON := TJSONObject.Create;
-    try
-      JSON.Add('uri', 'test://binaryfromjson');
-      JSON.Add('name', 'binary_from_json');
-      JSON.Add('title', 'Binary From JSON');
-      JSON.Add('description', 'A binary resource loaded from JSON');
-      JSON.Add('mimetype', 'application/octet-stream');
-      JSON.Add('text', 'SGkh'); // Base64 for "Hi!"
+    JSON.Add('uri', 'test://binaryfromjson');
+    JSON.Add('name', 'binary_from_json');
+    JSON.Add('title', 'Binary From JSON');
+    JSON.Add('description', 'A binary resource loaded from JSON');
+    JSON.Add('mimetype', 'application/octet-stream');
+    JSON.Add('text', 'SGkh'); // Base64 for "Hi!"
 
-      ResourceInfo.FromJSON(JSON);
+    ResourceInfo.FromJSON(JSON);
 
-      AssertEquals('Uri should be loaded', 'test://binaryfromjson', ResourceInfo.Uri);
-      AssertEquals('Name should be loaded', 'binary_from_json', ResourceInfo.Name);
-      AssertEquals('Title should be loaded (from title field only)', 'Binary From JSON', ResourceInfo.Title);
-      AssertEquals('Description should be loaded from description field', 'A binary resource loaded from JSON', ResourceInfo.Description);
-      AssertEquals('MimeType should be loaded', 'application/octet-stream', ResourceInfo.MimeType);
+    AssertEquals('Uri should be loaded', 'test://binaryfromjson', ResourceInfo.Uri);
+    AssertEquals('Name should be loaded', 'binary_from_json', ResourceInfo.Name);
+    AssertEquals('Title should be loaded (from title field only)', 'Binary From JSON', ResourceInfo.Title);
+    AssertEquals('Description should be loaded from description field', 'A binary resource loaded from JSON', ResourceInfo.Description);
+    AssertEquals('MimeType should be loaded', 'application/octet-stream', ResourceInfo.MimeType);
 
-      // For binary data (non-text mimetype), should be decoded
-      SetLength(ExpectedData, 3);
-      ExpectedData[0] := $48; // 'H'
-      ExpectedData[1] := $69; // 'i'
-      ExpectedData[2] := $21; // '!'
+    // For binary data (non-text mimetype), should be decoded
+    SetLength(ExpectedData, 3);
+    ExpectedData[0] := $48; // 'H'
+    ExpectedData[1] := $69; // 'i'
+    ExpectedData[2] := $21; // '!'
 
-      AssertEquals('Data length should match', Length(ExpectedData), Length(ResourceInfo.Data));
-      if Length(ResourceInfo.Data) >= 3 then
-      begin
-        AssertEquals('Data[0] should match', ExpectedData[0], ResourceInfo.Data[0]);
-        AssertEquals('Data[1] should match', ExpectedData[1], ResourceInfo.Data[1]);
-        AssertEquals('Data[2] should match', ExpectedData[2], ResourceInfo.Data[2]);
-      end;
-      AssertEquals('Kind should be rkData', rkData, ResourceInfo.GetKind);
-      AssertEquals('Size should be calculated', Length(ExpectedData), ResourceInfo.GetSize);
-    finally
-      JSON.Free;
+    AssertEquals('Data length should match', Length(ExpectedData), Length(ResourceInfo.Data));
+    if Length(ResourceInfo.Data) >= 3 then
+    begin
+      AssertEquals('Data[0] should match', ExpectedData[0], ResourceInfo.Data[0]);
+      AssertEquals('Data[1] should match', ExpectedData[1], ResourceInfo.Data[1]);
+      AssertEquals('Data[2] should match', ExpectedData[2], ResourceInfo.Data[2]);
     end;
+    AssertEquals('Kind should be rkData', rkData, ResourceInfo.GetKind);
+    AssertEquals('Size should be calculated', Length(ExpectedData), ResourceInfo.GetSize);
   finally
-    ResourceInfo.Free;
-  end;
+    JSON.Free;
+    end;
 end;
 
 procedure TMCPResourceInfoTest.TestFromJSONWithMissingFields;
@@ -1160,29 +1120,25 @@ var
   JSON: TJSONObject;
 begin
   ResourceInfo := TMCPResourceInfo.Create('original://uri', 'original_name');
+  // Set initial values
+  ResourceInfo.Title := 'Original Title';
+  ResourceInfo.Description := 'Original Description';
+
+  JSON := TJSONObject.Create;
   try
-    // Set initial values
-    ResourceInfo.Title := 'Original Title';
-    ResourceInfo.Description := 'Original Description';
+    // Only provide uri and name, missing other fields
+    JSON.Add('uri', 'test://partial');
+    JSON.Add('name', 'partial_resource');
 
-    JSON := TJSONObject.Create;
-    try
-      // Only provide uri and name, missing other fields
-      JSON.Add('uri', 'test://partial');
-      JSON.Add('name', 'partial_resource');
+    ResourceInfo.FromJSON(JSON);
 
-      ResourceInfo.FromJSON(JSON);
-
-      AssertEquals('Uri should be updated', 'test://partial', ResourceInfo.Uri);
-      AssertEquals('Name should be updated', 'partial_resource', ResourceInfo.Name);
-      AssertEquals('Title should be cleared', '', ResourceInfo.Title);
-      AssertEquals('Description should be cleared', '', ResourceInfo.Description);
-      AssertEquals('MimeType should be empty', '', ResourceInfo.MimeType);
-    finally
-      JSON.Free;
-    end;
+    AssertEquals('Uri should be updated', 'test://partial', ResourceInfo.Uri);
+    AssertEquals('Name should be updated', 'partial_resource', ResourceInfo.Name);
+    AssertEquals('Title should be cleared', '', ResourceInfo.Title);
+    AssertEquals('Description should be cleared', '', ResourceInfo.Description);
+    AssertEquals('MimeType should be empty', '', ResourceInfo.MimeType);
   finally
-    ResourceInfo.Free;
+    JSON.Free;
   end;
 end;
 
@@ -1191,19 +1147,15 @@ var
   ResourceInfo: TMCPResourceInfo;
 begin
   ResourceInfo := TMCPResourceInfo.Create('test://nil', 'nil_test');
-  try
-    ResourceInfo.Title := 'Original Title';
+  ResourceInfo.Title := 'Original Title';
 
-    // Should not crash with nil JSON
-    ResourceInfo.FromJSON(nil);
+  // Should not crash with nil JSON
+  ResourceInfo.FromJSON(nil);
 
-    // Values should remain unchanged
-    AssertEquals('Uri should remain unchanged', 'test://nil', ResourceInfo.Uri);
-    AssertEquals('Name should remain unchanged', 'nil_test', ResourceInfo.Name);
-    AssertEquals('Title should remain unchanged', 'Original Title', ResourceInfo.Title);
-  finally
-    ResourceInfo.Free;
-  end;
+  // Values should remain unchanged
+  AssertEquals('Uri should remain unchanged', 'test://nil', ResourceInfo.Uri);
+  AssertEquals('Name should remain unchanged', 'nil_test', ResourceInfo.Name);
+  AssertEquals('Title should remain unchanged', 'Original Title', ResourceInfo.Title);
 end;
 
 procedure TMCPResourceInfoTest.TestRoundTripSerialization;

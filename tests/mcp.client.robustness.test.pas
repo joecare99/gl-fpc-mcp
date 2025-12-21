@@ -5,7 +5,7 @@ unit mcp.client.robustness.test;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.client.base, mcp.client.calls;
+  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.types, mcp.client.base, mcp.client.calls;
 
 type
 

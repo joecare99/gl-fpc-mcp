@@ -67,8 +67,8 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
-    procedure OnSecondListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
+    procedure OnListToolsReply(aSender: TObject; var aList: TMCPToolInfoList; const aError : TRPCError);
+    procedure OnSecondListToolsReply(aSender: TObject; var aList: TMCPToolInfoList; const aError : TRPCError);
     function CreateMockToolsResponse: TJSONObject;
     function CreateEmptyToolsResponse: TJSONObject;
     function CreateMalformedToolsResponse: TJSONObject;
@@ -115,17 +115,17 @@ type
     FClient: TMockClient;
     FReadPromptList: TMCPReadPromptList;
     FCallbackExecuted: Boolean;
-    FLastPromptList: TMCPPromptInfoList;
+    FLastPromptList: TMCPPromptInfoArray;
     FCallbackSender: TObject;
     FResponseCount: Integer;
     // Additional callback for multi-callback test
     FSecondCallbackExecuted: Boolean;
-    FSecondPromptList: TMCPPromptInfoList;
+    FSecondPromptList: TMCPPromptInfoArray;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
-    procedure OnSecondListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
+    procedure OnListPromptsReply(aSender: TObject; aList: TMCPPromptInfoArray; const aError : TRPCError);
+    procedure OnSecondListPromptsReply(aSender: TObject; aList: TMCPPromptInfoArray; const aError : TRPCError);
     function CreateMockPromptsResponse: TJSONObject;
     function CreateEmptyPromptsResponse: TJSONObject;
     function CreateMalformedPromptsResponse: TJSONObject;
@@ -172,17 +172,17 @@ type
     FClient: TMockClient;
     FReadResourceList: TMCPReadResourceList;
     FCallbackExecuted: Boolean;
-    FLastResourceList: TMCPResourceInfoList;
+    FLastResourceList: TMCPResourceInfoArray;
     FCallbackSender: TObject;
     FResponseCount: Integer;
     // Additional callback for multi-callback test
     FSecondCallbackExecuted: Boolean;
-    FSecondResourceList: TMCPResourceInfoList;
+    FSecondResourceList: TMCPResourceInfoArray;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
-    procedure OnSecondListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
+    procedure OnListResourcesReply(aSender: TObject; aList: TMCPResourceInfoArray; const AError : TRPCError);
+    procedure OnSecondListResourcesReply(aSender: TObject; aList: TMCPResourceInfoArray; const AError : TRPCError);
     function CreateMockResourcesResponse: TJSONObject;
     function CreateEmptyResourcesResponse: TJSONObject;
     function CreateMalformedResourcesResponse: TJSONObject;
@@ -238,8 +238,8 @@ type
   protected
     procedure SetUp; override;
     procedure TearDown; override;
-    procedure OnGetResourceReply(aSender: TObject; aResource: TMCPResourceInfo);
-    procedure OnSecondGetResourceReply(aSender: TObject; aResource: TMCPResourceInfo);
+    procedure OnGetResourceReply(aSender: TObject; constref aResource: TMCPResourceInfo; const aError : TRPCError);
+    procedure OnSecondGetResourceReply(aSender: TObject; constref aResource: TMCPResourceInfo; const aError : TRPCError);
     function CreateMockResourceResponse: TJSONObject;
     function CreateMockResourceWithDataResponse: TJSONObject;
     function CreateMalformedResourceResponse: TJSONObject;
@@ -331,38 +331,29 @@ var
 begin
   Result:=TMCPGetResource.Create(Self);
   Info:=TMCPResourceInfo.Create('file:///test/resource.txt','b');
-  aOnReply(Self,Info)
+  aOnReply(Self,Info,TRPCError.NoError);
 end;
 
 function TMockClient.ListPrompts(aOnReply: TPromptListResponseEvent): TMCPCall;
 var
-  aList : TMCPPromptInfoList;
+  aList : TMCPPromptInfoArray;
 begin
   Result:=TMCPReadPromptList.Create(Self);
-  aList:=TMCPPromptInfoList.Create(True);
-  try
-    aList.add(TMCPPromptInfo.Create('a','b'));
-    aList.add(TMCPPromptInfo.Create('c','d'));
-    aOnReply(Self,aList);
-  finally
- //   aList.Free;
-  end;
-
+  SetLength(aList,2);
+  aList[0]:=TMCPPromptInfo.Create('a','b');
+  aList[1]:=TMCPPromptInfo.Create('c','d');
+  aOnReply(Self,aList,TRPCError.NoError);
 end;
 
 function TMockClient.ListResources(aOnReply: TResourceListResponseEvent): TMCPCall;
 var
-  aList : TMCPResourceInfoList;
+  aList : TMCPResourceInfoArray;
 begin
   Result:=TMCPReadResourceList.Create(Self);
-  aList:=TMCPResourceInfoList.Create(True);
-  try
-    aList.add(TMCPResourceInfo.Create('a','b'));
-    aList.add(TMCPResourceInfo.Create('c','d'));
-    aOnReply(Self,aList);
-  finally
- //   aList.Free;
-  end;
+  SetLength(aList,2);
+  aList[0]:=TMCPResourceInfo.Create('a','b');
+  aList[1]:=TMCPResourceInfo.Create('c','d');
+  aOnReply(Self,aList,TRPCError.NoError);
 end;
 
 function TMockClient.ListTools(aOnReply: TListToolsResponseEvent): TMCPCall;
@@ -374,7 +365,7 @@ begin
   try
     aList.add(TMCPToolInfo.Create('a','b'));
     aList.add(TMCPToolInfo.Create('c','d'));
-    aOnReply(Self,aList);
+    aOnReply(Self,aList,TRPCError.NoError);
   finally
  //   aList.Free;
   end;
@@ -391,6 +382,7 @@ begin
   FLastRequestArgs := aArgs.Clone as TJSONObject;
   FLastRequest := aRequest;
   FLastRequestID := aRequestID;
+  aArgs.Free;
   // Don't call inherited - we don't want actual network operations
 end;
 
@@ -460,7 +452,7 @@ begin
   inherited TearDown;
 end;
 
-procedure TMCPListToolsTest.OnListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
+procedure TMCPListToolsTest.OnListToolsReply(aSender: TObject; var aList: TMCPToolInfoList; const aError : TRPCError);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
@@ -470,7 +462,7 @@ begin
   Inc(FResponseCount);
 end;
 
-procedure TMCPListToolsTest.OnSecondListToolsReply(aSender: TObject; var aList: TMCPToolInfoList);
+procedure TMCPListToolsTest.OnSecondListToolsReply(aSender: TObject; var aList: TMCPToolInfoList; const aError : TRPCError);
 begin
   FSecondCallbackExecuted := True;
   FSecondToolList.Free; // Free previous list if any
@@ -976,27 +968,23 @@ end;
 
 procedure TMCPReadPromptListTest.TearDown;
 begin
-  FLastPromptList.Free;
-  FSecondPromptList.Free;
-  FReadPromptList.Free;
+  FreeAndNil(FReadPromptList);
   FClient.Free;
   inherited TearDown;
 end;
 
-procedure TMCPReadPromptListTest.OnListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
+procedure TMCPReadPromptListTest.OnListPromptsReply(aSender: TObject; aList: TMCPPromptInfoArray; const aError : TRPCError);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
-  FLastPromptList.Free; // Free previous list if any
   FLastPromptList := aList; // Take ownership
   aList:=Nil;
   Inc(FResponseCount);
 end;
 
-procedure TMCPReadPromptListTest.OnSecondListPromptsReply(aSender: TObject; var aList: TMCPPromptInfoList);
+procedure TMCPReadPromptListTest.OnSecondListPromptsReply(aSender: TObject; aList: TMCPPromptInfoArray; const aError : TRPCError);
 begin
   FSecondCallbackExecuted := True;
-  FSecondPromptList.Free; // Free previous list if any
   FSecondPromptList := aList; // Take ownership
   aList:=Nil;
 end;
@@ -1079,8 +1067,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
-    AssertEquals('Should have 2 prompts', 2, FLastPromptList.Count);
+    AssertEquals('Should have 2 prompts', 2, Length(FLastPromptList));
     AssertEquals('First prompt name', 'test-prompt-1', FLastPromptList[0].Name);
     AssertEquals('Second prompt name', 'test-prompt-2', FLastPromptList[1].Name);
     AssertEquals('First prompt description', 'First test prompt', FLastPromptList[0].Description);
@@ -1111,8 +1098,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
-    AssertEquals('Should have 1 prompt', 1, FLastPromptList.Count);
+    AssertEquals('Should have 1 prompt', 1, Length(FLastPromptList));
     AssertEquals('Prompt name', 'single-prompt', FLastPromptList[0].Name);
     AssertEquals('Prompt description', 'Single prompt description', FLastPromptList[0].Description);
   finally
@@ -1132,8 +1118,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
-    AssertEquals('Should have 0 prompts', 0, FLastPromptList.Count);
+    AssertEquals('Should have 0 prompts', 0, Length(FLastPromptList));
   finally
     MockResponse.Free;
   end;
@@ -1151,9 +1136,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil even with malformed data', FLastPromptList);
-    // Should handle malformed data gracefully - malformed entries are skipped
-    AssertEquals('Should have 0 prompts due to malformed data', 0, FLastPromptList.Count);
+    AssertEquals('Should have 0 prompts due to malformed data', 0, Length(FLastPromptList));
   finally
     MockResponse.Free;
   end;
@@ -1172,8 +1155,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
-    AssertEquals('Should have 0 prompts when field is missing', 0, FLastPromptList.Count);
+    AssertEquals('Should have 0 prompts when field is missing', 0, Length(FLastPromptList));
   finally
     MockResponse.Free;
   end;
@@ -1201,8 +1183,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
-    AssertEquals('Should have 1 prompt', 1, FLastPromptList.Count);
+    AssertEquals('Should have 1 prompt', 1, Length(FLastPromptList));
     AssertEquals('Prompt name', 'full-prompt', FLastPromptList[0].Name);
     AssertEquals('Prompt description', 'Full prompt description', FLastPromptList[0].Description);
   finally
@@ -1231,7 +1212,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
     AssertEquals('Should have 1 prompt', 1, FLastPromptList.Count);
     AssertEquals('Prompt name', 'minimal-prompt', FLastPromptList[0].Name);
     AssertEquals('Prompt description', 'Minimal description', FLastPromptList[0].Description);
@@ -1261,7 +1241,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
     AssertEquals('Should have 1 prompt', 1, FLastPromptList.Count);
     AssertEquals('Prompt name', 'incomplete-prompt', FLastPromptList[0].Name);
     AssertEquals('Prompt description should be empty', '', FLastPromptList[0].Description);
@@ -1303,7 +1282,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Prompt list should be nil on error', FLastPromptList);
+  AssertEquals('Prompt list should be nil on error', 0,Length(FLastPromptList));
 end;
 
 procedure TMCPReadPromptListTest.TestMultipleCallbacks;
@@ -1351,7 +1330,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Prompt list should be nil on error', FLastPromptList);
+  AssertEquals('Prompt list should be nil on error', 0,Length(FLastPromptList));
 end;
 
 procedure TMCPReadPromptListTest.TestErrorCallback;
@@ -1368,7 +1347,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Error callback should have been executed', FCallbackExecuted);
-  AssertNull('Prompt list should be nil on error', FLastPromptList);
+  AssertEquals('Prompt list should be nil on error', 0,Length(FLastPromptList));
   AssertTrue('Should be the ReadPromptList instance', FCallbackSender = FReadPromptList);
 end;
 
@@ -1386,13 +1365,13 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Prompt list should be nil on RPC error', FLastPromptList);
+  AssertEquals('Prompt list should be nil on RPC error', 0, Length(FLastPromptList));
 end;
 
 procedure TMCPReadPromptListTest.TestMemoryCleanupOnSuccess;
 var
   MockResponse: TJSONObject;
-  InitialList: TMCPPromptInfoList;
+  InitialList: TMCPPromptInfoArray;
 begin
   FReadPromptList.OnReply := @OnListPromptsReply;
   FReadPromptList.Call();
@@ -1402,7 +1381,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Prompt list should not be nil', FLastPromptList);
+    AssertTrue('Prompt list should not be nil', Length(FLastPromptList)<>0);
 
     // Save reference and test cleanup
     InitialList := FLastPromptList;
@@ -1411,7 +1390,6 @@ begin
     // List should still be valid since callback owns it
     AssertEquals('List should still be accessible', 2, InitialList.Count);
 
-    InitialList.Free; // Cleanup
   finally
     MockResponse.Free;
   end;
@@ -1431,7 +1409,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Prompt list should be nil on error', FLastPromptList);
+  AssertEquals('Prompt list should be nil on error', 0, Length(FLastPromptList));
 
   // No memory leaks should occur
 end;
@@ -1452,7 +1430,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, lObj);
 
     AssertTrue('Client callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Result list should not be nil', FLastPromptList);
     AssertEquals('Should have 2 prompts from client method', 2, FLastPromptList.Count);
   finally
     lObj.Free;
@@ -1497,29 +1474,23 @@ end;
 
 procedure TMCPReadResourceListTest.TearDown;
 begin
-  FLastResourceList.Free;
-  FSecondResourceList.Free;
-  FReadResourceList.Free;
+  FreeAndNil(FReadResourceList);
   FClient.Free;
   inherited TearDown;
 end;
 
-procedure TMCPReadResourceListTest.OnListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
+procedure TMCPReadResourceListTest.OnListResourcesReply(aSender: TObject; aList: TMCPResourceInfoArray; const aError : TRPCError);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
-  FLastResourceList.Free; // Free previous list if any
-  FLastResourceList := aList; // Take ownership
-  aList:=Nil;
+  FLastResourceList:=aList;
   Inc(FResponseCount);
 end;
 
-procedure TMCPReadResourceListTest.OnSecondListResourcesReply(aSender: TObject; var aList: TMCPResourceInfoList);
+procedure TMCPReadResourceListTest.OnSecondListResourcesReply(aSender: TObject; aList: TMCPResourceInfoArray; const aError : TRPCError);
 begin
   FSecondCallbackExecuted := True;
-  FSecondResourceList.Free; // Free previous list if any
   FSecondResourceList := aList; // Take ownership
-  aList:=Nil;
 end;
 
 function TMCPReadResourceListTest.CreateMockResourcesResponse: TJSONObject;
@@ -1602,7 +1573,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
     AssertEquals('Should have 2 resources', 2, FLastResourceList.Count);
     AssertEquals('First resource uri', 'file:///test-resource-1.txt', FLastResourceList[0].URI);
     AssertEquals('Second resource uri', 'file:///test-resource-2.txt', FLastResourceList[1].URI);
@@ -1638,7 +1608,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
     AssertEquals('Should have 1 resource', 1, FLastResourceList.Count);
     AssertEquals('Resource uri', 'file:///single-resource.txt', FLastResourceList[0].URI);
     AssertEquals('Resource name', 'single-resource', FLastResourceList[0].Name);
@@ -1660,7 +1629,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
     AssertEquals('Should have 0 resources', 0, FLastResourceList.Count);
   finally
     MockResponse.Free;
@@ -1679,7 +1647,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil even with malformed data', FLastResourceList);
     // Should handle malformed data gracefully - malformed entries are skipped
     AssertEquals('Should have 0 resources due to malformed data', 0, FLastResourceList.Count);
   finally
@@ -1700,7 +1667,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
     AssertEquals('Should have 0 resources when field is missing', 0, FLastResourceList.Count);
   finally
     MockResponse.Free;
@@ -1730,7 +1696,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
+
     AssertEquals('Should have 1 resource', 1, FLastResourceList.Count);
     AssertEquals('Resource uri', 'file:///full-resource.txt', FLastResourceList[0].URI);
     AssertEquals('Resource name', 'full-resource', FLastResourceList[0].Name);
@@ -1761,7 +1727,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
     AssertEquals('Should have 1 resource', 1, FLastResourceList.Count);
     AssertEquals('Resource uri', 'file:///minimal-resource.txt', FLastResourceList[0].URI);
     AssertEquals('Resource name', 'minimal-resource', FLastResourceList[0].Name);
@@ -1792,7 +1757,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
     AssertEquals('Should have 1 resource', 1, FLastResourceList.Count);
     AssertEquals('Resource uri', 'file:///incomplete-resource.txt', FLastResourceList[0].URI);
     AssertEquals('Resource name', 'incomplete-resource', FLastResourceList[0].Name);
@@ -1835,7 +1799,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource list should be nil on error', FLastResourceList);
+  AssertEquals('Resource list should be nil on error', 0, Length(FLastResourceList));
 end;
 
 procedure TMCPReadResourceListTest.TestMultipleCallbacks;
@@ -1883,7 +1847,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource list should be nil on error', FLastResourceList);
+  AssertEquals('Resource list should be nil on error', 0, Length(FLastResourceList));
 end;
 
 procedure TMCPReadResourceListTest.TestErrorCallback;
@@ -1900,7 +1864,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Error callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource list should be nil on error', FLastResourceList);
+  AssertEquals('Resource list should be nil on error', 0, Length(FLastResourceList));
   AssertTrue('Should be the ReadResourceList instance', FCallbackSender = FReadResourceList);
 end;
 
@@ -1918,13 +1882,13 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource list should be nil on RPC error', FLastResourceList);
+  AssertEquals('Resource list should be nil on RPC error', 0, Length(FLastResourceList));
 end;
 
 procedure TMCPReadResourceListTest.TestMemoryCleanupOnSuccess;
 var
   MockResponse: TJSONObject;
-  InitialList: TMCPResourceInfoList;
+  InitialList: TMCPResourceInfoArray;
 begin
   FReadResourceList.OnReply := @OnListResourcesReply;
   FReadResourceList.Call();
@@ -1934,7 +1898,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource list should not be nil', FLastResourceList);
+    AssertTrue('Resource list should not be nil', 0<>Length(FLastResourceList));
 
     // Save reference and test cleanup
     InitialList := FLastResourceList;
@@ -1943,7 +1907,6 @@ begin
     // List should still be valid since callback owns it
     AssertEquals('List should still be accessible', 2, InitialList.Count);
 
-    InitialList.Free; // Cleanup
   finally
     MockResponse.Free;
   end;
@@ -1963,7 +1926,7 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource list should be nil on error', FLastResourceList);
+  AssertTrue('Resource list should be nil on error', 0=Length(FLastResourceList));
 
   // No memory leaks should occur
 end;
@@ -1984,7 +1947,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, lObj);
 
     AssertTrue('Client callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Result list should not be nil', FLastResourceList);
+    AssertTrue('Result list should not be nil', 0<>Length(FLastResourceList));
     AssertEquals('Should have 2 resources from client method', 2, FLastResourceList.Count);
   finally
     ListResourcesCall.Free;
@@ -2019,11 +1982,9 @@ begin
   FClient := TMockClient.Create(nil);
   FGetResource := TMCPGetResource.Create(FClient);
   FCallbackExecuted := False;
-  FLastResource := nil;
   FCallbackSender := nil;
   FResponseCount := 0;
   FSecondCallbackExecuted := False;
-  FSecondResource := nil;
 end;
 
 procedure TMCPGetResourceTest.TearDown;
@@ -2035,7 +1996,7 @@ begin
   inherited TearDown;
 end;
 
-procedure TMCPGetResourceTest.OnGetResourceReply(aSender: TObject; aResource: TMCPResourceInfo);
+procedure TMCPGetResourceTest.OnGetResourceReply(aSender: TObject; constref aResource: TMCPResourceInfo; const aError : TRPCError);
 begin
   FCallbackExecuted := True;
   FCallbackSender := aSender;
@@ -2044,7 +2005,7 @@ begin
   Inc(FResponseCount);
 end;
 
-procedure TMCPGetResourceTest.OnSecondGetResourceReply(aSender: TObject; aResource: TMCPResourceInfo);
+procedure TMCPGetResourceTest.OnSecondGetResourceReply(aSender: TObject; constref aResource: TMCPResourceInfo; const aError : TRPCError);
 begin
   FSecondCallbackExecuted := True;
   FSecondResource.Free; // Free previous resource if any
@@ -2117,7 +2078,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil', FLastResource);
     AssertEquals('Resource URI should be correct', 'file:///test/resource.txt', FLastResource.URI);
     AssertEquals('Resource name should be correct', 'test-resource', FLastResource.Name);
     AssertEquals('Resource title should be correct', 'Test Resource', FLastResource.Title);
@@ -2143,7 +2103,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil', FLastResource);
     AssertEquals('Resource URI should be correct', 'file:///minimal.txt', FLastResource.URI);
     AssertEquals('Resource name should be correct', 'minimal', FLastResource.Name);
   finally
@@ -2163,7 +2122,7 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil', FLastResource);
+
     AssertEquals('Resource text should be correct', 'Hello from resource data!', FLastResource.Text);
     AssertTrue('Resource kind should be rkText', FLastResource.Kind = rkText);
   finally
@@ -2188,7 +2147,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil', FLastResource);
     AssertEquals('Resource mimeType should be binary', 'application/octet-stream', FLastResource.MimeType);
   finally
     MockResponse.Free;
@@ -2207,7 +2165,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil even with malformed data', FLastResource);
     // The TMCPResourceInfo.FromJSON should handle missing fields gracefully
   finally
     MockResponse.Free;
@@ -2229,7 +2186,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil', FLastResource);
     AssertEquals('URI should be loaded', 'file:///incomplete.txt', FLastResource.URI);
     AssertEquals('Name should be empty when missing', '', FLastResource.Name);
   finally
@@ -2297,7 +2253,6 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource should be nil on error', FLastResource);
 end;
 
 procedure TMCPGetResourceTest.TestMultipleCallbacks;
@@ -2322,8 +2277,6 @@ begin
 
     AssertTrue('First callback should have been executed', FCallbackExecuted);
     AssertTrue('Second callback should have been executed', FSecondCallbackExecuted);
-    AssertNotNull('First resource should not be nil', FLastResource);
-    AssertNotNull('Second resource should not be nil', FSecondResource);
   finally
     lObj2.Free;
     MockResponse.Free;
@@ -2345,7 +2298,6 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource should be nil on error', FLastResource);
 end;
 
 procedure TMCPGetResourceTest.TestErrorCallback;
@@ -2362,7 +2314,6 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Error callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource should be nil on error', FLastResource);
   AssertTrue('Should be the GetResource instance', FCallbackSender = FGetResource);
 end;
 
@@ -2380,7 +2331,6 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource should be nil on RPC error', FLastResource);
 end;
 
 procedure TMCPGetResourceTest.TestMemoryCleanupOnSuccess;
@@ -2396,11 +2346,9 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Resource should not be nil', FLastResource);
 
     // Save reference and test cleanup
     InitialResource := FLastResource;
-    FLastResource := nil; // Simulate that callback took ownership
 
     // Resource should still be valid since callback owns it
     AssertEquals('Resource should still be accessible', 'file:///test/resource.txt', InitialResource.URI);
@@ -2425,7 +2373,6 @@ begin
   FClient.SimulateError(FClient.LastRequestID, Error);
 
   AssertTrue('Callback should have been executed', FCallbackExecuted);
-  AssertNull('Resource should be nil on error', FLastResource);
 
   // No memory leaks should occur
 end;
@@ -2447,7 +2394,6 @@ begin
     FClient.SimulateResponse(FClient.LastRequestID, MockResponse);
 
     AssertTrue('Client callback should have been executed', FCallbackExecuted);
-    AssertNotNull('Result resource should not be nil', FLastResource);
     AssertEquals('Should get correct resource from client method', 'file:///test/resource.txt', FLastResource.URI);
   finally
     GetResourceCall.Free;

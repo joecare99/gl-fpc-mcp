@@ -147,6 +147,7 @@ begin
   FLastRequestArgs := aArgs.Clone as TJSONObject;
   FLastRequest := aRequest;
   FLastRequestID := aRequestID;
+  aArgs.Free;
   // Don't call inherited - we don't want actual network operations
 end;
 
@@ -181,7 +182,7 @@ end;
 
 procedure TMCPInitializeTest.TestMethodName;
 begin
-  AssertEquals('Method name should be initialization', 'initialization', TMCPInitialize.MethodName);
+  AssertEquals('Method name should be initialize', 'initialize', TMCPInitialize.MethodName);
 end;
 
 procedure TMCPInitializeTest.TestInitializeCall;
@@ -189,7 +190,6 @@ var
   RequestID: TRequestID;
 begin
   RequestID := FInitialize.Call();
-
   AssertEquals('Should return request ID', 1, RequestID);
   AssertNotNull('Should have sent request arguments', FClient.LastRequestArgs);
   AssertTrue('Should have capabilities field', FClient.LastRequestArgs.IndexOfName('capabilities') >= 0);

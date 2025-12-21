@@ -11,8 +11,8 @@ type
   TListSerializationTest = class(TTestCase)
   private
     FToolList: TMCPToolInfoList;
-    FPromptList: TMCPPromptInfoList;
-    FResourceList: TMCPResourceInfoList;
+    FPromptList: TMCPPromptInfoArray;
+    FResourceList: TMCPResourceInfoArray;
   protected
     procedure SetUp; override;
     procedure TearDown; override;
@@ -36,14 +36,12 @@ procedure TListSerializationTest.SetUp;
 begin
   inherited SetUp;
   FToolList := TMCPToolInfoList.Create(True);
-  FPromptList := TMCPPromptInfoList.Create(True);
-  FResourceList := TMCPResourceInfoList.Create(True);
+  FPromptList := [];
+  FResourceList := [];
 end;
 
 procedure TListSerializationTest.TearDown;
 begin
-  FResourceList.Free;
-  FPromptList.Free;
   FToolList.Free;
   inherited TearDown;
 end;
@@ -136,8 +134,9 @@ begin
   Prompt1 := TMCPPromptInfo.Create('test-prompt-1', 'Test Prompt 1', 'First test prompt');
   Prompt2 := TMCPPromptInfo.Create('test-prompt-2', 'Test Prompt 2', 'Second test prompt');
 
-  FPromptList.Add(Prompt1);
-  FPromptList.Add(Prompt2);
+  SetLength(FPromptList,2);
+  FPromptList[0]:=Prompt1;
+  FPromptList[1]:=Prompt2;
 
   JSONArr := FPromptList.ToJSON;
   try
@@ -182,26 +181,21 @@ procedure TListSerializationTest.TestPromptInfoListRoundTrip;
 var
   Prompt1, Prompt2: TMCPPromptInfo;
   JSONArr: TJSONArray;
-  NewList: TMCPPromptInfoList;
+  NewList: TMCPPromptInfoArray;
 begin
   Prompt1 := TMCPPromptInfo.Create('roundtrip-prompt-1', 'Roundtrip Prompt 1', 'First roundtrip prompt');
   Prompt2 := TMCPPromptInfo.Create('roundtrip-prompt-2', 'Roundtrip Prompt 2', 'Second roundtrip prompt');
-
-  FPromptList.Add(Prompt1);
-  FPromptList.Add(Prompt2);
+  SetLength(FPromptList,2);
+  FPromptList[0]:=Prompt1;
+  FPromptList[1]:=Prompt2;
 
   JSONArr := FPromptList.ToJSON;
   try
-    NewList := TMCPPromptInfoList.Create(True);
-    try
-      NewList.FromJSON(JSONArr);
-
-      AssertEquals('Original and new list should have same count', FPromptList.Count, NewList.Count);
-      AssertEquals('First prompt name should match', FPromptList[0].Name, NewList[0].Name);
-      AssertEquals('Second prompt name should match', FPromptList[1].Name, NewList[1].Name);
-    finally
-      NewList.Free;
-    end;
+    NewList := [];
+    NewList.FromJSON(JSONArr);
+    AssertEquals('Original and new list should have same count', FPromptList.Count, NewList.Count);
+    AssertEquals('First prompt name should match', FPromptList[0].Name, NewList[0].Name);
+    AssertEquals('Second prompt name should match', FPromptList[1].Name, NewList[1].Name);
   finally
     JSONArr.Free;
   end;
@@ -216,9 +210,9 @@ begin
   Resource1.Description := 'First test resource';
   Resource2 := TMCPResourceInfo.Create('file://test2.txt', 'Test Resource 2');
   Resource2.Description := 'Second test resource';
-
-  FResourceList.Add(Resource1);
-  FResourceList.Add(Resource2);
+  SetLength(FResourceList,2);
+  FResourceList[0]:=Resource1;
+  FResourceList[1]:=Resource2;
 
   JSONArr := FResourceList.ToJSON;
   try
@@ -263,28 +257,24 @@ procedure TListSerializationTest.TestResourceInfoListRoundTrip;
 var
   Resource1, Resource2: TMCPResourceInfo;
   JSONArr: TJSONArray;
-  NewList: TMCPResourceInfoList;
+  NewList: TMCPResourceInfoArray;
 begin
   Resource1 := TMCPResourceInfo.Create('file://roundtrip1.txt', 'Roundtrip Resource 1');
   Resource1.Description := 'First roundtrip resource';
   Resource2 := TMCPResourceInfo.Create('file://roundtrip2.txt', 'Roundtrip Resource 2');
   Resource2.Description := 'Second roundtrip resource';
-
-  FResourceList.Add(Resource1);
-  FResourceList.Add(Resource2);
+  SetLength(FResourceList,2);
+  FResourceList[0]:=Resource1;
+  FResourceList[1]:=Resource2;
 
   JSONArr := FResourceList.ToJSON;
   try
-    NewList := TMCPResourceInfoList.Create(True);
-    try
-      NewList.FromJSON(JSONArr);
+    NewList := [];
+    NewList.FromJSON(JSONArr);
 
-      AssertEquals('Original and new list should have same count', FResourceList.Count, NewList.Count);
-      AssertEquals('First resource URI should match', FResourceList[0].URI, NewList[0].URI);
-      AssertEquals('Second resource URI should match', FResourceList[1].URI, NewList[1].URI);
-    finally
-      NewList.Free;
-    end;
+    AssertEquals('Original and new list should have same count', FResourceList.Count, NewList.Count);
+    AssertEquals('First resource URI should match', FResourceList[0].URI, NewList[0].URI);
+    AssertEquals('Second resource URI should match', FResourceList[1].URI, NewList[1].URI);
   finally
     JSONArr.Free;
   end;

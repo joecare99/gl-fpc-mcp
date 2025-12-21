@@ -25,27 +25,6 @@ uses
   sysutils, fpjson, types, classes, mcp.types, mcp.utils, mcp.client.base;
 
 type
-  { TServerInfo }
-
-  TServerInfo = record
-    name : string;
-    version : string;
-    procedure fromJSON(aJSON : TJSONObject);
-  end;
-
-  TServerFeature = (sfLogging,sfCompletions,sfPrompts,sfResources,sfTools,sfPromptChanges,sfResourceChanges,sfResourceSubscribe,sfToolChanges);
-  TServerFeatures = set of TServerFeature;
-
-  { TInitializeResponse }
-
-  TMCPInitializeResponse = record
-    Info : TServerInfo;
-    protocol : string;
-    Features : TServerFeatures;
-    procedure FromJson(aJSON : TJSONObject);
-  end;
-
-  TOnInitializeEvent = procedure(const aResponse : TMCPInitializeResponse; aError : TRPCError) of object;
 
   TMCPInitialize = class(TMCPCall)
   private
@@ -67,7 +46,7 @@ type
     FOnReply: TResourceListResponseEvent;
   protected
     procedure Reply(aData: TJSONObject); override;
-    procedure HandleReply(var ResourceList: TMCPResourceInfoList); virtual;
+    procedure HandleReply(ResourceList: TMCPResourceInfoArray); virtual;
     procedure HandleError(aError: TRPCError); override;
   public
     class function methodname : string; override;
@@ -80,7 +59,7 @@ type
   end;
 
 
-  TOnResourceReadEvent = procedure(aInfo : TMCPReadResourceResponse; aError : TRPCError) of object;
+  TOnResourceReadEvent = procedure(aInfo : TMCPReadResourceResponse; const aError : TRPCError) of object;
 
   { TMCPReadResource }
 
@@ -105,7 +84,7 @@ type
     FOnReply: TGetResourceResponseEvent;
   protected
     procedure Reply(aData: TJSONObject); override;
-    procedure HandleReply(Resource: TMCPResourceInfo); virtual;
+    procedure HandleReply(var Resource: TMCPResourceInfo); virtual;
     procedure HandleError(aError: TRPCError); override;
   public
     class function methodname : string; override;
@@ -120,7 +99,7 @@ type
     FOnReply: TPromptListResponseEvent;
   protected
     procedure Reply(aData: TJSONObject); override;
-    procedure HandleReply(var PromptList: TMCPPromptInfoList); virtual;
+    procedure HandleReply(PromptList: TMCPPromptInfoArray); virtual;
     Procedure HandleError(aError: TRPCError); override;
   public
     class function methodname : string; override;
@@ -258,7 +237,7 @@ type
 
   { Event Types }
 
-  TOnCompletionCompleteEvent = procedure(aResponse: TMCPCompletionResponse; aError: TRPCError) of object;
+  TOnCompletionCompleteEvent = procedure(aResponse: TMCPCompletionResponse; const aError: TRPCError) of object;
 
   { TMCPCompletionComplete }
 
@@ -421,54 +400,6 @@ function CreateToolCallResponseFromJSON(aJSON: TJSONObject): TMCPToolCallRespons
 
 implementation
 
-{ TServerInfo }
-
-procedure TServerInfo.fromJSON(aJSON: TJSONObject);
-begin
-  with aJSON do
-    begin
-    name:=get('name','');
-    version:=get('version','');
-    end;
-end;
-
-{ TInitializeResponse }
-
-procedure TMCPInitializeResponse.FromJson(aJSON: TJSONObject);
-
-  function checkavailable(aCaps : TJSONObject; aFeature : string; aAvailable : TServerFeature; aChanges : TServerFeature) : boolean;
-  var
-    lTmp : TJSONObject;
-  begin
-    Result:=assigned(aCaps);
-    if result then
-      ltmp:=aCaps.get(aFeature,TJSONObject(Nil));
-    Result:=Result and Assigned(lTmp);
-    if result then
-      begin
-      Include(Features,aAvailable);
-      if lTmp.Get('listChanged',false) then
-        Include(Features,aChanges);
-      end;
-  end;
-
-var
-  lCaps : TJSONObject;
-
-begin
-  lCaps:=aJSON.get('serverInfo',TJSONObject(nil));
-  if assigned(lCaps) then
-    Info.fromJSON(lCaps);
-  protocol:=aJSON.Get('protocol','');
-  lCaps:=aJSON.get('capabilities',TJSONObject(nil));
-  checkavailable(lCaps,'prompts',sfPrompts,sfPromptChanges);
-  if checkavailable(lCaps,'resources',sfResources,sfResourceChanges) then
-    if lCaps.Get('resources',TJSONObject(Nil)).Get('subscribe',false) then
-      include(Features,sfResourceSubscribe);
-  checkAvailable(lCaps,'tools',sfTools,sfToolChanges);
-  checkAvailable(lCaps,'logging',sfLogging,sfLogging);
-  checkAvailable(lCaps,'completions',sfCompletions,sfCompletions);
-end;
 
 { TMCPInitialize }
 
@@ -490,7 +421,7 @@ end;
 
 class function TMCPInitialize.methodname: string;
 begin
-  result:='initialization'
+  result:='initialize'
 end;
 
 function TMCPInitialize.Call() : TRequestID;
@@ -513,10 +444,11 @@ begin
     args.add('clientInfo',tmp);
     tmp.add('name',client.clientname);
     tmp.add('version',client.clientversion);
-    Result:=Inherited call(args);
-  finally
+  except
     args.Free;
+    raise;
   end;
+  Result:=Inherited call(args);
 end;
 
 
@@ -524,62 +456,30 @@ end;
 
 procedure TMCPReadResourceList.Reply(aData: TJSONObject);
 var
-  ResourceList: TMCPResourceInfoList;
+  lInfo: TMCPResourceInfoArray;
   lResources: TJSONArray;
   I: Integer;
   ResourceInfo: mcp.types.TMCPResourceInfo;
 begin
   inherited Reply(aData);
-
-  // Create TMCPResourceInfoList and populate it directly
-  ResourceList:=TMCPResourceInfoList.Create(True);
-  try
-    // Parse resources array from JSON response
-    lResources:=aData.Get('resources', TJSONArray(nil));
-    if Assigned(lResources) then
-    begin
-      for I:=0 to lResources.Count - 1 do
-        if lResources.Types[I] = jtObject then
-        begin
-          ResourceInfo:=mcp.types.TMCPResourceInfo.Create('temp', 'temp');
-          try
-            ResourceInfo.FromJSON(lResources.Objects[I]);
-            ResourceList.Add(ResourceInfo);
-          except
-            ResourceInfo.Free;
-            raise;
-          end;
-        end;
-    end;
-
-    HandleReply(ResourceList);
-  finally
-    ResourceList.Free;
-  end;
+  lInfo:=[];
+  lResources:=aData.Get('resources', TJSONArray(nil));
+  lInfo.FromJSON(lResources);
+  HandleReply(lInfo);
 end;
 
-procedure TMCPReadResourceList.HandleReply(var ResourceList: TMCPResourceInfoList);
+procedure TMCPReadResourceList.HandleReply(ResourceList: TMCPResourceInfoArray);
 begin
   if Assigned(FOnReply) then
-  begin
     // Call the event handler - it's responsible for freeing the list
-    FOnReply(Self, ResourceList);
-  end
-  else
-  begin
-    // If no handler, free the list to prevent memory leak
-    ResourceList.Free;
-  end;
+    FOnReply(Self, ResourceList, TRPCError.NoError);
 end;
 
 procedure TMCPReadResourceList.HandleError(aError: TRPCError);
-var
-  L: TMCPResourceInfoList;
+
 begin
-  L:=Nil;
-  inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, L); // Pass nil list on error
+    FOnReply(Self, Nil, aError); // Pass nil list on error
 end;
 
 class function TMCPReadResourceList.methodname: string;
@@ -592,11 +492,7 @@ var
   Obj : TJSONObject;
 begin
   Obj:=TJSONObject.Create();
-  try
-    inherited call(Obj);
-  finally
-    Obj.Free;
-  end;
+  inherited call(Obj);
 end;
 
 { TMCPReadResource }
@@ -633,27 +529,19 @@ var
   lArgs : TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  try
-    lArgs.Add('uri', aUri);
-    inherited call(lArgs);
-  finally
-    lArgs.Free;
-  end;
+  lArgs.Add('uri', aUri);
+  inherited call(lArgs);
 end;
 
 procedure TMCPGetPrompt.Call(const aName: String; aArguments: TJSONObject);
 var
-  lObj: TJSONObject;
+  lObj:TJSONObject;
 begin
   lObj:=TJSONObject.Create;
-  try
-    lObj.Add('name', aName);
-    if Assigned(aArguments) then
-      lObj.Add('arguments', aArguments.Clone);
-    inherited Call(lObj);
-  finally
-    lObj.Free;
-  end;
+  lObj.Add('name', aName);
+  if Assigned(aArguments) then
+    lObj.Add('arguments', aArguments.Clone);
+  inherited Call(lObj);
 end;
 
 { TMCPGetResource }
@@ -664,34 +552,23 @@ var
 begin
   inherited Reply(aData);
   Resource:=TMCPResourceInfo.Create('temp', 'temp');
-  try
-    Resource.FromJSON(aData);
-    HandleReply(Resource);
-  except
-    Resource.Free;
-    raise;
-  end;
+  Resource.FromJSON(aData);
+  HandleReply(Resource);
 end;
 
-procedure TMCPGetResource.HandleReply(Resource: TMCPResourceInfo);
+procedure TMCPGetResource.HandleReply(var Resource: TMCPResourceInfo);
 begin
   if Assigned(FOnReply) then
-  begin
-    // Call the event handler - it's responsible for freeing the resource
-    FOnReply(Self, Resource);
-  end
-  else
-  begin
-    // If no handler, free the resource to prevent memory leak
-    Resource.Free;
-  end;
+    FOnReply(Self, Resource,TRPCError.NoError);
 end;
 
 procedure TMCPGetResource.HandleError(aError: TRPCError);
+var
+  R : TMCPResourceInfo;
 begin
   inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, nil); // Pass nil resource on error
+    FOnReply(Self, R, aError); // Pass nil resource on error
 end;
 
 class function TMCPGetResource.methodname: string;
@@ -704,66 +581,37 @@ var
   lArgs: TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  try
-    lArgs.Add('uri', aURI);
-    inherited call(lArgs);
-  finally
-    lArgs.Free;
-  end;
+  lArgs.Add('uri', aURI);
+  inherited call(lArgs);
 end;
 
 { TMCPReadPromptList }
 
 procedure TMCPReadPromptList.Reply(aData: TJSONObject);
 var
-  PromptList: TMCPPromptInfoList;
+  PromptList: TMCPPromptInfoArray;
   lPrompts: TJSONArray;
-  I: Integer;
-  PromptInfo: mcp.types.TMCPPromptInfo;
 begin
   inherited Reply(aData);
-
-  // Create TMCPPromptInfoList and populate it directly
-  PromptList:=TMCPPromptInfoList.Create(True);
-  try
-    // Parse prompts array from JSON response
-    lPrompts:=aData.Get('prompts', TJSONArray(nil));
-    if Assigned(lPrompts) then
-    begin
-      for I:=0 to lPrompts.Count - 1 do
-        if lPrompts.Types[I] = jtObject then
-        begin
-          PromptInfo:=mcp.types.TMCPPromptInfo.Create('temp', 'temp');
-          try
-            PromptInfo.FromJSON(lPrompts.Objects[I]);
-            PromptList.Add(PromptInfo);
-          except
-            PromptInfo.Free;
-            raise;
-          end;
-        end;
-    end;
-
-    HandleReply(PromptList);
-  finally
-    PromptList.Free;
-  end;
+  lPrompts:=aData.Get('prompts', TJSONArray(nil));
+  PromptList.FromJson(lPrompts);
+  HandleReply(PromptList);
 end;
 
-procedure TMCPReadPromptList.HandleReply(var PromptList: TMCPPromptInfoList);
+procedure TMCPReadPromptList.HandleReply(PromptList: TMCPPromptInfoArray);
 begin
   if Assigned(FOnReply) then
-    FOnReply(Self, PromptList);
+    FOnReply(Self, PromptList, TRPCError.NoError);
 end;
 
 procedure TMCPReadPromptList.HandleError(aError: TRPCError);
 var
-  L : TMCPPromptInfoList;
+  L : TMCPPromptInfoArray;
 begin
   L:=nil;
   inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, L); // Pass nil list on error
+    FOnReply(Self, L, aError); // Pass nil list on error
 end;
 
 class function TMCPReadPromptList.methodname: string;
@@ -776,11 +624,7 @@ var
   lArgs : TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  try
-    Inherited Call(lArgs)
-  finally
-    lArgs.Free;
-  end;
+  Inherited Call(lArgs)
 end;
 
 { TMCPContentBlock }
@@ -949,7 +793,7 @@ end;
 procedure TMCPListTools.HandleReply(var ToolList: TMCPToolInfoList);
 begin
   if Assigned(FOnReply) then
-    FOnReply(Self, ToolList);
+    FOnReply(Self, ToolList, TRPCError.NoError);
 end;
 
 procedure TMCPListTools.HandleError(aError: TRPCError);
@@ -959,7 +803,7 @@ begin
   L:=nil;
   inherited HandleError(aError);
   if Assigned(FOnReply) then
-    FOnReply(Self, L); // Pass nil list on error
+    FOnReply(Self, L, aError); // Pass nil list on error
 end;
 
 class function TMCPListTools.methodname: string;
@@ -972,11 +816,7 @@ var
   Obj: TJSONObject;
 begin
   Obj:=TJSONObject.Create();
-  try
-    inherited Call(Obj);
-  finally
-    Obj.Free;
-  end;
+  inherited Call(Obj);
 end;
 
 { TMCPCompletionRefTypeHelper }

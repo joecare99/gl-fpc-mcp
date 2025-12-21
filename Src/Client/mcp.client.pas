@@ -8,8 +8,12 @@ uses
   Classes, SysUtils, mcp.types,  mcp.client.base, fpjson;
 
 Type
+
+  { TMCPClient }
+
   TMCPClient = Class (TMCPCustomClient)
   Public
+    procedure Initialize(aOnReply: TOnInitializeEvent);
     // List available tools
     function ListTools(aOnReply: TListToolsResponseEvent): TMCPCall; override;
     // List available prompts
@@ -54,6 +58,15 @@ Type
 implementation
 
 uses mcp.client.calls;
+
+procedure TMCPClient.Initialize(aOnReply : TOnInitializeEvent);
+var
+  lCall:TMCPInitialize;
+begin
+  lCall:=TMCPInitialize.create(Self);
+  lCall.OnReply:=aOnReply;
+  lCall.Call;
+end;
 
 function TMCPClient.ListTools(aOnReply: TListToolsResponseEvent): TMCPCall;
 var

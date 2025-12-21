@@ -5,7 +5,7 @@ program mcpclient;
 
 uses
   Classes, SysUtils, CustApp, fpjson, jsonscanner, jsonparser, strutils,
-  mcp.client.base, mcp.client.calls, mcp.client.stdio, mcp.types;
+  mcp.client.base, mcp.client.calls, mcp.client.stdio, mcp.types, mcp.client;
 
 type
   EMCPClientApp = class(Exception);
@@ -14,7 +14,7 @@ type
   TServerCommandHandler = procedure of object;
 
   { Response type enumeration }
-  TResponseType = (rtNone, rtToolCall, rtToolsList, rtPromptsList, rtResourcesList, rtResourceGet, rtCompletion);
+  TResponseType = (rtNone, rtInitialize, rtToolCall, rtToolsList, rtPromptsList, rtResourcesList, rtResourceGet, rtCompletion);
 
   { TMCPClientOptions }
 
@@ -40,19 +40,20 @@ type
   private
     FOptions: TMCPClientOptions;
     FConfigData: TJSONObject;
-    FClient: TMCPCustomClient;
+    FClient: TMCPClient;
     FLastResponse: TResponseType;
     FToolCallResponse: TMCPToolCallResponse;
     FToolsList: TMCPToolInfoList;
-    FPromptsList: TMCPPromptInfoList;
-    FResourcesList: TMCPResourceInfoList;
+    FPromptsList: TMCPPromptInfoArray;
+    FResourcesList: TMCPResourceInfoArray;
     FResourceGetResponse: TMCPReadResourceResponse;
     FCompletionResponse: TMCPCompletionResponse;
     FProcessTransport: TMCPClientStdioTransport;
-
+    FInitializeResponse: TMCPInitializeResponse;
     // Configuration management
     function GetCompletionContext(aFileName: string; out aContext: TMCPCompletionContext): Boolean;
     procedure LoadConfiguration;
+    procedure OnInitialized(const aResponse: TMCPInitializeResponse; aError: TRPCError);
     // Get config for a particular server Do not free aServerconfig!
     procedure ParseServerConfig(const aServerName: string; out aServerConfig: TJSONObject);
     function ParseOptions: Boolean;
@@ -78,11 +79,11 @@ type
 
     // Event handlers
     procedure OnToolCallReply(aResponse: TMCPToolCallResponse; aError: TRPCError);
-    procedure OnToolsListReply(aSender: TObject; var aList: TMCPToolInfoList);
-    procedure OnPromptsListReply(aSender: TObject; var aList: TMCPPromptInfoList);
-    procedure OnResourcesListReply(aSender: TObject; var aList: TMCPResourceInfoList);
-    procedure OnResourceGetReply(aInfo: TMCPReadResourceResponse; aError: TRPCError);
-    procedure OnCompletionReply(aResponse: TMCPCompletionResponse; aError: TRPCError);
+    procedure OnToolsListReply(aSender: TObject; var aList: TMCPToolInfoList; const aError: TRPCError);
+    procedure OnPromptsListReply(aSender: TObject; aList: TMCPPromptInfoArray; const aError: TRPCError);
+    procedure OnResourcesListReply(aSender: TObject; aList: TMCPResourceInfoArray; const aError: TRPCError);
+    procedure OnResourceGetReply(aInfo: TMCPReadResourceResponse; const aError: TRPCError);
+    procedure OnCompletionReply(aResponse: TMCPCompletionResponse; const aError: TRPCError);
 
     // Utility methods
     procedure Usage(const aErr: string);
@@ -209,6 +210,12 @@ begin
     on E: Exception do
       raise EMCPClientApp.CreateFmt('Failed to load configuration: %s', [E.Message]);
   end;
+end;
+
+procedure TMCPClientApplication.OnInitialized(const aResponse: TMCPInitializeResponse; aError: TRPCError);
+begin
+  FInitializeResponse:=aResponse;
+  FLastResponse:=rtInitialize;
 end;
 
 procedure TMCPClientApplication.ParseServerConfig(const aServerName: string; out aServerConfig: TJSONObject);
@@ -388,6 +395,10 @@ begin
     Exit;
     end;
 
+  LogInfo('Initializing MCP server: '+FOptions.ServerName);
+  FClient.Initialize(@OnInitialized);
+  WaitForResponse(rtInitialize,'Initialization');
+
   try
     if aLogMessage <> '' then
       LogInfo(aLogMessage);
@@ -429,7 +440,7 @@ begin
       end;
       end;
 
-    FClient := TMCPCustomClient.Create(nil);
+    FClient := TMCPClient.Create(nil);
     FClient.ClientName := 'mcpclient-demo';
     FClient.ClientVersion := '1.0';
     FClient.Transport := FProcessTransport;
@@ -550,34 +561,33 @@ begin
   FLastResponse := rtToolCall;
 end;
 
-procedure TMCPClientApplication.OnToolsListReply(aSender: TObject; var aList: TMCPToolInfoList);
+procedure TMCPClientApplication.OnToolsListReply(aSender: TObject; var aList: TMCPToolInfoList; const aError: TRPCError);
 begin
   FToolsList := aList;
   aList:=Nil;
   FLastResponse := rtToolsList;
 end;
 
-procedure TMCPClientApplication.OnPromptsListReply(aSender: TObject; var aList: TMCPPromptInfoList);
+procedure TMCPClientApplication.OnPromptsListReply(aSender: TObject; aList: TMCPPromptInfoArray; const aError: TRPCError);
 begin
   FPromptsList := aList;
-  aList:=Nil;
   FLastResponse := rtPromptsList;
 end;
 
-procedure TMCPClientApplication.OnResourcesListReply(aSender: TObject; var aList: TMCPResourceInfoList);
+procedure TMCPClientApplication.OnResourcesListReply(aSender: TObject; aList: TMCPResourceInfoArray; const aError: TRPCError);
 begin
   FResourcesList := aList;
   aList:=nil;
   FLastResponse := rtResourcesList;
 end;
 
-procedure TMCPClientApplication.OnResourceGetReply(aInfo: TMCPReadResourceResponse; aError: TRPCError);
+procedure TMCPClientApplication.OnResourceGetReply(aInfo: TMCPReadResourceResponse; const aError: TRPCError);
 begin
   FResourceGetResponse := aInfo;
   FLastResponse := rtResourceGet;
 end;
 
-procedure TMCPClientApplication.OnCompletionReply(aResponse: TMCPCompletionResponse; aError: TRPCError);
+procedure TMCPClientApplication.OnCompletionReply(aResponse: TMCPCompletionResponse; const aError: TRPCError);
 begin
   FCompletionResponse := aResponse;
   FLastResponse := rtCompletion;
@@ -730,8 +740,8 @@ begin
 
     if Assigned(FPromptsList) then
       begin
-      LogInfo(Format('Available prompts (%d):', [FPromptsList.Count]));
-      for i := 0 to FPromptsList.Count - 1 do
+      LogInfo(Format('Available prompts (%d):', [Length(FPromptsList)]));
+      for i := 0 to Length(FPromptsList)-1 do
         begin
         PromptInfo := FPromptsList[i];
         WriteLn(Format('  %-20s: %s', [PromptInfo.Name, PromptInfo.Description]));
@@ -739,8 +749,6 @@ begin
       end
     else
       LogInfo('No prompts available from server');
-
-
   finally
     ListPromptsCall.Free;
   end;
@@ -754,19 +762,16 @@ var
 begin
   FLastResponse := rtNone;
   FreeAndNil(FResourcesList);
-
   ListResourcesCall := TMCPReadResourceList.Create(FClient);
   try
     ListResourcesCall.OnReply := @OnResourcesListReply;
     ListResourcesCall.Call();
-
     if not WaitForResponse(rtResourcesList, 'resources list') then
       exit;
-
     if Assigned(FResourcesList) then
       begin
-      LogInfo(Format('Available resources (%d):', [FResourcesList.Count]));
-      for i := 0 to FResourcesList.Count - 1 do
+      LogInfo(Format('Available resources (%d):', [Length(FResourcesList)]));
+      for i := 0 to Length(FResourcesList) do
         begin
         ResourceInfo := FResourcesList[i];
         WriteLn(Format('  %-20s: %s (%s)', [ResourceInfo.Name, ResourceInfo.Description, ResourceInfo.MimeType]));
@@ -774,7 +779,6 @@ begin
       end
     else
       LogInfo('No resources available from server');
-
   finally
     ListResourcesCall.Free;
   end;
@@ -1002,7 +1006,6 @@ begin
       Exit;
       end;
   end;
-
   // Execute command
   try
     ExecuteCommand;

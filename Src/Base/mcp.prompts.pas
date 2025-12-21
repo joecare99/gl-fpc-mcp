@@ -448,7 +448,6 @@ end;
 
 destructor TMCPPrompt.Destroy;
 begin
-  FInfo.Free;
   inherited Destroy;
 end;
 

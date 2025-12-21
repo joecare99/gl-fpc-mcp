@@ -25,19 +25,6 @@ uses
   Classes, SysUtils, contnrs, fpjson, mcp.types;
 
 Type
-  EMCPClient = Class(Exception);
-
-  { TRPCError }
-
-  TRPCError = Record
-    Code : Integer;
-    Message : TJSONStringType;
-    Data : TJSONStringType; // JSON
-    Procedure FromJSON(aJSON : TJSONObject);
-    Procedure ToJSON(aJSON : TJSONObject);
-    Function IsSuccess : Boolean; Inline;
-    Function IsError : Boolean; Inline;
-  end;
 
 
   TMCPCustomClient = class;
@@ -224,68 +211,12 @@ resourcestring
   SWarnUnhandledMethod = 'Unhandled request %s with method %s, params: %s';
   SErrUnknownMethod = 'Unknown method %s';
 
-
-{ TRPCError }
-
-procedure TRPCError.FromJSON(aJSON: TJSONObject);
-
-var
-  D : TJSONData;
-
-begin
-  D:=aJSON.Find('code');
-  if not assigned(D) or (D.JSONType=jtNull) then
-    Code:=0
-  else if D.JSONType<>jtNumber then
-    Raise EJSON.Create('Code is not a number')
-  else
-    Code:=aJSON.Get('code',0);
-  D:=aJSON.Find('message');
-  if not assigned(D) or (D.JSONType=jtNull) then
-    Message:=''
-  else if D.JSONType<>jtString then
-    Raise EJSON.Create('Message is not a string')
-  else
-    Message:=aJSON.Get('message','');
-  D:=aJSON.Find('data');
-  if Assigned(D) then
-    Data:=D.AsJSON
-  else
-    Data:='';
-end;
-
-procedure TRPCError.ToJSON(aJSON: TJSONObject);
-
-Var
-  D : TJSONData;
-
-begin
-  if not Assigned(aJSON) then
-    Raise Exception.Create('Need JSON object');
-  aJSON.Integers['code']:=Code;
-  aJSON.Strings['message']:=Message;
-  if Data<>'' then
-    begin
-    D:=GetJSON(Data);
-    aJSON.Elements['data']:=D;
-    end;
-end;
-
-function TRPCError.IsSuccess: Boolean;
-begin
-  Result:=(Code=0)
-end;
-
-function TRPCError.IsError: Boolean;
-begin
-  Result:=Code<>0;
-end;
-
 constructor TMCPCall.create(aClient: TMCPCustomClient);
 begin
   FClient:=aClient;
   FCurrentCall:=0;
 end;
+
 
 destructor TMCPCall.Destroy;
 begin
@@ -308,7 +239,10 @@ end;
 function TMCPCall.Call(aArguments: TJSONObject): TRequestID;
 begin
   if FCurrentCall<>0 then
+    begin
+    aArguments.Free;
     Raise EMCPClient.CreateFmt('Call %d still in progress',[FCurrentCall]);
+    end;
   FCurrentCall:=FClient.Request(Self,aArguments);
   Result:=FCurrentCall;
 end;

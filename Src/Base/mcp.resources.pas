@@ -281,7 +281,6 @@ end;
 
 destructor TMCPResource.Destroy;
 begin
-  FInfo.Free;
   inherited Destroy;
 end;
 

@@ -25,6 +25,22 @@ uses
   SysUtils,Types, Classes, Contnrs, fpjson, mcp.utils;
 
 Type
+  EMCPClient = Class(Exception);
+
+  { TRPCError }
+
+  TRPCError = Record
+    Code : Integer;
+    Message : TJSONStringType;
+    Data : TJSONStringType; // JSON
+    Procedure FromJSON(aJSON : TJSONObject);
+    Procedure ToJSON(aJSON : TJSONObject);
+    Function IsSuccess : Boolean; Inline;
+    Function IsError : Boolean; Inline;
+    class Function NoError: TRPCError; static;
+  end;
+
+Type
   TMCPLogType = (mltError,mltWarning,mltInfo,mltTrace,mltDebug);
   TMCPLogTypes = set of TMCPLogType;
 
@@ -33,6 +49,26 @@ Type
   TMCPResourceKind = (rkUnknown,rkText,rkData);
   EMCPException = class(Exception)
     code: integer;
+  end;
+
+  { TServerInfo }
+
+  TServerInfo = record
+    name : string;
+    version : string;
+    procedure fromJSON(aJSON : TJSONObject);
+  end;
+
+  TServerFeature = (sfLogging,sfCompletions,sfPrompts,sfResources,sfTools,sfPromptChanges,sfResourceChanges,sfResourceSubscribe,sfToolChanges);
+  TServerFeatures = set of TServerFeature;
+
+  { TInitializeResponse }
+
+  TMCPInitializeResponse = record
+    Info : TServerInfo;
+    protocol : string;
+    Features : TServerFeatures;
+    procedure FromJson(aJSON : TJSONObject);
   end;
 
   TMCPPromptKind = (pkText,pkImage,pkAudio,pkResourceLink,pkEmbeddedResource);
@@ -148,7 +184,7 @@ Type
   TPromptArgumentArray = array of TPromptArgument;
 
   { TMCPPromptInfo }
-  TMCPPromptInfo = class
+  TMCPPromptInfo = Record
   private
     FName: string;
     FTitle: string;
@@ -171,14 +207,20 @@ Type
     property ArgumentCount: integer read GetArgumentCount;
   end;
 
-  TMCPPromptInfoList = class(specialize TGFPObjectList<TMCPPromptInfo>)
-  public
+  TMCPPromptInfoArray = array of TMCPPromptInfo;
+
+  { TMCPPromptInfoArrayHelper }
+
+  TMCPPromptInfoArrayHelper = type helper for TMCPPromptInfoArray
     procedure ToJSON(aJSON: TJSONArray);
     function ToJSON: TJSONArray;
     procedure FromJSON(aJSON: TJSONArray);
+    function Count : Integer;
   end;
 
-  TMCPResourceInfo = class
+  { TMCPResourceInfo }
+
+  TMCPResourceInfo = Record
   private
     FData: TBytes;
     FKind: TMCPResourceKind;
@@ -195,8 +237,9 @@ Type
     procedure SetSize(AValue: Integer);
   public
     constructor Create(const aURI, aName: String);
-    destructor Destroy; override;
-
+    // Clears everything
+    procedure Free;
+    procedure Clear;
     function GetSize: Integer;
     function GetKind: TMCPResourceKind;
     procedure SetKind(AValue: TMCPResourceKind);
@@ -216,11 +259,17 @@ Type
     procedure FromJSON(aJSON: TJSONObject);
   end;
 
-  TMCPResourceInfoList = class(specialize TGFPObjectList<TMCPResourceInfo>)
-  public
+  TMCPResourceInfoArray = Array of TMCPResourceInfo;
+
+//  TMCPResourceInfoList = class(specialize TGFPObjectList<TMCPResourceInfo>)
+
+  { TMCPResourceInfoArrayHelper }
+
+  TMCPResourceInfoArrayHelper = Type helper for TMCPResourceInfoArray
     procedure ToJSON(aJSON: TJSONArray; withData: Boolean = True);
     function ToJSON(withData: Boolean = True): TJSONArray;
     procedure FromJSON(aJSON: TJSONArray);
+    function Count : Integer;
   end;
 
   { Tool Result Types - Shared between client and server }
@@ -267,15 +316,15 @@ Type
   TMCPToolResultArray = Array of TMCPToolResult;
   PMCPToolResultArray = ^TMCPToolResultArray;
 
-  // The caller frees the list if the callee didn't set it to nil.
-  TListToolsResponseEvent = procedure (aSender: TObject; var aList: TMCPToolInfoList) of object;
-  TPromptListResponseEvent = procedure (aSender: TObject; var aList: TMCPPromptInfoList) of object;
-  TResourceListResponseEvent = procedure (aSender: TObject; var aList: TMCPResourceInfoList) of object;
-
-  TGetResourceResponseEvent = procedure (aSender: TObject; aResource: TMCPResourceInfo) of object;
-  TCompletionCompleteEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
-  TSetLogLevelEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
-  TToolCallEvent = procedure(aSender: TObject; const aResponse: TJSONObject) of object;
+  // Var arguments that are classes: The caller frees the argument if the callee didn't set it to nil.
+  TListToolsResponseEvent = procedure (aSender: TObject; var aList: TMCPToolInfoList; const aError : TRPCError) of object;
+  TPromptListResponseEvent = procedure (aSender: TObject; aList: TMCPPromptInfoArray; const aError : TRPCError) of object;
+  TResourceListResponseEvent = procedure (aSender: TObject; aList: TMCPResourceInfoArray; const aError : TRPCError) of object;
+  TOnInitializeEvent = procedure(const aResponse : TMCPInitializeResponse; aError : TRPCError) of object;
+  TGetResourceResponseEvent = procedure (aSender: TObject; constref aResource: TMCPResourceInfo; const aError : TRPCError) of object;
+  TCompletionCompleteEvent = procedure(aSender: TObject; const aResponse: TJSONObject; const aError : TRPCError) of object;
+  TSetLogLevelEvent = procedure(aSender: TObject; const aResponse: TJSONObject; const aError : TRPCError) of object;
+  TToolCallEvent = procedure(aSender: TObject; const aResponse: TJSONObject; const aError : TRPCError) of object;
 
 
 implementation
@@ -663,15 +712,21 @@ end;
 
 constructor TMCPResourceInfo.Create(const aURI, aName: String);
 begin
-  inherited Create;
+  Self:=Default(TMCPResourceInfo);
   Uri:=aURI;
   Name:=aName;
 end;
 
-destructor TMCPResourceInfo.Destroy;
+procedure TMCPResourceInfo.Free;
 begin
-  inherited Destroy;
+  Clear;
 end;
+
+procedure TMCPResourceInfo.Clear;
+begin
+  Self:=Default(TMCPResourceInfo);
+end;
+
 
 function TMCPResourceInfo.GetSize: Integer;
 begin
@@ -782,7 +837,7 @@ end;
 
 constructor TMCPPromptInfo.Create(const aName, aTitle: String; aDescription: String);
 begin
-  inherited Create;
+  Self:=Default(TMCPPromptInfo);
   Name:=aName;
   FTitle:=aTitle;
   FDescription:=aDescription;
@@ -925,15 +980,15 @@ end;
 
 { TMCPPromptInfoList }
 
-procedure TMCPPromptInfoList.ToJSON(aJSON: TJSONArray);
+procedure TMCPPromptInfoArrayHelper.ToJSON(aJSON: TJSONArray);
 var
   I: Integer;
 begin
-  for I:=0 to Count - 1 do
-    aJSON.Add(Elements[I].ToJSON);
+  for I:=0 to Length(Self)- 1 do
+    aJSON.Add(Self[I].ToJSON);
 end;
 
-function TMCPPromptInfoList.ToJSON: TJSONArray;
+function TMCPPromptInfoArrayHelper.ToJSON: TJSONArray;
 
 begin
   Result:=TJSONArray.Create;
@@ -945,44 +1000,46 @@ begin
   end;
 end;
 
-procedure TMCPPromptInfoList.FromJSON(aJSON: TJSONArray);
+procedure TMCPPromptInfoArrayHelper.FromJSON(aJSON: TJSONArray);
 var
-  I: Integer;
+  I,aCount: Integer;
   PromptInfo: TMCPPromptInfo;
   ItemObj: TJSONObject;
 
 begin
   if not Assigned(aJSON) then
     Exit;
-  Clear;
+  SetLength(Self,aJSON.Count);
+  aCount:=0;
   for I:=0 to aJSON.Count - 1 do
     begin
     if aJSON[I] is TJSONObject then
       begin
       ItemObj:=TJSONObject(aJSON[I]);
-      PromptInfo:=TMCPPromptInfo.Create('dummy', ''); // Will be set by FromJSON
-      try
-        PromptInfo.FromJSON(ItemObj);
-        Add(PromptInfo);
-      except
-        PromptInfo.Free;
-        raise;
-      end;
+      Self[aCount]:=Default(TMCPPromptInfo);
+      Self[aCount].FromJSON(ItemObj);
+      inc(aCount);
       end;
     end;
+  SetLength(Self,aCount);
+end;
+
+function TMCPPromptInfoArrayHelper.Count: Integer;
+begin
+  Result:=Length(Self);
 end;
 
 { TMCPResourceInfoList }
 
-procedure TMCPResourceInfoList.ToJSON(aJSON: TJSONArray; withData: Boolean);
+procedure TMCPResourceInfoArrayHelper.ToJSON(aJSON: TJSONArray; withData: Boolean);
 var
   I: Integer;
 begin
-  for I:=0 to Count - 1 do
-    aJSON.Add(Elements[I].ToJSON(withData));
+  for I:=0 to Length(Self) - 1 do
+    aJSON.Add(Self[I].ToJSON(withData));
 end;
 
-function TMCPResourceInfoList.ToJSON(withData: Boolean): TJSONArray;
+function TMCPResourceInfoArrayHelper.ToJSON(withData: Boolean): TJSONArray;
 begin
   Result:=TJSONArray.Create;
   try
@@ -993,30 +1050,31 @@ begin
   end;
 end;
 
-procedure TMCPResourceInfoList.FromJSON(aJSON: TJSONArray);
+procedure TMCPResourceInfoArrayHelper.FromJSON(aJSON: TJSONArray);
 var
-  I: Integer;
-  ResourceInfo: TMCPResourceInfo;
+  I,aCount: Integer;
   ItemObj: TJSONObject;
 begin
   if not Assigned(aJSON) then
     Exit;
-  Clear;
+  SetLength(Self,aJSON.Count);
+  aCount:=0;
   for I:=0 to aJSON.Count - 1 do
     begin
     if aJSON[I] is TJSONObject then
       begin
       ItemObj:=TJSONObject(aJSON[I]);
-      ResourceInfo:=TMCPResourceInfo.Create('', ''); // Will be set by FromJSON
-      try
-        ResourceInfo.FromJSON(ItemObj);
-        Add(ResourceInfo);
-      except
-        ResourceInfo.Free;
-        raise;
-      end;
+      Self[aCount]:=Default(TMCPResourceInfo);
+      Self[aCount].FromJSON(ItemObj);
+      inc(aCount);
       end;
     end;
+  SetLength(Self,aCount);
+end;
+
+function TMCPResourceInfoArrayHelper.Count: Integer;
+begin
+  Result:=Length(Self);
 end;
 
 { Helper functions for TMCPToolResult }
@@ -1225,6 +1283,117 @@ begin
   else if lStr = 'debug' then Result:=mclDebug
   else Result:=mclError; // Default fallback
 end;
+
+{ TServerInfo }
+
+procedure TServerInfo.fromJSON(aJSON: TJSONObject);
+begin
+  with aJSON do
+    begin
+    name:=get('name','');
+    version:=get('version','');
+    end;
+end;
+
+{ TInitializeResponse }
+
+procedure TMCPInitializeResponse.FromJson(aJSON: TJSONObject);
+
+  function checkavailable(aCaps : TJSONObject; aFeature : string; aAvailable : TServerFeature; aChanges : TServerFeature) : boolean;
+  var
+    lTmp : TJSONObject;
+  begin
+    Result:=assigned(aCaps);
+    if result then
+      ltmp:=aCaps.get(aFeature,TJSONObject(Nil));
+    Result:=Result and Assigned(lTmp);
+    if result then
+      begin
+      Include(Features,aAvailable);
+      if lTmp.Get('listChanged',false) then
+        Include(Features,aChanges);
+      end;
+  end;
+
+var
+  lCaps : TJSONObject;
+
+begin
+  lCaps:=aJSON.get('serverInfo',TJSONObject(nil));
+  if assigned(lCaps) then
+    Info.fromJSON(lCaps);
+  protocol:=aJSON.Get('protocol','');
+  lCaps:=aJSON.get('capabilities',TJSONObject(nil));
+  checkavailable(lCaps,'prompts',sfPrompts,sfPromptChanges);
+  if checkavailable(lCaps,'resources',sfResources,sfResourceChanges) then
+    if lCaps.Get('resources',TJSONObject(Nil)).Get('subscribe',false) then
+      include(Features,sfResourceSubscribe);
+  checkAvailable(lCaps,'tools',sfTools,sfToolChanges);
+  checkAvailable(lCaps,'logging',sfLogging,sfLogging);
+  checkAvailable(lCaps,'completions',sfCompletions,sfCompletions);
+end;
+
+{ TRPCError }
+
+procedure TRPCError.FromJSON(aJSON: TJSONObject);
+
+var
+  D : TJSONData;
+
+begin
+  D:=aJSON.Find('code');
+  if not assigned(D) or (D.JSONType=jtNull) then
+    Code:=0
+  else if D.JSONType<>jtNumber then
+    Raise EJSON.Create('Code is not a number')
+  else
+    Code:=aJSON.Get('code',0);
+  D:=aJSON.Find('message');
+  if not assigned(D) or (D.JSONType=jtNull) then
+    Message:=''
+  else if D.JSONType<>jtString then
+    Raise EJSON.Create('Message is not a string')
+  else
+    Message:=aJSON.Get('message','');
+  D:=aJSON.Find('data');
+  if Assigned(D) then
+    Data:=D.AsJSON
+  else
+    Data:='';
+end;
+
+procedure TRPCError.ToJSON(aJSON: TJSONObject);
+
+Var
+  D : TJSONData;
+
+begin
+  if not Assigned(aJSON) then
+    Raise Exception.Create('Need JSON object');
+  aJSON.Integers['code']:=Code;
+  aJSON.Strings['message']:=Message;
+  if Data<>'' then
+    begin
+    D:=GetJSON(Data);
+    aJSON.Elements['data']:=D;
+    end;
+end;
+
+function TRPCError.IsSuccess: Boolean;
+begin
+  Result:=(Code=0)
+end;
+
+function TRPCError.IsError: Boolean;
+begin
+  Result:=Code<>0;
+end;
+
+class function TRPCError.NoError: TRPCError;
+begin
+  Result:=Default(TRPCError);
+end;
+
 
 end.
 

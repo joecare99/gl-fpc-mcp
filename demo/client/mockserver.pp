@@ -5,6 +5,9 @@ program mockserver;
 uses
   SysUtils, fpjson, jsonparser;
 
+var
+  HasInitialized :Boolean;
+
 procedure SendResponse(const Response: TJSONObject);
 var
   JSONStr: string;
@@ -18,12 +21,12 @@ procedure HandleInitialize(RequestID: Integer);
 var
   Response, Result, Capabilities, Tools, ServerInfo: TJSONObject;
 begin
+  HasInitialized:=True;
   Response := TJSONObject.Create;
   Result := TJSONObject.Create;
   Capabilities := TJSONObject.Create;
   Tools := TJSONObject.Create;
   ServerInfo := TJSONObject.Create;
-
   try
     Tools.Add('listChanged', True);
     Capabilities.Add('tools', Tools);
@@ -316,17 +319,17 @@ begin
   end;
 end;
 
-procedure HandleMethodNotFound(RequestID: Integer; const Method: string);
+
+procedure SendError(RequestID: Integer; const ErrorMessage: string);
+
 var
   Response, Error: TJSONObject;
 begin
   Response := TJSONObject.Create;
   Error := TJSONObject.Create;
-
   try
     Error.Add('code', -32601);
-    Error.Add('message', Format('Method not found: %s', [Method]));
-
+    Error.Add('message', ErrorMessage);
     Response.Add('jsonrpc', '2.0');
     Response.Add('id', RequestID);
     Response.Add('error', Error);
@@ -335,6 +338,12 @@ begin
   finally
     Response.Free;
   end;
+
+end;
+
+procedure HandleMethodNotFound(RequestID: Integer; const Method: string);
+begin
+  SendError(RequestID,Format('Method not found: %s', [Method]));
 end;
 
 procedure HandleToolsCall(RequestID: Integer; const Params: TJSONObject);
@@ -443,20 +452,25 @@ begin
 
         if Method = 'initialize' then
           HandleInitialize(RequestID)
-        else if Method = 'tools/list' then
-          HandleToolsList(RequestID)
-        else if Method = 'prompts/list' then
-          HandlePromptsList(RequestID)
-        else if Method = 'resources/list' then
-          HandleResourcesList(RequestID)
-        else if Method = 'resources/read' then
-          HandleResourcesRead(RequestID, Params)
-        else if Method = 'completion/complete' then
-          HandleCompletionComplete(RequestID, Params)
-        else if Method = 'tools/call' then
-          HandleToolsCall(RequestID, Params)
         else
-          HandleMethodNotFound(RequestID, Method);
+          begin
+          if not HasInitialized then
+            SendError(RequestID,'Need initialize message first');
+          if Method = 'tools/list' then
+            HandleToolsList(RequestID)
+          else if Method = 'prompts/list' then
+            HandlePromptsList(RequestID)
+          else if Method = 'resources/list' then
+            HandleResourcesList(RequestID)
+          else if Method = 'resources/read' then
+            HandleResourcesRead(RequestID, Params)
+          else if Method = 'completion/complete' then
+            HandleCompletionComplete(RequestID, Params)
+          else if Method = 'tools/call' then
+            HandleToolsCall(RequestID, Params)
+          else
+            HandleMethodNotFound(RequestID, Method);
+          end;
 
       finally
         Request.Free;
@@ -473,6 +487,7 @@ end;
 var
   Line: string;
 begin
+  HasInitialized:=False;
   try
     while not EOF do
     begin
