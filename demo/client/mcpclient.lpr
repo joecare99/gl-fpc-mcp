@@ -76,9 +76,9 @@ type
 
     // Event handlers
     procedure OnToolCallReply(aResponse: TMCPToolCallResponse; aError: TRPCError);
-    procedure OnToolsListReply(aSender: TObject; aList: TMCPToolInfoList);
-    procedure OnPromptsListReply(aSender: TObject; aList: TMCPPromptInfoList);
-    procedure OnResourcesListReply(aSender: TObject; aList: TMCPResourceInfoList);
+    procedure OnToolsListReply(aSender: TObject; var aList: TMCPToolInfoList);
+    procedure OnPromptsListReply(aSender: TObject; var aList: TMCPPromptInfoList);
+    procedure OnResourcesListReply(aSender: TObject; var aList: TMCPResourceInfoList);
     procedure OnResourceGetReply(aInfo: TMCPReadResourceResponse; aError: TRPCError);
     procedure OnCompletionReply(aResponse: TMCPCompletionResponse; aError: TRPCError);
 
@@ -548,21 +548,24 @@ begin
   FLastResponse := rtToolCall;
 end;
 
-procedure TMCPClientApplication.OnToolsListReply(aSender: TObject; aList: TMCPToolInfoList);
+procedure TMCPClientApplication.OnToolsListReply(aSender: TObject; var aList: TMCPToolInfoList);
 begin
   FToolsList := aList;
+  aList:=Nil;
   FLastResponse := rtToolsList;
 end;
 
-procedure TMCPClientApplication.OnPromptsListReply(aSender: TObject; aList: TMCPPromptInfoList);
+procedure TMCPClientApplication.OnPromptsListReply(aSender: TObject; var aList: TMCPPromptInfoList);
 begin
   FPromptsList := aList;
+  aList:=Nil;
   FLastResponse := rtPromptsList;
 end;
 
-procedure TMCPClientApplication.OnResourcesListReply(aSender: TObject; aList: TMCPResourceInfoList);
+procedure TMCPClientApplication.OnResourcesListReply(aSender: TObject; var aList: TMCPResourceInfoList);
 begin
   FResourcesList := aList;
+  aList:=nil;
   FLastResponse := rtResourcesList;
 end;
 
