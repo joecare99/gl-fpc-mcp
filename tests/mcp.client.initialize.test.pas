@@ -147,7 +147,7 @@ begin
   FLastRequestArgs := aArgs.Clone as TJSONObject;
   FLastRequest := aRequest;
   FLastRequestID := aRequestID;
-  aArgs.Free;
+//  aArgs.Free;
   // Don't call inherited - we don't want actual network operations
 end;
 

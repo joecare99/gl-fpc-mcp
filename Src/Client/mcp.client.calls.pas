@@ -444,11 +444,10 @@ begin
     args.add('clientInfo',tmp);
     tmp.add('name',client.clientname);
     tmp.add('version',client.clientversion);
-  except
+    Result:=Inherited call(args);
+  finally
     args.Free;
-    raise;
   end;
-  Result:=Inherited call(args);
 end;
 
 
@@ -492,7 +491,11 @@ var
   Obj : TJSONObject;
 begin
   Obj:=TJSONObject.Create();
-  inherited call(Obj);
+  try
+    inherited call(Obj);
+  finally
+    Obj.Free;
+  end;
 end;
 
 { TMCPReadResource }
@@ -529,8 +532,12 @@ var
   lArgs : TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  lArgs.Add('uri', aUri);
-  inherited call(lArgs);
+  try
+    lArgs.Add('uri', aUri);
+    inherited call(lArgs);
+  finally
+    lArgs.Free;
+  end;
 end;
 
 procedure TMCPGetPrompt.Call(const aName: String; aArguments: TJSONObject);
@@ -538,10 +545,14 @@ var
   lObj:TJSONObject;
 begin
   lObj:=TJSONObject.Create;
-  lObj.Add('name', aName);
-  if Assigned(aArguments) then
-    lObj.Add('arguments', aArguments.Clone);
-  inherited Call(lObj);
+  try
+    lObj.Add('name', aName);
+    if Assigned(aArguments) then
+      lObj.Add('arguments', aArguments.Clone);
+    inherited Call(lObj);
+  finally
+    lObj.Free;
+  end;
 end;
 
 { TMCPGetResource }
@@ -576,13 +587,33 @@ begin
   result:='resources/read';
 end;
 
+Type
+
+  { TMyJ }
+
+  TMyJ = class(TJSONObject)
+    destructor Destroy; override;
+  end;
+
+{ TMyJ }
+
+destructor TMyJ.Destroy;
+begin
+  Writeln('Hier');
+  inherited Destroy;
+end;
+
 procedure TMCPGetResource.Call(const aURI: String);
 var
   lArgs: TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  lArgs.Add('uri', aURI);
-  inherited call(lArgs);
+  try
+    lArgs.Add('uri', aURI);
+    inherited call(lArgs);
+  finally
+    lArgs.Free;
+  end;
 end;
 
 { TMCPReadPromptList }
@@ -624,7 +655,11 @@ var
   lArgs : TJSONObject;
 begin
   lArgs:=TJSONObject.Create;
-  Inherited Call(lArgs)
+  try
+    Inherited Call(lArgs)
+  finally
+    lArgs.Free;
+  end;
 end;
 
 { TMCPContentBlock }
@@ -712,19 +747,19 @@ var
 begin
   lObj:=TJSONObject.Create;
   try
-  lObj.Add('name',aName);
-  if aArguments.Count>0 then
-    begin
-    lArgs:=TJSONObject.Create;
-    lObj.Add('arguments',lArgs);
-    for I:=0 to aArguments.Count-1 do
+    lObj.Add('name',aName);
+    if aArguments.Count>0 then
       begin
-      aArguments.GetNameValue(I,N,V);
-      if N<>'' then
-        lArgs.Add(N,V);
+      lArgs:=TJSONObject.Create;
+      lObj.Add('arguments',lArgs);
+      for I:=0 to aArguments.Count-1 do
+        begin
+        aArguments.GetNameValue(I,N,V);
+        if N<>'' then
+          lArgs.Add(N,V);
+        end;
       end;
-    end;
-  Inherited Call(lObj);
+    Inherited Call(lObj);
   finally
     lObj.Free;
   end;
@@ -816,7 +851,11 @@ var
   Obj: TJSONObject;
 begin
   Obj:=TJSONObject.Create();
-  inherited Call(Obj);
+  try
+    inherited Call(Obj);
+  finally
+    Obj.Free;
+  end;
 end;
 
 { TMCPCompletionRefTypeHelper }

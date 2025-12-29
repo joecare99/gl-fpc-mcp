@@ -239,10 +239,7 @@ end;
 function TMCPCall.Call(aArguments: TJSONObject): TRequestID;
 begin
   if FCurrentCall<>0 then
-    begin
-    aArguments.Free;
     Raise EMCPClient.CreateFmt('Call %d still in progress',[FCurrentCall]);
-    end;
   FCurrentCall:=FClient.Request(Self,aArguments);
   Result:=FCurrentCall;
 end;
@@ -396,10 +393,11 @@ begin
     ]);
     if assigned(aArgs) then
       msg.add('params',aArgs);
-    aArgs:=nil;
     Transport.SendMessage(Msg);
   finally
-    aArgs.Free;
+    if assigned(aArgs) then
+      if aArgs<>msg.Extract('params') then
+        Raise EMCPClient.Create('Error extracting params after call');
     Msg.Free;
   end;
 end;
