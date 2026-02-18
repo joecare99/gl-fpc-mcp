@@ -8,7 +8,7 @@ unit mcpclient;
 interface
 
 uses
-  rpc.clienttool, MCP.Client.Base, MCP.Client.Process, MCP.Client.StdIO, 
+  rpc.clienttool, MCP.Client.Base, rpc.client.process, rpc.client.stdio,
   MCP.Client.Calls, mcp.client, LazarusPackageIntf;
 
 implementation

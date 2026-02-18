@@ -5,7 +5,7 @@ program mcpclient;
 
 uses
   Classes, SysUtils, CustApp, fpjson, jsonscanner, jsonparser, strutils,
-  mcp.client.base, mcp.client.calls, mcp.client.stdio, mcp.types, mcp.client;
+  mcp.client.base, mcp.client.calls, rpc.client.stdio, mcp.types, mcp.client;
 
 type
   EMCPClientApp = class(Exception);

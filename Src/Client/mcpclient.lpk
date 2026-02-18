@@ -19,12 +19,12 @@
         <UnitName Value="MCP.Client.Base"/>
       </Item>
       <Item>
-        <Filename Value="mcp.client.process.pas"/>
-        <UnitName Value="MCP.Client.Process"/>
+        <Filename Value="rpc.client.process.pas"/>
+        <UnitName Value="rpc.client.process"/>
       </Item>
       <Item>
-        <Filename Value="mcp.client.stdio.pas"/>
-        <UnitName Value="MCP.Client.StdIO"/>
+        <Filename Value="rpc.client.stdio.pas"/>
+        <UnitName Value="rpc.client.stdio"/>
       </Item>
       <Item>
         <Filename Value="mcp.client.calls.pas"/>

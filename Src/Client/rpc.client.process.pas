@@ -12,7 +12,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
  **********************************************************************}
-unit MCP.Client.Process;
+unit rpc.client.process;
 
 {$mode objfpc}{$H+}
 
@@ -132,4 +132,3 @@ end;
 
 
 end.
-

@@ -13,14 +13,14 @@
 
  **********************************************************************}
 
-unit MCP.Client.StdIO;
+unit rpc.client.stdio;
 
 {$mode ObjFPC}{$H+}
 
 interface
 
 uses
-  Classes, SysUtils, Pipes, Process, fpjson, rpc.clienttool, mcp.client.process;
+  Classes, SysUtils, Pipes, Process, fpjson, rpc.clienttool, rpc.client.process;
 
 Type
   { TLSPClientStdIOTransport }
@@ -213,4 +213,3 @@ begin
 end;
 
 end.
-
