@@ -112,8 +112,10 @@ Type
     Procedure RemoveCall(ID : TRequestID);
     procedure DoRequest(aRequest: TMCPCall; aRequestID: TRequestID; aArgs: TJSONObject); virtual;
     Function Request(aRequest : TMCPCall; aArguments : TJSONObject) : TRequestID;
+    procedure SendResponse(aID: TJSONStringType; aResult: TJSONObject); virtual;
     procedure SendError(aID: TJSONStringType; const aError: TRPCError);virtual;
     procedure SendError(aID: TJSONStringType; aCode: Integer; const aMessage: String);
+    function DispatchServerRequest(const aID: TJSONStringType; const aMethod: String; aParams: TJSONObject): Boolean; virtual;
   Public
     Constructor Create(aOwner : TComponent); override;
     Destructor Destroy; override;
@@ -146,6 +148,7 @@ resourcestring
   SErrDestreamingResponse = 'Exception %s while destreaming request %s result: %s (%s)';
   SErrHandlingResponse = 'Exception %s while handling request %s result: %s (%s)';
   SErrSendingError = 'Error %s trying to send error response (code:%d, message: "%s") to server: %s';
+  SErrSendingResponse = 'Error %s trying to send response to server for request %s: %s';
 
 constructor TMCPCall.create(aClient: TRPCClientTool);
 begin
@@ -477,6 +480,33 @@ begin
   SendError(aID,Err);
 end;
 
+procedure TRPCClientTool.SendResponse(aID: TJSONStringType; aResult: TJSONObject);
+var
+  Msg: TJSONObject;
+begin
+  try
+    Msg := TJSONObject.Create([
+      'jsonrpc', '2.0',
+      'id', aID,
+      'result', aResult   // caller passes ownership
+    ]);
+    try
+      Transport.SendMessage(Msg);
+    finally
+      Msg.Free;
+    end;
+  except
+    on E: Exception do
+      MCPLogger.Error(SErrSendingResponse, [E.ClassName, aID, E.Message]);
+  end;
+end;
+
+function TRPCClientTool.DispatchServerRequest(const aID: TJSONStringType;
+  const aMethod: String; aParams: TJSONObject): Boolean;
+begin
+  Result := False;
+end;
+
 function TRPCClientTool.HandleServerMessage(J : TJSONObject) : Boolean;
 
 var
@@ -499,14 +529,18 @@ begin
   aError:=nil;
   if (aMethod<>'') then
     begin
-    if aID<>'' then
-      MCPLogger.Warning('Received notification with ID: %s',[aID]);
-    // notification
     aParams:=J.Find('params');
     if not (aParams is TJSONObject) then
-      MCPLogger.Warning('Received notification with wrong data: %s',[aID,aParams.AsJSON])
+      begin
+      MCPLogger.Warning('Received message with wrong data: %s',[aMethod]);
+      exit;
+      end;
+    if aID<>'' then
+      // Server REQUEST (has id, expects response)
+      Result:=DispatchServerRequest(aID, aMethod, TJSONObject(aParams))
     else
-      Result:=DispatchIncomingNotification(aMethod,TJSONObject(aParams));
+      // Server NOTIFICATION (no id, fire-and-forget)
+      Result:=DispatchIncomingNotification(aMethod, TJSONObject(aParams));
     end
   else
     begin
