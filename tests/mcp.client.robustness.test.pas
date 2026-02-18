@@ -5,7 +5,7 @@ unit mcp.client.robustness.test;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.types, mcp.client.base, mcp.client.calls;
+  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.types, rpc.clienttool, mcp.client.base;
 
 type
 
@@ -50,7 +50,7 @@ type
 
   { TMockClient }
   // Mock client for testing
-  TMockClient = class(TMCPCustomClient)
+  TMockClient = class(TRPCClientTool)
   private
     FMockTransport: TMockTransport;
     FLastErrorEvent: TRPCError;

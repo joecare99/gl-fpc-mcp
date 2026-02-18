@@ -6,7 +6,7 @@ unit mcp.client.initialize.test;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, fpjson, mcp.client.base, mcp.client.calls, mcp.types;
+  Classes, SysUtils, fpcunit, testregistry, fpjson, rpc.clienttool, mcp.client.base, mcp.client.calls, mcp.types;
 
 type
 

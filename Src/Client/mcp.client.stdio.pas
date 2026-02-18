@@ -20,7 +20,7 @@ unit MCP.Client.StdIO;
 interface
 
 uses
-  Classes, SysUtils, Pipes, Process, fpjson, mcp.client.base, mcp.client.process;
+  Classes, SysUtils, Pipes, Process, fpjson, rpc.clienttool, mcp.client.process;
 
 Type
   { TLSPClientStdIOTransport }

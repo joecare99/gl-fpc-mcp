@@ -22,7 +22,7 @@ unit MCP.Client.Calls;
 interface
 
 uses
-  sysutils, fpjson, types, classes, mcp.types, mcp.utils, mcp.client.base;
+  sysutils, fpjson, types, classes, mcp.types, mcp.utils, rpc.clienttool, mcp.client.base;
 
 type
 
@@ -433,11 +433,11 @@ begin
   try
     tmp:=TJSONObject.create;
     args.Add('capabilities',tmp);
-    if coRoots in Client.Options then
+    if coRoots in TMCPCustomClient(Client).Options then
      tmp.add('roots',TJSONObject.create(['list_changed',True]));
-    if coSampling in Client.Options then
+    if coSampling in TMCPCustomClient(Client).Options then
      tmp.add('sampling',TJSONObject.create);
-    if coElicitation in Client.Options then
+    if coElicitation in TMCPCustomClient(Client).Options then
      tmp.add('elicitation',TJSONObject.create);
     args.add('protocolversion',client.protocolversion);
     tmp:=TJSONObject.create();

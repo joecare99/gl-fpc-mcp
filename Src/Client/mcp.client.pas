@@ -5,7 +5,7 @@ unit mcp.client;
 interface
 
 uses
-  Classes, SysUtils, mcp.types,  mcp.client.base, fpjson;
+  Classes, SysUtils, mcp.types, rpc.clienttool, mcp.client.base, fpjson;
 
 Type
 

@@ -11,6 +11,10 @@
     </CompilerOptions>
     <Files>
       <Item>
+        <Filename Value="rpc.clienttool.pp"/>
+        <UnitName Value="rpc.clienttool"/>
+      </Item>
+      <Item>
         <Filename Value="mcp.client.base.pas"/>
         <UnitName Value="MCP.Client.Base"/>
       </Item>

@@ -19,7 +19,7 @@ unit MCP.Client.Process;
 interface
 
 uses
-  Classes, SysUtils, mcp.client.base, fpjson, streamex, process;
+  Classes, SysUtils, rpc.clienttool, fpjson, streamex, process;
 
 Type
 
