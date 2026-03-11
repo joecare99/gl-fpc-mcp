@@ -176,10 +176,11 @@ function TMCPClientStdIOTransport.DoGetMessage(out J: TJSONStringType): Boolean;
 begin
   CheckDiagnostic;
   J:='';
-  Result:=FStdOut.NumBytesAvailable>0;
+  Result:=(FStdOut.BufferAvail>0) or (FStdOut.NumBytesAvailable>0);
   if Not Result then
     exit;
-  FStdOut.FillBuffer;
+  if FStdOut.BufferAvail=0 then
+    FStdOut.FillBuffer;
   FStdOut.ReadLine(J);
   Result:=True;
 end;
