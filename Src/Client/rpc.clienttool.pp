@@ -445,16 +445,20 @@ procedure TRPCClientTool.SendError(aID : TJSONStringType; const aError : TRPCErr
 
 Var
   Err,Msg : TJSONObject;
+  IntVal: Int64;
 
 begin
   try
     Err:=TJSONObject.Create;
     try
       aError.ToJSON(Err);
-      Msg:=TJSONObject.Create([
-        'jsonrpc','2.0',
-        'id',aID,
-        'error',Err]);
+      Msg:=TJSONObject.Create;
+      Msg.Add('jsonrpc','2.0');
+      if TryStrToInt64(aID, IntVal) then
+        Msg.Add('id', IntVal)
+      else
+        Msg.Add('id', aID);
+      Msg.Add('error',Err);
       Transport.SendMessage(Msg);
       Err:=Nil;
     Finally
@@ -483,13 +487,16 @@ end;
 procedure TRPCClientTool.SendResponse(aID: TJSONStringType; aResult: TJSONObject);
 var
   Msg: TJSONObject;
+  IntVal: Int64;
 begin
   try
-    Msg := TJSONObject.Create([
-      'jsonrpc', '2.0',
-      'id', aID,
-      'result', aResult   // caller passes ownership
-    ]);
+    Msg := TJSONObject.Create;
+    Msg.Add('jsonrpc', '2.0');
+    if TryStrToInt64(aID, IntVal) then
+      Msg.Add('id', IntVal)
+    else
+      Msg.Add('id', aID);
+    Msg.Add('result', aResult);
     try
       Transport.SendMessage(Msg);
     finally
