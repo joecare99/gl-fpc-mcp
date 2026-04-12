@@ -54,7 +54,7 @@ uses
   mcp.logging,
   mcp.tools,
   mcp.resources,
-  mcp.prompts, mcpsqldbtools, mcpsqldbsupport;
+  mcp.prompts, mcpsqldbtools, mcpmetadatatools, mcpsqldbsupport;
 
 const
   sDatabase = 'Database';
@@ -137,6 +137,16 @@ begin
   T:=TExecuteSQLTool.Create('execute-query','Executes a query in the database.');
   T.Register;
   T:=TGetTableInfoTool.Create('describe-table','Gets the detailed schema (columns, types) of a specific table.');
+  T.Register;
+  T:=TListIndexesTool.Create('list-indexes','Lists all indexes of a specific table.');
+  T.Register;
+  T:=TListViewsTool.Create('list-views','Lists all views in the database.');
+  T.Register;
+  T:=TViewDetailsTool.Create('view-details','Gets the SQL definition and updatability of a specific view.');
+  T.Register;
+  T:=TListRelationshipsTool.Create('list-relationships','Lists all foreign key relationships of a specific table.');
+  T.Register;
+  T:=TGetSampleDataTool.Create('get-sample-data','Returns sample rows from a specific table (max 10).');
   T.Register;
 end;
 

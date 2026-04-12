@@ -47,9 +47,11 @@ uses
   {$IFDEF USE_FIREBIRD}
   ibase60dyn,
   IBConnection,
+  mcpmetadata.firebird,
   {$ENDIF}
   {$IFDEF USE_POSTGRESQL}
   PQConnection,
+  mcpmetadata.postgresql,
   {$ENDIF}
   {$IFDEF USE_MYSQL8}
   mysql80conn,
@@ -57,19 +59,26 @@ uses
   {$IFDEF USE_MYSQL57}
   mysql57conn,
   {$ENDIF}
+  {$IF DEFINED(USE_MYSQL8) OR DEFINED(USE_MYSQL57)}
+  mcpmetadata.mysql,
+  {$ENDIF}
   {$IFDEF USE_ODBC}
   odbcconn,
   {$ENDIF}
   {$IFDEF USE_MSSQL}
   MSSQLConn,
+  mcpmetadata.mssql,
   {$ENDIF}
   {$IFDEF USE_ORACLE}
   oracleconnection,
+  mcpmetadata.oracle,
   {$ENDIF}
   {$IFDEF USE_SQLITE}
   SQLite3Conn,
+  mcpmetadata.sqlite,
   {$ENDIF}
   Sqldb,
+  mcpmetadata.base,
   mcpsqldbtools;
 
 
