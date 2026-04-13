@@ -86,7 +86,7 @@ implementation
 
 {$IFDEF UNIX}
 uses
-  baseunix, unixtype;
+  baseunix;
 {$ENDIF}
 
 {$IFDEF unix}
