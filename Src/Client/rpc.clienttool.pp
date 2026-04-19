@@ -384,11 +384,16 @@ begin
     Exit;
     end;
   try
-    MCPLogger.Error(SServerErrorReport,[aID,Err.Code,Err.Message]);
-    aRequest.HandleError(Err);
-  except
-    On E : Exception do
-      MCPLogger.Error(SErrorDuringServerErrorReport,[E.ClassName,Err.Code,Err.Message,aID,E.Message]);
+    try
+      MCPLogger.Error(SServerErrorReport,[aID,Err.Code,Err.Message]);
+      aRequest.HandleError(Err);
+    except
+      On E : Exception do
+        MCPLogger.Error(SErrorDuringServerErrorReport,[E.ClassName,Err.Code,Err.Message,aID,E.Message]);
+    end;
+  finally
+    FCalls.Delete(aID);
+    aRequest.Free;
   end;
 end;
 
@@ -396,12 +401,10 @@ function TRPCClientTool.DoServerResponse(const aID : TJSONStringType; aResult : 
 
 var
   aRequest : TMCPCall;
-  Streamed : Boolean;
   Msg : string;
 
 begin
   Result:=False;
-  Streamed:=False;
   aRequest:=FindCall(StrToIntDef(aID,0));
   if (aRequest=Nil) then
     begin
@@ -409,18 +412,19 @@ begin
     Exit;
     end;
   try
-    Msg:=aResult.AsJSON;
-    aRequest.Reply(aResult as TJSONObject);
-    Result:=True;
-  except
-    On E : Exception do
-      begin
-      if not Streamed then
-        Msg:=SErrDestreamingResponse
-      else
-        Msg:=SErrHandlingResponse;
-      MCPLOgger.Error(Format(Msg,[E.ClassName,aID,E.Message,aResult.AsJSON]));
-      end;
+    try
+      aRequest.Reply(aResult as TJSONObject);
+      Result:=True;
+    except
+      On E : Exception do
+        begin
+        Msg:=SErrDestreamingResponse;
+        MCPLOgger.Error(Format(Msg,[E.ClassName,aID,E.Message,aResult.AsJSON]));
+        end;
+    end;
+  finally
+    FCalls.Delete(aID);
+    aRequest.Free;
   end;
 end;
 
@@ -564,7 +568,6 @@ end;
 function TRPCClientTool.CheckMessages: integer;
 var
   J : TJSONObject;
-  S : String;
 begin
   Result:=0;
   While Transport.HaveMessage do
@@ -572,9 +575,7 @@ begin
     J:=Transport.GetMessage;
     try
       Inc(Result);
-      S:=J.AsJSON;
       HandleServerMessage(J);
-      S:=J.AsJSON;
     finally
       J.Free;
     end;
