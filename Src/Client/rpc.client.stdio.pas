@@ -32,6 +32,7 @@ Type
     FBufferPosition : Integer;
     FBufferRead : Integer;
     FStream : TInputPipeStream;
+    FPending : TJSONStringType;
     Constructor Create(aStream : TInputPipeStream; aBufferSize : Cardinal);
     procedure FillBuffer;
     procedure ReadBuffer(P : Pointer; aCount : Integer);
@@ -92,14 +93,27 @@ begin
   SetLength(FBuffer,aBufferSize);
   FBufferRead := 0;
   FBufferPosition := 0;
+  FPending := '';
 end;
 
 procedure TBufferedStream.FillBuffer;
 
+var
+  Avail, ToRead : Integer;
 begin
-  FBufferRead := FStream.Read(FBuffer[0], Pred(Length(FBuffer)));
-  FBuffer[FBufferRead] := 0;
   FBufferPosition := 0;
+  Avail := FStream.NumBytesAvailable;
+  if Avail <= 0 then
+    begin
+    FBufferRead := 0;
+    Exit;
+    end;
+  ToRead := Pred(Length(FBuffer));
+  if ToRead > Avail then
+    ToRead := Avail;
+  FBufferRead := FStream.Read(FBuffer[0], ToRead);
+  if FBufferRead > 0 then
+    FBuffer[FBufferRead] := 0;
 end;
 
 procedure TBufferedStream.ReadBuffer(P: Pointer; aCount: Integer);
@@ -128,7 +142,8 @@ var
 
 begin
   VPosition := FBufferPosition;
-  aString:='';
+  aString := FPending;
+  FPending := '';
   repeat
     VPByte := @FBuffer[FBufferPosition];
     while (FBufferPosition < FBufferRead) and not (VPByte^ in [10, 13]) do
@@ -146,6 +161,13 @@ begin
         Move(FBuffer[VPosition], AString[Succ(VStrLength)], VLength);
       end;
       FillBuffer;
+      if FBufferRead = 0 then
+      begin
+        { No more data available yet - save partial and resume next call }
+        FPending := aString;
+        aString := '';
+        Exit;
+      end;
       VPByte := @FBuffer[FBufferPosition];
       VPosition := FBufferPosition;
     end;
@@ -182,7 +204,8 @@ begin
   if FStdOut.BufferAvail=0 then
     FStdOut.FillBuffer;
   FStdOut.ReadLine(J);
-  Result:=True;
+  { Empty result means the line is still incomplete - try again on next poll }
+  Result := J <> '';
 end;
 
 procedure TMCPClientStdIOTransport.DoSendMessage(J: TJSONStringType);
