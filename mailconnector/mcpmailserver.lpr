@@ -146,6 +146,10 @@ begin
   T.Register;
   T := TGetHeadersTool.Create('get-headers', 'Get message headers for a range of messages by zero-based index.');
   T.Register;
+  T := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  T.Register;
+  T := TGetFlagsTool.Create('get-flags', 'Get message flags (seen, answered, flagged, deleted, draft, recent) for a range of messages by zero-based index.');
+  T.Register;
   T := TGetMailTool.Create('get-mail', 'Get the full body of a message by mail ID.');
   T.Register;
   T := TMarkReadTool.Create('mark-read', 'Mark a message as read (set Seen flag).');

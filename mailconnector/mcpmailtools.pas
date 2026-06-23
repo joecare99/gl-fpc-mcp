@@ -106,6 +106,24 @@ type
     procedure DoExecute(aInput: TJSONObject; aResult: TJSONObject); override;
   end;
 
+  { TSearchTool }
+
+  TSearchTool = class(TIMAPMailTool)
+  public
+    constructor Create(const aName, aDescription: string); override;
+  protected
+    procedure DoExecute(aInput: TJSONObject; aResult: TJSONObject); override;
+  end;
+
+  { TGetFlagsTool }
+
+  TGetFlagsTool = class(TIMAPMailTool)
+  public
+    constructor Create(const aName, aDescription: string); override;
+  protected
+    procedure DoExecute(aInput: TJSONObject; aResult: TJSONObject); override;
+  end;
+
   { TGetMailTool }
 
   TGetMailTool = class(TIMAPMailTool)
@@ -458,6 +476,146 @@ begin
   end;
   aResult.Add('messages', lArr);
   DoLog(mltInfo, 'get-headers: returned %d message headers', [lArr.Count]);
+end;
+
+{ TSearchTool }
+
+constructor TSearchTool.Create(const aName, aDescription: string);
+begin
+  inherited Create(aName, aDescription);
+  InputSchema.AddArgument('criterion',
+    TJSONObject.Create([
+      'type', 'string',
+      'description', 'IMAP search flag criterion.',
+      'enum', TJSONArray.Create([
+        'SEEN', 'UNSEEN', 'ANSWERED', 'UNANSWERED', 'DELETED', 'UNDELETED',
+        'FLAGGED', 'UNFLAGGED', 'DRAFT', 'RECENT', 'NEW', 'OLD'])
+    ]),
+    False);
+  InputSchema.AddArgument('query',
+    TJSONObject.Create([
+      'type', 'string',
+      'description', 'Raw IMAP SEARCH query, combined with criterion using AND.']),
+    False);
+end;
+
+procedure TSearchTool.DoExecute(aInput: TJSONObject; aResult: TJSONObject);
+const
+  SearchCriteria: array[0..11] of string = (
+    'SEEN', 'UNSEEN', 'ANSWERED', 'UNANSWERED', 'DELETED', 'UNDELETED',
+    'FLAGGED', 'UNFLAGGED', 'DRAFT', 'RECENT', 'NEW', 'OLD');
+var
+  lConn: TIMAPSend;
+  lCriterion, lQuery, lSearch, lAllowed: String;
+  lValid: Boolean;
+  lFound: TStringList;
+  lArr: TJSONArray;
+  i, lSeq: Integer;
+begin
+  lCriterion := UpperCase(Trim(aInput.Get('criterion', '')));
+  lQuery := Trim(aInput.Get('query', ''));
+  DoLog(mltTrace, 'search: criterion=%s query=%s', [lCriterion, lQuery]);
+  if (lCriterion = '') and (lQuery = '') then
+    raise EMCPException.Create('search requires a criterion or query');
+  if (Pos(#13, lQuery) > 0) or (Pos(#10, lQuery) > 0) then
+    raise EMCPException.Create('query must not contain line breaks');
+  if lCriterion <> '' then
+  begin
+    lValid := False;
+    for lAllowed in SearchCriteria do
+      if lAllowed = lCriterion then
+      begin
+        lValid := True;
+        Break;
+      end;
+    if not lValid then
+      raise EMCPException.Create('Invalid criterion: ' + lCriterion);
+  end;
+  lSearch := lCriterion;
+  if lQuery <> '' then
+  begin
+    if lSearch <> '' then
+      lSearch := lSearch + ' ';
+    lSearch := lSearch + lQuery;
+  end;
+  RequireFolder;
+  lConn := ConnMgr.GetConnection;
+  lFound := TStringList.Create;
+  try
+    if not lConn.SearchMess(lSearch, lFound) then
+      raise EMCPException.Create('Failed to search messages: ' + lConn.ResultString);
+    lArr := TJSONArray.Create;
+    try
+      for i := 0 to lFound.Count - 1 do
+      begin
+        // SearchMess yields 1-based sequence numbers; skip any malformed/empty token
+        lSeq := StrToIntDef(Trim(lFound[i]), 0);
+        if lSeq >= 1 then
+          lArr.Add(lSeq - 1);
+      end;
+    except
+      lArr.Free;
+      raise;
+    end;
+    aResult.Add('indices', lArr);
+    DoLog(mltInfo, 'search: "%s" matched %d messages in "%s"',
+      [lSearch, lFound.Count, ConnMgr.SelectedFolder]);
+  finally
+    lFound.Free;
+  end;
+end;
+
+{ TGetFlagsTool }
+
+constructor TGetFlagsTool.Create(const aName, aDescription: string);
+begin
+  inherited Create(aName, aDescription);
+  InputSchema.AddArgument('from_index', TJSONObject.Create(['type', 'integer']), True);
+  InputSchema.AddArgument('to_index', TJSONObject.Create(['type', 'integer']), True);
+end;
+
+procedure TGetFlagsTool.DoExecute(aInput: TJSONObject; aResult: TJSONObject);
+var
+  lConn: TIMAPSend;
+  lFrom, lTo, i: Integer;
+  lFlags: String;
+  lArr: TJSONArray;
+  lMsg: TJSONObject;
+begin
+  lFrom := aInput.Get('from_index', 0);
+  lTo := aInput.Get('to_index', 0);
+  DoLog(mltTrace, 'get-flags: from=%d to=%d', [lFrom, lTo]);
+  RequireFolder;
+  if lTo < lFrom then
+    raise EMCPException.Create('to_index must be >= from_index');
+  lConn := ConnMgr.GetConnection;
+  lArr := TJSONArray.Create;
+  try
+    for i := lFrom to lTo do
+    begin
+      lFlags := '';
+      if not lConn.GetFlagsMess(i + 1, lFlags) then
+        raise EMCPException.CreateFmt('Failed to fetch flags for message %d: %s',
+          [i, lConn.ResultString]);
+      // Space-pad so flags are matched as whole tokens, not substrings
+      // (avoids a custom flag like \SeenByX falsely matching \Seen).
+      lFlags := ' ' + UpperCase(lFlags) + ' ';
+      lMsg := TJSONObject.Create;
+      lMsg.Add('index', i);
+      lMsg.Add('seen', Pos(' \SEEN ', lFlags) > 0);
+      lMsg.Add('answered', Pos(' \ANSWERED ', lFlags) > 0);
+      lMsg.Add('flagged', Pos(' \FLAGGED ', lFlags) > 0);
+      lMsg.Add('deleted', Pos(' \DELETED ', lFlags) > 0);
+      lMsg.Add('draft', Pos(' \DRAFT ', lFlags) > 0);
+      lMsg.Add('recent', Pos(' \RECENT ', lFlags) > 0);
+      lArr.Add(lMsg);
+    end;
+  except
+    lArr.Free;
+    raise;
+  end;
+  aResult.Add('messages', lArr);
+  DoLog(mltInfo, 'get-flags: returned flags for %d messages', [lArr.Count]);
 end;
 
 { TGetMailTool }

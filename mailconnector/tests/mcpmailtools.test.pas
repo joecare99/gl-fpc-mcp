@@ -122,6 +122,44 @@ type
     procedure TestToIndexLessThanFromIndexRaisesException;
   end;
 
+  { TSearchToolTest }
+
+  TSearchToolTest = class(TTestCase)
+  protected
+    procedure SetUp; override;
+  published
+    procedure TestInstantiation;
+    procedure TestInheritsFromTIMAPMailTool;
+    procedure TestInheritsFromTMCPTool;
+    procedure TestDescriptionIsSet;
+    procedure TestInputSchemaHasCriterionArg;
+    procedure TestInputSchemaHasQueryArg;
+    procedure TestCriterionArgHasStringType;
+    procedure TestCriterionArgHasEnum;
+    procedure TestNoArgumentsAreRequired;
+    procedure TestEmptyInputRaisesException;
+    procedure TestInvalidCriterionRaisesException;
+    procedure TestQueryWithLineBreakRaisesException;
+  end;
+
+  { TGetFlagsToolTest }
+
+  TGetFlagsToolTest = class(TTestCase)
+  protected
+    procedure SetUp; override;
+  published
+    procedure TestInstantiation;
+    procedure TestInheritsFromTIMAPMailTool;
+    procedure TestInheritsFromTMCPTool;
+    procedure TestDescriptionIsSet;
+    procedure TestInputSchemaHasFromIndexArg;
+    procedure TestInputSchemaHasToIndexArg;
+    procedure TestBothArgsAreRequired;
+    procedure TestFromIndexArgHasIntegerType;
+    procedure TestToIndexArgHasIntegerType;
+    procedure TestToIndexLessThanFromIndexRaisesException;
+  end;
+
   { TGetMailToolTest }
 
   TGetMailToolTest = class(TTestCase)
@@ -960,6 +998,378 @@ begin
   // Set a folder so RequireFolder passes — validation check fires before GetConnection
   TIMAPConnectionManager.Instance.SelectFolder('INBOX');
   lTool := TGetHeadersTool.Create('get-headers', 'Get message headers for a range of messages by zero-based index.');
+  lInput := TJSONObject.Create;
+  lResult := TJSONObject.Create;
+  try
+    lInput.Add('from_index', 5);
+    lInput.Add('to_index', 2);
+    try
+      lTool.Execute(lInput, lResult);
+      Fail('Expected EMCPException when to_index < from_index');
+    except
+      on E: EMCPException do
+        AssertEquals('Exception message should match validation rule',
+          'to_index must be >= from_index', E.Message);
+    end;
+  finally
+    lTool.Free;
+    lInput.Free;
+    lResult.Free;
+  end;
+end;
+
+{ TSearchToolTest }
+
+procedure TSearchToolTest.SetUp;
+begin
+  inherited SetUp;
+  TIMAPConnectionManager.Instance.SelectFolder('');
+end;
+
+procedure TSearchToolTest.TestInstantiation;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertNotNull('TSearchTool should be instantiated', lTool);
+    AssertEquals('Tool name should be search', 'search', lTool.Name);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestInheritsFromTIMAPMailTool;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertTrue('TSearchTool should inherit from TIMAPMailTool',
+      lTool is TIMAPMailTool);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestInheritsFromTMCPTool;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertTrue('TSearchTool should inherit from TMCPTool',
+      lTool is TMCPTool);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestDescriptionIsSet;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertEquals('Description should match constructor argument',
+      'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.',
+      lTool.Description);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestInputSchemaHasCriterionArg;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertNotNull('InputSchema should have a criterion argument',
+      lTool.InputSchema.Arguments['criterion']);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestInputSchemaHasQueryArg;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertNotNull('InputSchema should have a query argument',
+      lTool.InputSchema.Arguments['query']);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestCriterionArgHasStringType;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertEquals('criterion argument schema type should be string',
+      'string', lTool.InputSchema.Arguments['criterion'].Get('type', ''));
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestCriterionArgHasEnum;
+var
+  lTool: TSearchTool;
+  lEnum: TJSONData;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    lEnum := lTool.InputSchema.Arguments['criterion'].Find('enum');
+    AssertNotNull('criterion argument should declare an enum', lEnum);
+    AssertTrue('criterion enum should be a JSON array', lEnum is TJSONArray);
+    AssertEquals('criterion enum should list 12 values', 12, TJSONArray(lEnum).Count);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestNoArgumentsAreRequired;
+var
+  lTool: TSearchTool;
+begin
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  try
+    AssertEquals('InputSchema.Required should be empty (criterion/query both optional)',
+      0, Length(lTool.InputSchema.Required));
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestEmptyInputRaisesException;
+var
+  lTool: TSearchTool;
+  lInput, lResult: TJSONObject;
+begin
+  TIMAPConnectionManager.Instance.SelectFolder('INBOX');
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  lInput := TJSONObject.Create;
+  lResult := TJSONObject.Create;
+  try
+    try
+      lTool.Execute(lInput, lResult);
+      Fail('Expected EMCPException when neither criterion nor query is given');
+    except
+      on E: EMCPException do
+        AssertEquals('Exception message should match validation rule',
+          'search requires a criterion or query', E.Message);
+    end;
+  finally
+    lTool.Free;
+    lInput.Free;
+    lResult.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestInvalidCriterionRaisesException;
+var
+  lTool: TSearchTool;
+  lInput, lResult: TJSONObject;
+begin
+  TIMAPConnectionManager.Instance.SelectFolder('INBOX');
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  lInput := TJSONObject.Create;
+  lResult := TJSONObject.Create;
+  try
+    lInput.Add('criterion', 'BOGUS');
+    try
+      lTool.Execute(lInput, lResult);
+      Fail('Expected EMCPException for an invalid criterion');
+    except
+      on E: EMCPException do
+        AssertEquals('Exception message should name the invalid criterion',
+          'Invalid criterion: BOGUS', E.Message);
+    end;
+  finally
+    lTool.Free;
+    lInput.Free;
+    lResult.Free;
+  end;
+end;
+
+procedure TSearchToolTest.TestQueryWithLineBreakRaisesException;
+var
+  lTool: TSearchTool;
+  lInput, lResult: TJSONObject;
+begin
+  TIMAPConnectionManager.Instance.SelectFolder('INBOX');
+  lTool := TSearchTool.Create('search', 'Search the selected folder by a flag criterion and/or raw IMAP query; returns matching zero-based message indices.');
+  lInput := TJSONObject.Create;
+  lResult := TJSONObject.Create;
+  try
+    lInput.Add('query', 'FROM bob'#13#10'LOGOUT');
+    try
+      lTool.Execute(lInput, lResult);
+      Fail('Expected EMCPException when query contains a line break');
+    except
+      on E: EMCPException do
+        AssertEquals('Exception message should reject line breaks',
+          'query must not contain line breaks', E.Message);
+    end;
+  finally
+    lTool.Free;
+    lInput.Free;
+    lResult.Free;
+  end;
+end;
+
+{ TGetFlagsToolTest }
+
+procedure TGetFlagsToolTest.SetUp;
+begin
+  inherited SetUp;
+  TIMAPConnectionManager.Instance.SelectFolder('');
+end;
+
+procedure TGetFlagsToolTest.TestInstantiation;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertNotNull('TGetFlagsTool should be instantiated', lTool);
+    AssertEquals('Tool name should be get-flags', 'get-flags', lTool.Name);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestInheritsFromTIMAPMailTool;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertTrue('TGetFlagsTool should inherit from TIMAPMailTool',
+      lTool is TIMAPMailTool);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestInheritsFromTMCPTool;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertTrue('TGetFlagsTool should inherit from TMCPTool',
+      lTool is TMCPTool);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestDescriptionIsSet;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertEquals('Description should match constructor argument',
+      'Get message flags for a range of messages by zero-based index.', lTool.Description);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestInputSchemaHasFromIndexArg;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertNotNull('InputSchema should have a from_index argument',
+      lTool.InputSchema.Arguments['from_index']);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestInputSchemaHasToIndexArg;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertNotNull('InputSchema should have a to_index argument',
+      lTool.InputSchema.Arguments['to_index']);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestBothArgsAreRequired;
+var
+  lTool: TGetFlagsTool;
+  lRequired: TStringArray;
+  lHasFrom, lHasTo: Boolean;
+  i: Integer;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    lRequired := lTool.InputSchema.Required;
+    AssertTrue('InputSchema.Required must have at least 2 entries',
+      Length(lRequired) >= 2);
+    lHasFrom := False;
+    lHasTo := False;
+    for i := 0 to High(lRequired) do
+    begin
+      if lRequired[i] = 'from_index' then lHasFrom := True;
+      if lRequired[i] = 'to_index' then lHasTo := True;
+    end;
+    AssertTrue('from_index must be in Required', lHasFrom);
+    AssertTrue('to_index must be in Required', lHasTo);
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestFromIndexArgHasIntegerType;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertEquals('from_index argument schema type should be integer',
+      'integer', lTool.InputSchema.Arguments['from_index'].Get('type', ''));
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestToIndexArgHasIntegerType;
+var
+  lTool: TGetFlagsTool;
+begin
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
+  try
+    AssertEquals('to_index argument schema type should be integer',
+      'integer', lTool.InputSchema.Arguments['to_index'].Get('type', ''));
+  finally
+    lTool.Free;
+  end;
+end;
+
+procedure TGetFlagsToolTest.TestToIndexLessThanFromIndexRaisesException;
+var
+  lTool: TGetFlagsTool;
+  lInput, lResult: TJSONObject;
+begin
+  // Set a folder so RequireFolder passes — validation check fires before GetConnection
+  TIMAPConnectionManager.Instance.SelectFolder('INBOX');
+  lTool := TGetFlagsTool.Create('get-flags', 'Get message flags for a range of messages by zero-based index.');
   lInput := TJSONObject.Create;
   lResult := TJSONObject.Create;
   try
@@ -2286,7 +2696,7 @@ initialization
   RegisterTests([TIMAPConnectionManagerTest, TIMAPMailToolTest,
     TListFoldersToolTest, TSelectFolderToolTest,
     TCountMessagesToolTest, TCountUnreadToolTest, TCountDeletedToolTest,
-    TGetHeadersToolTest,
+    TGetHeadersToolTest, TSearchToolTest, TGetFlagsToolTest,
     TGetMailToolTest, TMarkReadToolTest, TMarkUnreadToolTest,
     TMoveMailToolTest, TMarkDeletedToolTest, TMarkUndeletedToolTest,
     TExpungeFolderToolTest,
