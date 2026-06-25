@@ -78,6 +78,11 @@ type
     FProc : TProcess;        // the launched app (nil when not running)
     FDrain : TThread;        // drains the launched app's stdout/stderr pipe
     FAppId : Integer;        // id counter for proxy->app requests
+    FTargetLocked : Boolean; // True when --target was given: binary is fixed, setBinary refused
+    FAllow : TStringList;    // whitelist entries loaded from the config file (may be empty)
+    procedure LoadAllowList;
+    function IsAllowed(const aPath : String) : Boolean;
+    procedure DoSetBinary(const aPath : String; out aText : String; out aIsError : Boolean);
     function AppRunning : Boolean;
     procedure StopApp;
     function PostToApp(const aBody : String; aTimeoutMs : Integer; out aResponse : String) : Boolean;
@@ -122,6 +127,43 @@ begin
 end;
 
 
+// Like ToolDef, but declares one required string argument in the input schema.
+function ToolDefArg(const aName, aDescription, aArgName, aArgDescription : String) : TJSONObject;
+
+var
+  lSchema, lProps, lProp : TJSONObject;
+  lRequired : TJSONArray;
+
+begin
+  lProp := TJSONObject.Create;
+  lProp.Add('type', 'string');
+  lProp.Add('description', aArgDescription);
+  lProps := TJSONObject.Create;
+  lProps.Add(aArgName, lProp);
+  lRequired := TJSONArray.Create;
+  lRequired.Add(aArgName);
+  lSchema := TJSONObject.Create;
+  lSchema.Add('type', 'object');
+  lSchema.Add('properties', lProps);
+  lSchema.Add('required', lRequired);
+  Result := TJSONObject.Create;
+  Result.Add('name', aName);
+  Result.Add('description', aDescription);
+  Result.Add('inputSchema', lSchema);
+end;
+
+
+// True when the path has a parent-directory (..) segment, which could escape a
+// whitelisted folder prefix.
+function HasDotDot(const aPath : String) : Boolean;
+
+begin
+  Result := (Pos('/../', aPath) > 0)
+         or (Copy(aPath, 1, 3) = '../')
+         or ((Length(aPath) >= 3) and (Copy(aPath, Length(aPath) - 2, 3) = '/..'));
+end;
+
+
 { TPipeDrainThread }
 
 constructor TPipeDrainThread.Create(aPipe : TStream);
@@ -157,6 +199,7 @@ begin
   StopApp;
   FreeAndNil(FText);
   FreeAndNil(FController);
+  FreeAndNil(FAllow);
   inherited Destroy;
 end;
 
@@ -185,6 +228,147 @@ function TMCPSupervisorApp.AppRunning : Boolean;
 
 begin
   Result := Assigned(FProc) and FProc.Running;
+end;
+
+
+// Loads the whitelist from the first config file that exists: the user file
+// (~/.config/mcpsupervisor.conf) then the system file (/etc/mcpsupervisor.conf).
+// The file is JSON: { "allow": [ "/path", "/dir/*", "/dir/**" ] }. A missing,
+// unreadable or malformed file leaves the whitelist empty.
+procedure TMCPSupervisorApp.LoadAllowList;
+
+var
+  lPaths : array[0..1] of String;
+  lFile, lHome, lRaw : String;
+  I, J : Integer;
+  lSL : TStringList;
+  lData, lAllow : TJSONData;
+  lArr : TJSONArray;
+
+begin
+  FAllow.Clear;
+  lHome := GetEnvironmentVariable('HOME');
+  lPaths[0] := '';
+  if lHome <> '' then
+    lPaths[0] := IncludeTrailingPathDelimiter(lHome) + '.config/mcpsupervisor.conf';
+  lPaths[1] := '/etc/mcpsupervisor.conf';
+  lFile := '';
+  for I := 0 to High(lPaths) do
+    if (lPaths[I] <> '') and FileExists(lPaths[I]) then
+      begin
+      lFile := lPaths[I];
+      Break; // first existing file wins - no merge
+      end;
+  if lFile = '' then
+    Exit;
+
+  lRaw := '';
+  lSL := TStringList.Create;
+  try
+    try
+      lSL.LoadFromFile(lFile);
+      lRaw := lSL.Text;
+    except
+      lRaw := '';
+    end;
+  finally
+    lSL.Free;
+  end;
+  if lRaw = '' then
+    Exit;
+
+  lData := nil;
+  try
+    try
+      lData := GetJSON(lRaw);
+    except
+      on E : Exception do
+        begin
+        Writeln(StdErr, 'mcpsupervisor: ignoring config ', lFile, ': invalid JSON (', E.Message, ')');
+        lData := nil;
+        end;
+    end;
+    if lData is TJSONObject then
+      begin
+      lAllow := TJSONObject(lData).Find('allow');
+      if lAllow is TJSONArray then
+        begin
+        lArr := TJSONArray(lAllow);
+        for J := 0 to lArr.Count - 1 do
+          if lArr.Items[J].JSONType = jtString then
+            FAllow.Add(lArr.Items[J].AsString);
+        end
+      else
+        Writeln(StdErr, 'mcpsupervisor: config ', lFile, ' has no "allow" array; whitelist is empty');
+      end
+    else if lData <> nil then
+      Writeln(StdErr, 'mcpsupervisor: config ', lFile, ' is not a JSON object; whitelist is empty');
+  finally
+    lData.Free;
+  end;
+end;
+
+
+// True when aPath is permitted by the whitelist. Entry forms:
+//   exact    - aPath equals the entry
+//   /dir/*   - aPath's directory is exactly /dir (direct children only)
+//   /dir/**  - aPath is anywhere under /dir (any depth)
+// Matching is lexical: symlinks and '.' segments are not resolved, so the config
+// file is the trust boundary - only trusted administrators should be able to edit it.
+function TMCPSupervisorApp.IsAllowed(const aPath : String) : Boolean;
+
+var
+  I : Integer;
+  lEntry, lBase : String;
+
+begin
+  Result := False;
+  for I := 0 to FAllow.Count - 1 do
+    begin
+    lEntry := FAllow[I];
+    if (Length(lEntry) >= 3) and (Copy(lEntry, Length(lEntry) - 2, 3) = '/**') then
+      begin
+      lBase := Copy(lEntry, 1, Length(lEntry) - 3);
+      Result := Copy(aPath, 1, Length(lBase) + 1) = lBase + '/';
+      end
+    else if (Length(lEntry) >= 2) and (Copy(lEntry, Length(lEntry) - 1, 2) = '/*') then
+      begin
+      lBase := Copy(lEntry, 1, Length(lEntry) - 2);
+      Result := ExtractFileDir(aPath) = lBase;
+      end
+    else
+      Result := aPath = lEntry;
+    if Result then
+      Exit;
+    end;
+end;
+
+
+// Validates aPath and, if acceptable, makes it the binary that start() launches.
+// Checks in order: not locked, non-empty, absolute, no '..' segment, exists,
+// whitelisted. On any failure aIsError is True and FTarget is left unchanged.
+procedure TMCPSupervisorApp.DoSetBinary(const aPath : String; out aText : String; out aIsError : Boolean);
+
+begin
+  aIsError := True;
+  if FTargetLocked then
+    aText := '{"ok":false,"error":"a fixed target is configured (--target); setBinary is not allowed"}'
+  else if aPath = '' then
+    aText := '{"ok":false,"error":"path is required"}'
+  else if aPath[1] <> '/' then
+    aText := '{"ok":false,"error":"path must be absolute"}'
+  else if HasDotDot(aPath) then
+    aText := '{"ok":false,"error":"path must not contain a parent (..) segment"}'
+  else if not FileExists(aPath) then
+    aText := Format('{"ok":false,"error":"binary not found","path":%s}', [JStr(aPath).AsJSON])
+  else if not IsAllowed(aPath) then
+    aText := Format('{"ok":false,"error":"binary not allowed by whitelist configuration","path":%s}', [JStr(aPath).AsJSON])
+  else
+    begin
+    FTarget := aPath;
+    aText := Format('{"ok":true,"binary":%s}', [JStr(aPath).AsJSON]);
+    aIsError := False;
+    end;
 end;
 
 
@@ -283,6 +467,11 @@ begin
                     [FProc.ProcessID, JStr(FURL).AsJSON]);
     Exit;
     end;
+  if FTarget = '' then
+    begin
+    aText := '{"ok":false,"error":"no binary set - call setBinary first"}';
+    Exit;
+    end;
   if not FileExists(FTarget) then
     begin
     aText := Format('{"ok":false,"error":"target binary not found","target":%s}', [JStr(FTarget).AsJSON]);
@@ -365,7 +554,12 @@ begin
     + 'Idempotent; waits until the app answers. After this, the app''s own tools appear in tools/list.'));
   Result.Add(ToolDef('stop', 'Terminate the target application.'));
   Result.Add(ToolDef('restart', 'Stop then start the target application (use after a rebuild).'));
-  Result.Add(ToolDef('status', 'Report whether the target app is running, its pid, and whether the on-disk binary is newer than the running process.'));
+  Result.Add(ToolDef('status', 'Report whether the target app is running, its pid and MCP url, the selected binary, whether that binary choice is locked by --target, and whether the binary exists on disk.'));
+  Result.Add(ToolDefArg('setBinary',
+    'Choose the application binary to launch (absolute path). Only allowed when no --target '
+    + 'was given on the command line, and only for paths permitted by the supervisor whitelist config. '
+    + 'Call this before start() when the supervisor was started without --target.',
+    'path', 'Absolute path to the application binary to launch.'));
 end;
 
 
@@ -481,8 +675,9 @@ end;
 procedure TMCPSupervisorApp.HandleToolsCall(aRequest : TJSONObject; out aResponse : TJSONObject);
 
 var
-  lParams : TJSONData;
-  lName, lText : String;
+  lParams, lArgs : TJSONData;
+  lName, lText, lPath : String;
+  lIsError : Boolean;
 
 begin
   aResponse := nil;
@@ -507,14 +702,28 @@ begin
     DoStart(lText);
     aResponse := ToolResult(aRequest, lText);
     end
+  else if lName = 'setBinary' then
+    begin
+    lPath := '';
+    if lParams is TJSONObject then
+      begin
+      lArgs := TJSONObject(lParams).Find('arguments');
+      if lArgs is TJSONObject then
+        lPath := TJSONObject(lArgs).Get('path', '');
+      end;
+    DoSetBinary(lPath, lText, lIsError);
+    aResponse := ToolResult(aRequest, lText, lIsError);
+    end
   else if lName = 'status' then
     begin
     if AppRunning then
-      lText := Format('{"running":true,"pid":%d,"url":%s,"binaryExists":%s}',
-                 [FProc.ProcessID, JStr(FURL).AsJSON, BoolToStr(FileExists(FTarget), 'true', 'false')])
+      lText := Format('{"running":true,"pid":%d,"url":%s,"binary":%s,"locked":%s,"binaryExists":%s}',
+                 [FProc.ProcessID, JStr(FURL).AsJSON, JStr(FTarget).AsJSON,
+                  BoolToStr(FTargetLocked, 'true', 'false'), BoolToStr((FTarget <> '') and FileExists(FTarget), 'true', 'false')])
     else
-      lText := Format('{"running":false,"url":%s,"binaryExists":%s}',
-                 [JStr(FURL).AsJSON, BoolToStr(FileExists(FTarget), 'true', 'false')]);
+      lText := Format('{"running":false,"url":%s,"binary":%s,"locked":%s,"binaryExists":%s}',
+                 [JStr(FURL).AsJSON, JStr(FTarget).AsJSON,
+                  BoolToStr(FTargetLocked, 'true', 'false'), BoolToStr((FTarget <> '') and FileExists(FTarget), 'true', 'false')]);
     aResponse := ToolResult(aRequest, lText);
     end
   else
@@ -594,12 +803,10 @@ begin
   Terminate; // single pass: RunMessageLoop blocks until stdin closes
   FTarget := ArgValue('t', 'target', '');
   FURL := ArgValue('u', 'url', DefaultURL);
-  if FTarget = '' then
-    begin
-    Writeln(StdErr, 'mcpsupervisor: --target <path-to-app-binary> is required (optional --url, default ', DefaultURL, ')');
-    ExitCode := 1;
-    Exit;
-    end;
+  FTargetLocked := FTarget <> ''; // --target fixes the binary; setBinary is then refused
+  FAllow := TStringList.Create;
+  if not FTargetLocked then
+    LoadAllowList; // the whitelist only matters when the client picks the binary via setBinary
 
   FController := TMCPController.Create(Self);
   FText := TMCPSTDIOTransport.Create(@Input, @Output, @StdErr);
