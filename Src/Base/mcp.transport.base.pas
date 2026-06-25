@@ -63,11 +63,16 @@ var
   lObj : TJSONObject absolute aResponse;
 begin
   result := true;
-  // invalid responses without id's or null id's must not be sent to client, i.e:
-  // {"jsonrpc":"2.0","error":{"code":-32603,"message":"Access violation"},"id":null}
-  if (aResponse is TJSONObject) and
-     ((lObj.Find('id') = nil) or lObj.Nulls['id']) then
-    result := false;
+  if (aResponse is TJSONObject) then
+    begin
+    // Notifications are valid JSON-RPC: they carry a method and no id.
+    if lObj.Find('method') <> nil then
+      Exit(True);
+    // invalid responses without id's or null id's must not be sent to client, i.e:
+    // {"jsonrpc":"2.0","error":{"code":-32603,"message":"Access violation"},"id":null}
+    if (lObj.Find('id') = nil) or lObj.Nulls['id'] then
+      result := false;
+    end;
 end;
 
 procedure TMCPMessageTransport.SendMessage(aMessage: TJSONData);
