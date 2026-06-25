@@ -1,0 +1,831 @@
+1724028 execve("./todo", ["todo"], 0x7fffcbacce58 /* 57 vars */) = 0
+1724028 brk(NULL)                       = 0x6670000
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb4154d000
+1724028 access("/etc/ld.so.preload", R_OK) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/glibc-hwcaps/x86-64-v3/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/opt/firebird/lib/glibc-hwcaps/x86-64-v3/", 0x7ffcc8745d80, 0) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/glibc-hwcaps/x86-64-v2/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/opt/firebird/lib/glibc-hwcaps/x86-64-v2/", 0x7ffcc8745d80, 0) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/opt/firebird/lib/", {st_mode=S_IFDIR|0755, st_size=4096, ...}, 0) = 0
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/glibc-hwcaps/x86-64-v3/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/glibc-hwcaps/x86-64-v3/", 0x7ffcc8745d80, 0) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/glibc-hwcaps/x86-64-v2/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/glibc-hwcaps/x86-64-v2/", 0x7ffcc8745d80, 0) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/", {st_mode=S_IFDIR|0775, st_size=4096, ...}, 0) = 0
+1724028 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=145907, ...}) = 0
+1724028 mmap(NULL, 145907, PROT_READ, MAP_PRIVATE, 3, 0) = 0x74eb41529000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgdk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=781864, ...}) = 0
+1724028 mmap(NULL, 784968, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb41469000
+1724028 mmap(0x74eb41485000, 430080, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c000) = 0x74eb41485000
+1724028 mmap(0x74eb414ee000, 217088, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x85000) = 0x74eb414ee000
+1724028 mmap(0x74eb41523000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xb9000) = 0x74eb41523000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgtk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgtk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgtk-x11-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=4641256, ...}) = 0
+1724028 mmap(NULL, 4648832, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40e00000
+1724028 mmap(0x74eb40e64000, 2797568, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x64000) = 0x74eb40e64000
+1724028 mmap(0x74eb4110f000, 1388544, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x30f000) = 0x74eb4110f000
+1724028 mmap(0x74eb41262000, 45056, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x462000) = 0x74eb41262000
+1724028 mmap(0x74eb4126d000, 8064, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb4126d000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libX11.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libX11.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libX11.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=1298088, ...}) = 0
+1724028 mmap(NULL, 1297704, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4132c000
+1724028 mmap(0x74eb41345000, 589824, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19000) = 0x74eb41345000
+1724028 mmap(0x74eb413d5000, 585728, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xa9000) = 0x74eb413d5000
+1724028 mmap(0x74eb41464000, 20480, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x138000) = 0x74eb41464000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgdk_pixbuf-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgdk_pixbuf-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=186744, ...}) = 0
+1724028 mmap(NULL, 184808, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb412fe000
+1724028 mmap(0x74eb41306000, 110592, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8000) = 0x74eb41306000
+1724028 mmap(0x74eb41321000, 36864, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x23000) = 0x74eb41321000
+1724028 mmap(0x74eb4132a000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2c000) = 0x74eb4132a000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgobject-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgobject-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgobject-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=399752, ...}) = 0
+1724028 mmap(NULL, 404536, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4129b000
+1724028 mmap(0x74eb412aa000, 225280, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xf000) = 0x74eb412aa000
+1724028 mmap(0x74eb412e1000, 102400, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x46000) = 0x74eb412e1000
+1724028 mmap(0x74eb412fa000, 16384, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5e000) = 0x74eb412fa000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libglib-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libglib-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libglib-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=1343056, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb41299000
+1724028 mmap(NULL, 1343960, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40cb7000
+1724028 mmap(0x74eb40cd5000, 655360, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1e000) = 0x74eb40cd5000
+1724028 mmap(0x74eb40d75000, 557056, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xbe000) = 0x74eb40d75000
+1724028 mmap(0x74eb40dfd000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x146000) = 0x74eb40dfd000
+1724028 mmap(0x74eb40dff000, 472, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb40dff000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgthread-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgthread-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgthread-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=14488, ...}) = 0
+1724028 mmap(NULL, 16400, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb41294000
+1724028 mmap(0x74eb41295000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb41295000
+1724028 mmap(0x74eb41296000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb41296000
+1724028 mmap(0x74eb41297000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb41297000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgmodule-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgmodule-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgmodule-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=22736, ...}) = 0
+1724028 mmap(NULL, 24712, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4128d000
+1724028 mmap(0x74eb4128f000, 8192, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb4128f000
+1724028 mmap(0x74eb41291000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb41291000
+1724028 mmap(0x74eb41292000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb41292000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpango-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpango-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpango-1.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=433912, ...}) = 0
+1724028 mmap(NULL, 436800, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40c4c000
+1724028 mmap(0x74eb40c5f000, 233472, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x13000) = 0x74eb40c5f000
+1724028 mmap(0x74eb40c98000, 106496, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4c000) = 0x74eb40c98000
+1724028 mmap(0x74eb40cb2000, 20480, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x65000) = 0x74eb40cb2000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libcairo.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libcairo.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libcairo.so.2", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=1321832, ...}) = 0
+1724028 mmap(NULL, 1325864, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40b08000
+1724028 mmap(0x74eb40b1c000, 987136, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x14000) = 0x74eb40b1c000
+1724028 mmap(0x74eb40c0d000, 229376, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x105000) = 0x74eb40c0d000
+1724028 mmap(0x74eb40c45000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x13d000) = 0x74eb40c45000
+1724028 mmap(0x74eb40c4b000, 2856, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb40c4b000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libatk-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libatk-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libatk-1.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=170064, ...}) = 0
+1724028 mmap(NULL, 169192, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40ade000
+1724028 mmap(0x74eb40ae9000, 65536, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xb000) = 0x74eb40ae9000
+1724028 mmap(0x74eb40af9000, 45056, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b000) = 0x74eb40af9000
+1724028 mmap(0x74eb40b04000, 16384, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x26000) = 0x74eb40b04000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libc.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\220\243\2\0\0\0\0\0"..., 832) = 832
+1724028 pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+1724028 fstat(3, {st_mode=S_IFREG|0755, st_size=2125328, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb4128b000
+1724028 pread64(3, "\6\0\0\0\4\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0@\0\0\0\0\0\0\0"..., 784, 64) = 784
+1724028 mmap(NULL, 2170256, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40800000
+1724028 mmap(0x74eb40828000, 1605632, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x74eb40828000
+1724028 mmap(0x74eb409b0000, 323584, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1b0000) = 0x74eb409b0000
+1724028 mmap(0x74eb409ff000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1fe000) = 0x74eb409ff000
+1724028 mmap(0x74eb40a05000, 52624, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb40a05000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpangocairo-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpangocairo-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpangocairo-1.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=67712, ...}) = 0
+1724028 mmap(NULL, 65720, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4127a000
+1724028 mmap(0x74eb4127f000, 32768, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5000) = 0x74eb4127f000
+1724028 mmap(0x74eb41287000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xd000) = 0x74eb41287000
+1724028 mmap(0x74eb41289000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xf000) = 0x74eb41289000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgio-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgio-2.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgio-2.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=1887792, ...}) = 0
+1724028 mmap(NULL, 1897376, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40630000
+1724028 mmap(0x74eb40669000, 1142784, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x39000) = 0x74eb40669000
+1724028 mmap(0x74eb40780000, 479232, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x150000) = 0x74eb40780000
+1724028 mmap(0x74eb407f5000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c4000) = 0x74eb407f5000
+1724028 mmap(0x74eb407fe000, 5024, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb407fe000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libfontconfig.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libfontconfig.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libfontconfig.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=325712, ...}) = 0
+1724028 mmap(NULL, 328328, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a8d000
+1724028 mmap(0x74eb40a95000, 192512, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8000) = 0x74eb40a95000
+1724028 mmap(0x74eb40ac4000, 94208, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x37000) = 0x74eb40ac4000
+1724028 mmap(0x74eb40adb000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4d000) = 0x74eb40adb000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXrender.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXrender.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXrender.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=43600, ...}) = 0
+1724028 mmap(NULL, 45648, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a81000
+1724028 mmap(0x74eb40a83000, 28672, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a83000
+1724028 mmap(0x74eb40a8a000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb40a8a000
+1724028 mmap(0x74eb40a8b000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb40a8b000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXinerama.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXinerama.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXinerama.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=14616, ...}) = 0
+1724028 mmap(NULL, 16648, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb41275000
+1724028 mmap(0x74eb41276000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb41276000
+1724028 mmap(0x74eb41277000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb41277000
+1724028 mmap(0x74eb41278000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb41278000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXi.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXi.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXi.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=76320, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb41273000
+1724028 mmap(NULL, 74152, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a6e000
+1724028 mmap(0x74eb40a71000, 49152, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x74eb40a71000
+1724028 mmap(0x74eb40a7d000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xf000) = 0x74eb40a7d000
+1724028 mmap(0x74eb40a7f000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x11000) = 0x74eb40a7f000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXrandr.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXrandr.so.2", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXrandr.so.2", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=47504, ...}) = 0
+1724028 mmap(NULL, 49544, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a61000
+1724028 mmap(0x74eb40a63000, 28672, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a63000
+1724028 mmap(0x74eb40a6a000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb40a6a000
+1724028 mmap(0x74eb40a6c000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xa000) = 0x74eb40a6c000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXcursor.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXcursor.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXcursor.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=43464, ...}) = 0
+1724028 mmap(NULL, 45488, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a55000
+1724028 mmap(0x74eb40a57000, 24576, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a57000
+1724028 mmap(0x74eb40a5d000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8000) = 0x74eb40a5d000
+1724028 mmap(0x74eb40a5f000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb40a5f000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXcomposite.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXcomposite.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXcomposite.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=14464, ...}) = 0
+1724028 mmap(NULL, 16504, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a50000
+1724028 mmap(0x74eb40a51000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb40a51000
+1724028 mmap(0x74eb40a52000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a52000
+1724028 mmap(0x74eb40a53000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a53000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXdamage.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXdamage.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXdamage.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=14488, ...}) = 0
+1724028 mmap(NULL, 16520, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a4b000
+1724028 mmap(0x74eb40a4c000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb40a4c000
+1724028 mmap(0x74eb40a4d000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a4d000
+1724028 mmap(0x74eb40a4e000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a4e000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXfixes.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXfixes.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXfixes.so.3", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=26800, ...}) = 0
+1724028 mmap(NULL, 28904, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a43000
+1724028 mmap(0x74eb40a45000, 12288, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40a45000
+1724028 mmap(0x74eb40a48000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5000) = 0x74eb40a48000
+1724028 mmap(0x74eb40a49000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5000) = 0x74eb40a49000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXext.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXext.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXext.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=77512, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb41271000
+1724028 mmap(NULL, 80064, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a2f000
+1724028 mmap(0x74eb40a33000, 45056, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb40a33000
+1724028 mmap(0x74eb40a3e000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xf000) = 0x74eb40a3e000
+1724028 mmap(0x74eb40a41000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x11000) = 0x74eb40a41000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpangoft2-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpangoft2-1.0.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpangoft2-1.0.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=108536, ...}) = 0
+1724028 mmap(NULL, 106888, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40a14000
+1724028 mmap(0x74eb40a1c000, 53248, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8000) = 0x74eb40a1c000
+1724028 mmap(0x74eb40a29000, 16384, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x15000) = 0x74eb40a29000
+1724028 mmap(0x74eb40a2d000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x19000) = 0x74eb40a2d000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libm.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libm.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=952616, ...}) = 0
+1724028 mmap(NULL, 950296, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40547000
+1724028 mmap(0x74eb40557000, 520192, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x10000) = 0x74eb40557000
+1724028 mmap(0x74eb405d6000, 360448, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8f000) = 0x74eb405d6000
+1724028 mmap(0x74eb4062e000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xe7000) = 0x74eb4062e000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libxcb.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libxcb.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libxcb.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=162392, ...}) = 0
+1724028 mmap(NULL, 164488, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4051e000
+1724028 mmap(0x74eb40529000, 77824, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xb000) = 0x74eb40529000
+1724028 mmap(0x74eb4053c000, 36864, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1e000) = 0x74eb4053c000
+1724028 mmap(0x74eb40545000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x26000) = 0x74eb40545000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpng16.so.16", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpng16.so.16", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpng16.so.16", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=223304, ...}) = 0
+1724028 mmap(NULL, 225296, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb404e6000
+1724028 mmap(0x74eb404eb000, 163840, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5000) = 0x74eb404eb000
+1724028 mmap(0x74eb40513000, 36864, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2d000) = 0x74eb40513000
+1724028 mmap(0x74eb4051c000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x35000) = 0x74eb4051c000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libjpeg.so.8", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libjpeg.so.8", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libjpeg.so.8", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=534592, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb4126f000
+1724028 mmap(NULL, 532496, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40463000
+1724028 mmap(0x74eb40467000, 315392, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb40467000
+1724028 mmap(0x74eb404b4000, 196608, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x51000) = 0x74eb404b4000
+1724028 mmap(0x74eb404e4000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x81000) = 0x74eb404e4000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libffi.so.8", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libffi.so.8", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libffi.so.8", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=47672, ...}) = 0
+1724028 mmap(NULL, 46608, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40457000
+1724028 mmap(0x74eb40459000, 28672, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40459000
+1724028 mmap(0x74eb40460000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb40460000
+1724028 mmap(0x74eb40461000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xa000) = 0x74eb40461000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpcre2-8.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpcre2-8.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpcre2-8.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=625344, ...}) = 0
+1724028 mmap(NULL, 627472, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb403bd000
+1724028 mmap(0x74eb403bf000, 450560, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb403bf000
+1724028 mmap(0x74eb4042d000, 163840, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x70000) = 0x74eb4042d000
+1724028 mmap(0x74eb40455000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x97000) = 0x74eb40455000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libfribidi.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libfribidi.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libfribidi.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=121144, ...}) = 0
+1724028 mmap(NULL, 118984, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4039f000
+1724028 mmap(0x74eb403a1000, 16384, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb403a1000
+1724028 mmap(0x74eb403a5000, 90112, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x74eb403a5000
+1724028 mmap(0x74eb403bb000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c000) = 0x74eb403bb000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libthai.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libthai.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libthai.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=41152, ...}) = 0
+1724028 mmap(NULL, 43152, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40394000
+1724028 mmap(0x74eb40396000, 16384, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40396000
+1724028 mmap(0x74eb4039a000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x74eb4039a000
+1724028 mmap(0x74eb4039d000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x8000) = 0x74eb4039d000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libharfbuzz.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libharfbuzz.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libharfbuzz.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=1101752, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb40a12000
+1724028 mmap(NULL, 1100448, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40287000
+1724028 mmap(0x74eb40292000, 843776, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xb000) = 0x74eb40292000
+1724028 mmap(0x74eb40360000, 204800, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xd9000) = 0x74eb40360000
+1724028 mmap(0x74eb40392000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x10b000) = 0x74eb40392000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libz.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libz.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=113000, ...}) = 0
+1724028 mmap(NULL, 110744, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4026b000
+1724028 mmap(0x74eb4026d000, 73728, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb4026d000
+1724028 mmap(0x74eb4027f000, 24576, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x14000) = 0x74eb4027f000
+1724028 mmap(0x74eb40285000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1a000) = 0x74eb40285000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libfreetype.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libfreetype.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libfreetype.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=833608, ...}) = 0
+1724028 mmap(NULL, 831504, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4019f000
+1724028 mmap(0x74eb401ac000, 593920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xd000) = 0x74eb401ac000
+1724028 mmap(0x74eb4023d000, 155648, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9e000) = 0x74eb4023d000
+1724028 mmap(0x74eb40263000, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xc4000) = 0x74eb40263000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libxcb-render.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libxcb-render.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libxcb-render.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=55528, ...}) = 0
+1724028 mmap(NULL, 57448, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40190000
+1724028 mmap(0x74eb40195000, 20480, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5000) = 0x74eb40195000
+1724028 mmap(0x74eb4019a000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xa000) = 0x74eb4019a000
+1724028 mmap(0x74eb4019d000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xc000) = 0x74eb4019d000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libxcb-shm.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libxcb-shm.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libxcb-shm.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=14552, ...}) = 0
+1724028 mmap(NULL, 16472, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4018b000
+1724028 mmap(0x74eb4018c000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb4018c000
+1724028 mmap(0x74eb4018d000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb4018d000
+1724028 mmap(0x74eb4018e000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb4018e000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpixman-1.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpixman-1.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpixman-1.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=710832, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb40189000
+1724028 mmap(NULL, 713048, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb400da000
+1724028 mmap(0x74eb400e4000, 577536, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xa000) = 0x74eb400e4000
+1724028 mmap(0x74eb40171000, 61440, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x97000) = 0x74eb40171000
+1724028 mmap(0x74eb40180000, 36864, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xa5000) = 0x74eb40180000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libmount.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libmount.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libmount.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=309960, ...}) = 0
+1724028 mmap(NULL, 311896, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4008d000
+1724028 mmap(0x74eb40096000, 212992, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb40096000
+1724028 mmap(0x74eb400ca000, 53248, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3d000) = 0x74eb400ca000
+1724028 mmap(0x74eb400d7000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x49000) = 0x74eb400d7000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libselinux.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libselinux.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libselinux.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=174472, ...}) = 0
+1724028 mmap(NULL, 181960, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40060000
+1724028 mmap(0x74eb40066000, 118784, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x74eb40066000
+1724028 mmap(0x74eb40083000, 24576, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x23000) = 0x74eb40083000
+1724028 mmap(0x74eb40089000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x29000) = 0x74eb40089000
+1724028 mmap(0x74eb4008b000, 5832, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb4008b000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libexpat.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libexpat.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libexpat.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=174336, ...}) = 0
+1724028 mmap(NULL, 176256, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40034000
+1724028 mmap(0x74eb40038000, 118784, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb40038000
+1724028 mmap(0x74eb40055000, 32768, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x21000) = 0x74eb40055000
+1724028 mmap(0x74eb4005d000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x28000) = 0x74eb4005d000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXau.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXau.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXau.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=18696, ...}) = 0
+1724028 mmap(NULL, 20720, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4002e000
+1724028 mmap(0x74eb4002f000, 8192, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb4002f000
+1724028 mmap(0x74eb40031000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x74eb40031000
+1724028 mmap(0x74eb40032000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x74eb40032000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libXdmcp.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libXdmcp.so.6", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libXdmcp.so.6", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=26776, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb4002c000
+1724028 mmap(NULL, 28776, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb40024000
+1724028 mmap(0x74eb40026000, 8192, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb40026000
+1724028 mmap(0x74eb40028000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb40028000
+1724028 mmap(0x74eb4002a000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x5000) = 0x74eb4002a000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libdatrie.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libdatrie.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libdatrie.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=30792, ...}) = 0
+1724028 mmap(NULL, 32784, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb4001b000
+1724028 mmap(0x74eb4001d000, 16384, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb4001d000
+1724028 mmap(0x74eb40021000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x74eb40021000
+1724028 mmap(0x74eb40022000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x6000) = 0x74eb40022000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgraphite2.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgraphite2.so.3", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgraphite2.so.3", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=149776, ...}) = 0
+1724028 mmap(NULL, 151696, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3fff5000
+1724028 mmap(0x74eb3fff8000, 118784, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x3000) = 0x74eb3fff8000
+1724028 mmap(0x74eb40015000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x20000) = 0x74eb40015000
+1724028 mmap(0x74eb40018000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x22000) = 0x74eb40018000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libbz2.so.1.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libbz2.so.1.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libbz2.so.1.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=78944, ...}) = 0
+1724028 mmap(NULL, 80936, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3ffe1000
+1724028 mmap(0x74eb3ffe3000, 57344, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb3ffe3000
+1724028 mmap(0x74eb3fff1000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x10000) = 0x74eb3fff1000
+1724028 mmap(0x74eb3fff3000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x11000) = 0x74eb3fff3000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libbrotlidec.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libbrotlidec.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libbrotlidec.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=51512, ...}) = 0
+1724028 mmap(NULL, 53352, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3ffd3000
+1724028 mmap(0x74eb3ffd4000, 32768, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb3ffd4000
+1724028 mmap(0x74eb3ffdc000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x9000) = 0x74eb3ffdc000
+1724028 mmap(0x74eb3ffdf000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xb000) = 0x74eb3ffdf000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libblkid.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libblkid.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libblkid.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=236592, ...}) = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3ffd1000
+1724028 mmap(NULL, 238520, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3ff96000
+1724028 mmap(0x74eb3ff9d000, 147456, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x7000) = 0x74eb3ff9d000
+1724028 mmap(0x74eb3ffc1000, 36864, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2b000) = 0x74eb3ffc1000
+1724028 mmap(0x74eb3ffca000, 28672, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x33000) = 0x74eb3ffca000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libbsd.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libbsd.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libbsd.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=80888, ...}) = 0
+1724028 mmap(NULL, 86208, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3ff80000
+1724028 mmap(0x74eb3ff84000, 49152, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb3ff84000
+1724028 mmap(0x74eb3ff90000, 12288, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x10000) = 0x74eb3ff90000
+1724028 mmap(0x74eb3ff93000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x12000) = 0x74eb3ff93000
+1724028 mmap(0x74eb3ff95000, 192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x74eb3ff95000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libbrotlicommon.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libbrotlicommon.so.1", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libbrotlicommon.so.1", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=141640, ...}) = 0
+1724028 mmap(NULL, 139304, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3ff5d000
+1724028 mmap(0x74eb3ff5e000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb3ff5e000
+1724028 mmap(0x74eb3ff5f000, 126976, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb3ff5f000
+1724028 mmap(0x74eb3ff7e000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x21000) = 0x74eb3ff7e000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libmd.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libmd.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libmd.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=55536, ...}) = 0
+1724028 mmap(NULL, 57448, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3ff4e000
+1724028 mmap(0x74eb3ff50000, 36864, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb3ff50000
+1724028 mmap(0x74eb3ff59000, 8192, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xb000) = 0x74eb3ff59000
+1724028 mmap(0x74eb3ff5b000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0xc000) = 0x74eb3ff5b000
+1724028 close(3)                        = 0
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3ff4c000
+1724028 mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3ff4a000
+1724028 mmap(NULL, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3ff47000
+1724028 arch_prctl(ARCH_SET_FS, 0x74eb3ff47980) = 0
+1724028 set_tid_address(0x74eb3ff47c50) = 1724028
+1724028 set_robust_list(0x74eb3ff47c60, 24) = 0
+1724028 rseq(0x74eb3ff482a0, 0x20, 0, 0x53053053) = 0
+1724028 mprotect(0x74eb409ff000, 16384, PROT_READ) = 0
+1724028 mprotect(0x74eb3ff5b000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb3ff7e000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb3ff93000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb3ffca000, 24576, PROT_READ) = 0
+1724028 mprotect(0x74eb3ffdf000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb3fff3000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40018000, 8192, PROT_READ) = 0
+1724028 mprotect(0x74eb40022000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4002a000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40032000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4005d000, 8192, PROT_READ) = 0
+1724028 mprotect(0x74eb40455000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40089000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb400d7000, 8192, PROT_READ) = 0
+1724028 mprotect(0x74eb4062e000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40180000, 32768, PROT_READ) = 0
+1724028 mprotect(0x74eb40545000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4018e000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4019d000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40285000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4051c000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40263000, 28672, PROT_READ) = 0
+1724028 mprotect(0x74eb40dfd000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40392000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4039d000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb403bb000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40461000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb404e4000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb412fa000, 12288, PROT_READ) = 0
+1724028 mprotect(0x74eb41292000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb407f5000, 32768, PROT_READ) = 0
+1724028 mprotect(0x74eb40cb2000, 16384, PROT_READ) = 0
+1724028 mprotect(0x74eb40adb000, 8192, PROT_READ) = 0
+1724028 mprotect(0x74eb40a2d000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb41464000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a41000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a49000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a4e000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a53000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a8b000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a5f000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a6c000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40a7f000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb41278000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40c45000, 16384, PROT_READ) = 0
+1724028 mprotect(0x74eb41289000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb40b04000, 12288, PROT_READ) = 0
+1724028 mprotect(0x74eb41297000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb4132a000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb41523000, 16384, PROT_READ) = 0
+1724028 mprotect(0x74eb41262000, 28672, PROT_READ) = 0
+1724028 mprotect(0x8f7000, 4096, PROT_READ) = 0
+1724028 mprotect(0x74eb41585000, 8192, PROT_READ) = 0
+1724028 prlimit64(0, RLIMIT_STACK, NULL, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+1724028 munmap(0x74eb41529000, 145907)  = 0
+1724028 statfs("/sys/fs/selinux", 0x7ffcc8746b30) = -1 ENOENT (No such file or directory)
+1724028 statfs("/selinux", 0x7ffcc8746b30) = -1 ENOENT (No such file or directory)
+1724028 getrandom("\xcc\xc3\x8a\x61\x7f\x34\x9e\x4e", 8, GRND_NONBLOCK) = 8
+1724028 brk(NULL)                       = 0x6670000
+1724028 brk(0x6691000)                  = 0x6691000
+1724028 openat(AT_FDCWD, "/proc/filesystems", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0444, st_size=0, ...}) = 0
+1724028 read(3, "nodev\tsysfs\nnodev\ttmpfs\nnodev\tbd"..., 1024) = 431
+1724028 read(3, "", 1024)               = 0
+1724028 close(3)                        = 0
+1724028 access("/etc/selinux/config", F_OK) = -1 ENOENT (No such file or directory)
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 getrlimit(RLIMIT_STACK, {rlim_cur=8192*1024, rlim_max=RLIM64_INFINITY}) = 0
+1724028 rt_sigaction(SIGFPE, {sa_handler=0x44b7b0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x41f390}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1724028 rt_sigaction(SIGSEGV, {sa_handler=0x44b7b0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x41f390}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1724028 rt_sigaction(SIGBUS, {sa_handler=0x44b7b0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x41f390}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1724028 rt_sigaction(SIGILL, {sa_handler=0x44b7b0, sa_mask=[], sa_flags=SA_RESTORER|SA_SIGINFO, sa_restorer=0x41f390}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1724028 ioctl(1, TCGETS, {c_iflag=ICRNL|IXON, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0
+1724028 ioctl(2, TCGETS, {c_iflag=ICRNL|IXON, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0
+1724028 ioctl(1, TCGETS, {c_iflag=ICRNL|IXON, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0
+1724028 ioctl(2, TCGETS, {c_iflag=ICRNL|IXON, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0
+1724028 readlink("/proc/self/exe", "/home/michael/source/Dev/MCP/dem"..., 255) = 43
+1724028 open("/etc/timezone", O_RDONLY|O_LARGEFILE) = 3
+1724028 read(3, "Europe/Brussels\n", 255) = 16
+1724028 close(3)                        = 0
+1724028 open("/usr/share/zoneinfo/Europe/Brussels", O_RDONLY|O_LARGEFILE) = 3
+1724028 read(3, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\v\0\0\0\v\0\0\0\0"..., 2048) = 2048
+1724028 mmap(NULL, 262144, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3ff07000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb41545000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb4153d000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb41535000
+1724028 close(3)                        = 0
+1724028 time([1782399420 /* 2026-06-25T16:57:00+0200 */]) = 1782399420 (2026-06-25T16:57:00+0200)
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libpthread.so.0", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=145907, ...}) = 0
+1724028 mmap(NULL, 145907, PROT_READ, MAP_PRIVATE, 3, 0) = 0x74eb3fee3000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libpthread.so.0", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=14408, ...}) = 0
+1724028 mmap(NULL, 16400, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb41530000
+1724028 mmap(0x74eb41531000, 4096, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb41531000
+1724028 mmap(0x74eb41532000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb41532000
+1724028 mmap(0x74eb41533000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x2000) = 0x74eb41533000
+1724028 close(3)                        = 0
+1724028 mprotect(0x74eb41533000, 4096, PROT_READ) = 0
+1724028 munmap(0x74eb3fee3000, 145907)  = 0
+1724028 mmap(NULL, 4996, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb4152e000
+1724028 openat(AT_FDCWD, "/usr/lib/locale/locale-archive", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=6123184, ...}) = 0
+1724028 mmap(NULL, 6123184, PROT_READ, MAP_PRIVATE, 3, 0) = 0x74eb3f800000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libc.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libc.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=145907, ...}) = 0
+1724028 mmap(NULL, 145907, PROT_READ, MAP_PRIVATE, 3, 0) = 0x74eb3fee3000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/glibc-hwcaps/x86-64-v3/libc.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/lib/x86_64-linux-gnu/glibc-hwcaps/x86-64-v3/", 0x7ffcc8745f40, 0) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/glibc-hwcaps/x86-64-v2/libc.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 newfstatat(AT_FDCWD, "/lib/x86_64-linux-gnu/glibc-hwcaps/x86-64-v2/", 0x7ffcc8745f40, 0) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libc.so", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "/* GNU ld script\n   Use the shar"..., 832) = 283
+1724028 close(3)                        = 0
+1724028 munmap(0x74eb3fee3000, 145907)  = 0
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3feff000
+1724028 openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=27028, ...}) = 0
+1724028 mmap(NULL, 27028, PROT_READ, MAP_SHARED, 3, 0) = 0x74eb3fef8000
+1724028 close(3)                        = 0
+1724028 futex(0x74eb40a0472c, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/gconv/UTF-16.so", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=22736, ...}) = 0
+1724028 mmap(NULL, 24592, PROT_READ, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x74eb3fef1000
+1724028 mmap(0x74eb3fef2000, 12288, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1000) = 0x74eb3fef2000
+1724028 mmap(0x74eb3fef5000, 4096, PROT_READ, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb3fef5000
+1724028 mmap(0x74eb3fef6000, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x4000) = 0x74eb3fef6000
+1724028 close(3)                        = 0
+1724028 mprotect(0x74eb3fef6000, 4096, PROT_READ) = 0
+1724028 brk(0x66b3000)                  = 0x66b3000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3fee9000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3fee1000
+1724028 clock_gettime(CLOCK_MONOTONIC_RAW, {tv_sec=692417, tv_nsec=301087744}) = 0
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3fed9000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3fed1000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3fec9000
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3fec1000
+1724028 openat(AT_FDCWD, "/opt/firebird/lib/libgdk-x11-2.0.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/home/michael/projects/fresnel/bin/Binary/Shared/Linux64/libgdk-x11-2.0.so", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=145907, ...}) = 0
+1724028 mmap(NULL, 145907, PROT_READ, MAP_PRIVATE, 3, 0) = 0x74eb3fe9d000
+1724028 close(3)                        = 0
+1724028 openat(AT_FDCWD, "/lib/x86_64-linux-gnu/libgdk-x11-2.0.so", O_RDONLY|O_CLOEXEC) = 3
+1724028 read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\0\0\0\0\0\0\0\0"..., 832) = 832
+1724028 fstat(3, {st_mode=S_IFREG|0644, st_size=781864, ...}) = 0
+1724028 close(3)                        = 0
+1724028 munmap(0x74eb3fe9d000, 145907)  = 0
+1724028 mmap(NULL, 32768, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x74eb3feb9000
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 eventfd2(0, EFD_CLOEXEC|EFD_NONBLOCK) = 3
+1724028 openat(AT_FDCWD, "/usr/share/X11/locale/locale.alias", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=76784, ...}) = 0
+1724028 read(4, "#\n#\tThis file contains alias nam"..., 4096) = 4096
+1724028 read(4, "91\t\t\t\t\tbr_FR.ISO8859-1\nbr_FR.ISO"..., 4096) = 4096
+1724028 read(4, "\tde_DE.ISO8859-15\nde_DE.ISO-8859"..., 4096) = 4096
+1724028 read(4, "1\t\t\t\t\tes_AR.ISO8859-1\nes_AR.ISO-"..., 4096) = 4096
+1724028 read(4, "I.88591.en\t\t\t\t\tfi_FI.ISO8859-1\nf"..., 4096) = 4096
+1724028 read(4, "ev\t\t\t\t\thi_IN.ISCII-DEV\nhi_IN.utf"..., 4096) = 4096
+1724028 read(4, "i_IN.UTF-8\nmi\t\t\t\t\t\tmi_NZ.ISO8859"..., 4096) = 4096
+1724028 read(4, "TF-8\nro\t\t\t\t\t\tro_RO.ISO8859-2\nro_"..., 4096) = 4096
+1724028 read(4, "UA.cp1251\t\t\t\t\tuk_UA.CP1251\nuk_UA"..., 4096) = 4096
+1724028 read(4, "LT.ISO8859-13\npolish\t\t\t\t\t\tpl_PL."..., 4096) = 4096
+1724028 read(4, "859-6\nar_YE.ISO-8859-6:\t\t\t\tar_YE"..., 4096) = 4096
+1724028 read(4, "15:\t\t\t\tde_AT.ISO8859-15\nde_AT.IS"..., 4096) = 4096
+1724028 read(4, "n_NZ.ISO8859-1\nen_NZ.ISO-8859-1:"..., 4096) = 4096
+1724028 read(4, "1\nes_US.ISO-8859-1:\t\t\t\tes_US.ISO"..., 4096) = 4096
+1724028 read(4, "8859-14:\t\t\t\tga_IE.ISO8859-14\nga_"..., 4096) = 4096
+1724028 read(4, "15\nkl_GL.utf8:\t\t\t\t\tkl_GL.UTF-8\nk"..., 4096) = 4096
+1724028 read(4, "\t\t\t\tnso_ZA.ISO8859-15\nnso_ZA.iso"..., 4096) = 4096
+1724028 read(4, "SO8859-1\nsv.ISO8859-15:\t\t\t\t\tsv_S"..., 4096) = 4096
+1724028 read(4, "\nzh_HK.Big5:\t\t\t\t\tzh_HK.big5\nzh_H"..., 4096) = 3056
+1724028 read(4, "", 4096)               = 0
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/share/X11/locale/locale.alias", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=76784, ...}) = 0
+1724028 read(4, "#\n#\tThis file contains alias nam"..., 4096) = 4096
+1724028 read(4, "91\t\t\t\t\tbr_FR.ISO8859-1\nbr_FR.ISO"..., 4096) = 4096
+1724028 read(4, "\tde_DE.ISO8859-15\nde_DE.ISO-8859"..., 4096) = 4096
+1724028 read(4, "1\t\t\t\t\tes_AR.ISO8859-1\nes_AR.ISO-"..., 4096) = 4096
+1724028 read(4, "I.88591.en\t\t\t\t\tfi_FI.ISO8859-1\nf"..., 4096) = 4096
+1724028 read(4, "ev\t\t\t\t\thi_IN.ISCII-DEV\nhi_IN.utf"..., 4096) = 4096
+1724028 read(4, "i_IN.UTF-8\nmi\t\t\t\t\t\tmi_NZ.ISO8859"..., 4096) = 4096
+1724028 read(4, "TF-8\nro\t\t\t\t\t\tro_RO.ISO8859-2\nro_"..., 4096) = 4096
+1724028 read(4, "UA.cp1251\t\t\t\t\tuk_UA.CP1251\nuk_UA"..., 4096) = 4096
+1724028 read(4, "LT.ISO8859-13\npolish\t\t\t\t\t\tpl_PL."..., 4096) = 4096
+1724028 read(4, "859-6\nar_YE.ISO-8859-6:\t\t\t\tar_YE"..., 4096) = 4096
+1724028 read(4, "15:\t\t\t\tde_AT.ISO8859-15\nde_AT.IS"..., 4096) = 4096
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/share/X11/locale/locale.dir", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=38432, ...}) = 0
+1724028 read(4, "#\n#\tThis file contains locale da"..., 4096) = 4096
+1724028 read(4, "\t\t\tes_ES.ISO8859-1\niso8859-15/XL"..., 4096) = 4096
+1724028 read(4, "_KE.ISO8859-1\n# Presumably, \"pd\""..., 4096) = 4096
+1724028 read(4, "\t\t\tda_DK.UTF-8\nen_US.UTF-8/XLC_L"..., 4096) = 4096
+1724028 read(4, ".UTF-8/XLC_LOCALE\t\t\tne_NP.UTF-8\n"..., 4096) = 4096
+1724028 read(4, "XLC_LOCALE:\t\t\tca_AD.ISO8859-15\ni"..., 4096) = 4096
+1724028 read(4, "859-15\niso8859-1/XLC_LOCALE:\t\t\tf"..., 4096) = 4096
+1724028 read(4, "SO8859-15\niso8859-1/XLC_LOCALE:\t"..., 4096) = 4096
+1724028 close(4)                        = 0
+1724028 access("/usr/share/X11/locale/en_US.UTF-8/XLC_LOCALE", R_OK) = 0
+1724028 openat(AT_FDCWD, "/usr/share/X11/locale/en_US.UTF-8/XLC_LOCALE", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=4074, ...}) = 0
+1724028 read(4, "#  XLocale Database Sample for e"..., 4096) = 4074
+1724028 read(4, "", 4096)               = 0
+1724028 close(4)                        = 0
+1724028 getresuid([1000], [1000], [1000]) = 0
+1724028 getresgid([1000], [1000], [1000]) = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale/locale.alias", O_RDONLY|O_CLOEXEC) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=2996, ...}) = 0
+1724028 read(4, "# Locale name alias data base.\n#"..., 4096) = 2996
+1724028 read(4, "", 4096)               = 0
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale/en_GB/LC_MESSAGES/messages.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale/en/LC_MESSAGES/messages.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en_GB/LC_MESSAGES/messages.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en/LC_MESSAGES/messages.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale/en_GB/LC_MESSAGES/gtk20.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale/en/LC_MESSAGES/gtk20.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en_GB/LC_MESSAGES/gtk20.mo", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=5338, ...}) = 0
+1724028 mmap(NULL, 5338, PROT_READ, MAP_PRIVATE, 4, 0) = 0x74eb4152c000
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en/LC_MESSAGES/gtk20.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale/en_GB/LC_MESSAGES/libc.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale/en/LC_MESSAGES/libc.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en_GB/LC_MESSAGES/libc.mo", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=3656, ...}) = 0
+1724028 mmap(NULL, 3656, PROT_READ, MAP_PRIVATE, 4, 0) = 0x74eb4152b000
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en/LC_MESSAGES/libc.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 rt_sigaction(SIGPIPE, {sa_handler=SIG_IGN, sa_mask=[PIPE], sa_flags=SA_RESTORER|SA_RESTART, sa_restorer=0x74eb40845330}, {sa_handler=SIG_DFL, sa_mask=[], sa_flags=0}, 8) = 0
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale/en_GB/LC_MESSAGES/gtk20-properties.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale/en/LC_MESSAGES/gtk20-properties.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en_GB/LC_MESSAGES/gtk20-properties.mo", O_RDONLY) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=13359, ...}) = 0
+1724028 mmap(NULL, 13359, PROT_READ, MAP_PRIVATE, 4, 0) = 0x74eb3feb5000
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/share/locale-langpack/en/LC_MESSAGES/gtk20-properties.mo", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 getpeername(2, 0x7ffcc8746450, [128]) = -1 ENOTSOCK (Socket operation on non-socket)
+1724028 futex(0x74eb40dfee08, FUTEX_WAKE_PRIVATE, 2147483647) = 0
+1724028 ioctl(2, TCGETS, {c_iflag=ICRNL|IXON, c_oflag=NL0|CR0|TAB0|BS0|VT0|FF0|OPOST|ONLCR, c_cflag=B38400|CS8|CREAD, c_lflag=ISIG|ICANON|ECHO|ECHOE|ECHOK|IEXTEN|ECHOCTL|ECHOKE, ...}) = 0
+1724028 getpid()                        = 1724028
+1724028 openat(AT_FDCWD, "/etc/localtime", O_RDONLY|O_CLOEXEC) = 4
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=2933, ...}) = 0
+1724028 fstat(4, {st_mode=S_IFREG|0644, st_size=2933, ...}) = 0
+1724028 read(4, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\v\0\0\0\v\0\0\0\0"..., 4096) = 2933
+1724028 lseek(4, -1859, SEEK_CUR)       = 1074
+1724028 read(4, "TZif2\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\f\0\0\0\f\0\0\0\0"..., 4096) = 1859
+1724028 close(4)                        = 0
+1724028 openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/charset.alias", O_RDONLY) = -1 ENOENT (No such file or directory)
+1724028 write(2, "\n(todo:1724028): Gtk-\33[1;33mWARN"..., 89) = 89
+1724028 exit_group(1)                   = ?
+1724028 +++ exited with 1 +++

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="5">
+    <Name Value="mcpguicontrol"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+    </CompilerOptions>
+    <Version Major="1"/>
+    <Files>
+      <Item>
+        <Filename Value="mcp.lcl.mainthread.pas"/>
+        <UnitName Value="mcp.lcl.mainthread"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.serverthread.pas"/>
+        <UnitName Value="mcp.lcl.serverthread"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.strings.pas"/>
+        <UnitName Value="mcp.lcl.strings"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.control.pas"/>
+        <UnitName Value="mcp.lcl.control"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.security.pas"/>
+        <UnitName Value="mcp.lcl.security"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.locator.pas"/>
+        <UnitName Value="mcp.lcl.locator"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.serialize.pas"/>
+        <UnitName Value="mcp.lcl.serialize"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.accessors.pas"/>
+        <UnitName Value="mcp.lcl.accessors"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.osinput.pas"/>
+        <UnitName Value="mcp.lcl.osinput"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.formevents.pas"/>
+        <UnitName Value="mcp.lcl.formevents"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.tools.inspect.pas"/>
+        <UnitName Value="mcp.lcl.tools.inspect"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.lcl.tools.control.pas"/>
+        <UnitName Value="mcp.lcl.tools.control"/>
+      </Item>
+    </Files>
+    <RequiredPkgs>
+      <Item>
+        <PackageName Value="mcpbase"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

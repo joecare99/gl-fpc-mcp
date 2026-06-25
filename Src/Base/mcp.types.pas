@@ -295,6 +295,7 @@ Type
     procedure FromJSON(aJSON: TJSONObject);
     procedure Clear;
   end;
+  PMCPToolResult = ^TMCPToolResult;
 
   { TMCPProtocolLogLevel }
 

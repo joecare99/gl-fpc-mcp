@@ -1,0 +1,1581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <UserPkgLinks Version="3" Count="222">
+    <Item1>
+      <Name Value="acmapiclient"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/webclient/acmapi/acmapiclient.lpk"/>
+      <LastUsed Value="2025/11/24 22:28:53"/>
+    </Item1>
+    <Item2>
+      <Name Value="admincommon"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/admincommon/src/admincommon.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item2>
+    <Item3>
+      <Name Value="aggpas"/>
+      <Version Major="2" Minor="5"/>
+      <Filename Value="/home/michael/source/fpgui/src/corelib/render/software/aggpas.lpk"/>
+      <LastUsed Value="2017/05/27 16:06:58"/>
+    </Item3>
+    <Item4>
+      <Name Value="aggpasreport"/>
+      <Filename Value="/home/michael/source/fpreport/aggpas/aggpasreport.lpk"/>
+      <LastUsed Value="2017/05/27 16:06:58"/>
+    </Item4>
+    <Item5>
+      <Name Value="aissist"/>
+      <Version Minor="9" Release="1"/>
+      <Filename Value="components/aissist/api/aissist.lpk"/>
+      <LastUsed Value="2025/10/08 23:22:53"/>
+    </Item5>
+    <Item6>
+      <Name Value="alvaapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/alva/src/alvaapi.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item6>
+    <Item7>
+      <Name Value="appforms"/>
+      <Version Major="1"/>
+      <Filename Value="articles/customform/demo/appforms.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item7>
+    <Item8>
+      <Name Value="bauglirwebsocket"/>
+      <Filename Value="/home/michael/source/websockets/bauglirwebsocket.lpk"/>
+      <LastUsed Value="2020/06/03 16:41:19"/>
+    </Item8>
+    <Item9>
+      <Name Value="bbtcomponents"/>
+      <Filename Value="/home/michael/source/Projects/BBT/Src/Designer/bbtcomponents.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item9>
+    <Item10>
+      <Name Value="cairocanvas_pkg"/>
+      <Filename Value="components/cairocanvas/cairocanvas_pkg.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item10>
+    <Item11>
+      <Name Value="cbtpack"/>
+      <Version Major="2"/>
+      <Filename Value="demo/testcrash/cbtpack/cbtpack.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item11>
+    <Item12>
+      <Name Value="CEF4Delphi_Lazarus"/>
+      <Version Major="75" Minor="1" Release="4"/>
+      <Filename Value="/home/michael/source/lazarus/cef4delphi/packages/cef4delphi_lazarus.lpk"/>
+      <LastUsed Value="2025/07/21 11:48:53"/>
+    </Item12>
+    <Item13>
+      <Name Value="CEF4Delphi_Lazarus"/>
+      <Version Major="89" Release="15"/>
+      <Filename Value="/home/michael/source/Delphi/CEF4Delphi/packages/cef4delphi_lazarus.lpk"/>
+      <LastUsed Value="2025/07/13 10:22:03"/>
+    </Item13>
+    <Item14>
+      <Name Value="cfv_designtime"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/source/Projects/CFV/cfv_designtime.lpk"/>
+      <LastUsed Value="2026/04/18 10:17:32"/>
+    </Item14>
+    <Item15>
+      <Name Value="cfv_runtime"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/source/Projects/CFV/cfv_runtime.lpk"/>
+      <LastUsed Value="2026/04/18 10:17:32"/>
+    </Item15>
+    <Item16>
+      <Name Value="cgiLaz"/>
+      <Version Minor="1" Release="1"/>
+      <Filename Value="components/cgi/cgilaz.lpk"/>
+      <LastUsed Value="2011/03/26 00:00:00"/>
+    </Item16>
+    <Item17>
+      <Name Value="CodeTools"/>
+      <Version Major="1" Release="1"/>
+      <Filename Value="components/codetools/codetools.lpk"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item17>
+    <Item18>
+      <Name Value="CryptoLib4PascalPackage"/>
+      <Version Major="3" Minor="2"/>
+      <Filename Value="/home/michael/source/Projects/CryptoLib/Crypto/CryptoLib/src/Packages/FPC/CryptoLib4PascalPackage.lpk"/>
+      <LastUsed Value="2026/01/09 08:45:13"/>
+    </Item18>
+    <Item19>
+      <Name Value="DBFLaz"/>
+      <Version Minor="1" Release="1"/>
+      <Filename Value="components/tdbf/dbflaz.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item19>
+    <Item20>
+      <Name Value="dcpcrypt"/>
+      <Version Major="2" Release="4" Build="1"/>
+      <Filename Value="/home/michael/.lazarus/onlinepackagemanager/packages/dcpcrypt-2.0.4.1/dcpcrypt.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item20>
+    <Item21>
+      <Name Value="dcpcrypt_laz"/>
+      <Version Major="2" Release="4" Build="1"/>
+      <Filename Value="/home/michael/.lazarus/onlinepackagemanager/packages/dcpcrypt-2.0.4.1/dcpcrypt_laz.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item21>
+    <Item22>
+      <Name Value="dec"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/dec/dec.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item22>
+    <Item23>
+      <Name Value="DesignBaseClassDemoPkg"/>
+      <Filename Value="examples/designerbaseclass/designbaseclassdemopkg.lpk"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item23>
+    <Item24>
+      <Name Value="dwisawebdb"/>
+      <Filename Value="/home/michael/wisa/projects/wisaweb/src/ide/dwisawebdb.lpk"/>
+      <LastUsed Value="2019/02/24 15:18:10"/>
+    </Item24>
+    <Item25>
+      <Name Value="EasyDockMgr"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/lazarus/examples/dockmanager/package/easydockmgr.lpk"/>
+      <LastUsed Value="2015/12/15 21:29:39"/>
+    </Item25>
+    <Item26>
+      <Name Value="editortb"/>
+      <Filename Value="articles/editortoolbar/editortb.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item26>
+    <Item27>
+      <Name Value="EkRTF"/>
+      <Filename Value="/home/michael/source/BBT/Src/ThirdParty/EkRtf/EkRTF.lpk"/>
+      <LastUsed Value="2023/08/14 08:42:32"/>
+    </Item27>
+    <Item28>
+      <Name Value="exploreidemenu"/>
+      <Filename Value="articles/exploremenu/exploreidemenu.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item28>
+    <Item29>
+      <Name Value="extra"/>
+      <Filename Value="components/placement/extra.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item29>
+    <Item30>
+      <Name Value="extsyntaxcheck"/>
+      <Filename Value="/home/michael/lazarus/components/syntaxcheck/extsyntaxcheck.lpk"/>
+      <LastUsed Value="2010/07/16 00:00:00"/>
+    </Item30>
+    <Item31>
+      <Name Value="fcl2fpreport"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/fpreport/lcl/fcl2fpreport.lpk"/>
+      <LastUsed Value="2017/06/10 21:31:59"/>
+    </Item31>
+    <Item32>
+      <Name Value="fclfpreport"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/fpreport/fclfpreport.lpk"/>
+      <LastUsed Value="2017/08/20 18:50:58"/>
+    </Item32>
+    <Item33>
+      <Name Value="fclpdf"/>
+      <Filename Value="/home/michael/wisa/projects/fpcpackages/fppdf/src/fclpdf.lpk"/>
+      <LastUsed Value="2017/05/26 11:14:50"/>
+    </Item33>
+    <Item34>
+      <Name Value="fclreport"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/fpreport/fclreport.lpk"/>
+      <LastUsed Value="2017/06/10 09:58:51"/>
+    </Item34>
+    <Item35>
+      <Name Value="fcl_base_pas2js"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/P2JS/main/packages/fcl-base/src/fcl_base_pas2js.lpk"/>
+      <LastUsed Value="2023/12/25 13:44:35"/>
+    </Item35>
+    <Item36>
+      <Name Value="fcl_base_pas2js_namespaced"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/P2JS/main/packages/fcl-base/namespaced/fcl_base_pas2js_namespaced.lpk"/>
+      <LastUsed Value="2023/11/27 21:52:52"/>
+    </Item36>
+    <Item37>
+      <Name Value="fcl_opf"/>
+      <Version Minor="9"/>
+      <Filename Value="/home/michael/source/Projects/fcl-opf/ide/fcl_opf.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item37>
+    <Item38>
+      <Name Value="fcl_opf_design"/>
+      <Version Minor="9"/>
+      <Filename Value="/home/michael/source/Projects/fcl-opf/ide/fcl_opf_design.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item38>
+    <Item39>
+      <Name Value="fpcgoogleapis"/>
+      <Filename Value="/home/michael/wisa/projects/fpcpackages/googleapis/fpcgoogleapis.lpk"/>
+      <LastUsed Value="2016/06/02 22:51:51"/>
+    </Item39>
+    <Item40>
+      <Name Value="fpcunitide"/>
+      <Version Minor="1"/>
+      <Filename Value="components/fpcunit/ide/fpcunitide.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item40>
+    <Item41>
+      <Name Value="FPCUnitTestRunner"/>
+      <Version Minor="1"/>
+      <Filename Value="components/fpcunit/fpcunittestrunner.lpk"/>
+      <LastUsed Value="2026/03/07 10:36:58"/>
+    </Item41>
+    <Item42>
+      <Name Value="fpcunit_pas2js"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/P2JS/trunk/packages/fpcunit/fpcunit_pas2js.lpk"/>
+      <LastUsed Value="2019/07/11 17:30:32"/>
+    </Item42>
+    <Item43>
+      <Name Value="fpcunit_pas2js_namespaced"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/P2JS/main/packages/fpcunit/namespaced/fpcunit_pas2js_namespaced.lpk"/>
+      <LastUsed Value="2023/11/27 14:18:08"/>
+    </Item43>
+    <Item44>
+      <Name Value="fpc_markdown"/>
+      <Version Major="1" Minor="2" Build="7"/>
+      <Filename Value="/home/michael/source/fpc-markdown/fpc_markdown.lpk"/>
+      <LastUsed Value="2018/07/30 08:46:59"/>
+    </Item44>
+    <Item45>
+      <Name Value="fpgfx_package"/>
+      <Version Minor="6" Release="1"/>
+      <Filename Value="/home/michael/wisa/projects/fpcpackages/fpgui/src/corelib/x11/fpgfx_package.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item45>
+    <Item46>
+      <Name Value="fpguireport"/>
+      <Filename Value="/home/michael/source/fpreport/fpgui/fpguireport.lpk"/>
+      <LastUsed Value="2017/05/27 16:06:58"/>
+    </Item46>
+    <Item47>
+      <Name Value="fpgui_ide"/>
+      <Version Minor="2"/>
+      <Filename Value="/home/michael/source/fpgui/extras/lazarus_ide/fpgui_ide.lpk"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item47>
+    <Item48>
+      <Name Value="fpgui_package"/>
+      <Version Minor="6" Release="1"/>
+      <Filename Value="/home/michael/wisa/projects/fpcpackages/fpgui/src/gui/fpgui_package.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item48>
+    <Item49>
+      <Name Value="fpgui_richtext"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/source/fpgui/docview/components/richtext/fpgui_richtext.lpk"/>
+      <LastUsed Value="2011/03/26 00:00:00"/>
+    </Item49>
+    <Item50>
+      <Name Value="fpgui_toolkit"/>
+      <Version Major="1" Minor="5"/>
+      <Filename Value="/home/michael/source/fpgui/src/corelib/x11/fpgui_toolkit.lpk"/>
+      <LastUsed Value="2017/05/27 16:06:58"/>
+    </Item50>
+    <Item51>
+      <Name Value="fpreportdemo"/>
+      <Filename Value="/home/michael/wisa/projects/fpcpackages/fpreport/demos/common/fpreportdemo.lpk"/>
+      <LastUsed Value="2017/05/02 13:29:45"/>
+    </Item51>
+    <Item52>
+      <Name Value="FrameViewer09"/>
+      <Version Major="11" Minor="8"/>
+      <Filename Value="/home/michael/.lazarus/onlinepackagemanager/packages/HtmlViewer/package/FrameViewer09.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:31"/>
+    </Item52>
+    <Item53>
+      <Name Value="frameworkapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/framework/src/frameworkapi.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item53>
+    <Item54>
+      <Name Value="Fresnel"/>
+      <Version Minor="4"/>
+      <Filename Value="/home/michael/projects/fresnel/src/fresnel.lpk"/>
+      <LastUsed Value="2026/06/12 22:44:41"/>
+    </Item54>
+    <Item55>
+      <Name Value="FresnelBase"/>
+      <Version Minor="3"/>
+      <Filename Value="/home/michael/projects/fresnel/src/base/fresnelbase.lpk"/>
+      <LastUsed Value="2026/06/20 08:07:48"/>
+    </Item55>
+    <Item56>
+      <Name Value="FresnelDsgn"/>
+      <Version Minor="2"/>
+      <Filename Value="/home/michael/projects/fresnel/design/fresneldsgn.lpk"/>
+      <LastUsed Value="2023/01/05 12:34:16"/>
+    </Item56>
+    <Item57>
+      <Name Value="ftpmanageapi"/>
+      <Filename Value="/home/michael/wisa/projects/build/ftp/src/api/ftpmanageapi.lpk"/>
+      <LastUsed Value="2014/08/27 00:00:00"/>
+    </Item57>
+    <Item58>
+      <Name Value="GeckoComponents"/>
+      <Version Release="1"/>
+      <Filename Value="/home/michael/source/gecko/Components/GeckoComponents.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item58>
+    <Item59>
+      <Name Value="gemini"/>
+      <Filename Value="components/aissist/api/gemini/gemini.lpk"/>
+      <LastUsed Value="2025/10/08 23:22:53"/>
+    </Item59>
+    <Item60>
+      <Name Value="googleapiclient"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/webclient/googleapi/googleapiclient.lpk"/>
+      <LastUsed Value="2025/06/22 13:45:06"/>
+    </Item60>
+    <Item61>
+      <Name Value="gradebookapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/gradebook/src/gradebookapi.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item61>
+    <Item62>
+      <Name Value="HashLib4PascalPackage"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk"/>
+      <LastUsed Value="2026/01/04 21:09:01"/>
+    </Item62>
+    <Item63>
+      <Name Value="HashLib4PascalPackage"/>
+      <Version Major="4" Minor="2"/>
+      <Filename Value="/home/michael/source/Projects/CryptoLib/Hash/HashLib/src/Packages/FPC/HashLib4PascalPackage.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item63>
+    <Item64>
+      <Name Value="ibconnectionlaz"/>
+      <Filename Value="components/sqldb/interbase/ibconnectionlaz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item64>
+    <Item65>
+      <Name Value="ideextensions"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/source/lazarus/ideextensions/ideextensions.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:31"/>
+    </Item65>
+    <Item66>
+      <Name Value="idefilebrowser"/>
+      <Version Minor="2"/>
+      <Filename Value="components/filebrowser/idefilebrowser.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item66>
+    <Item67>
+      <Name Value="IdeLazLogger"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/lazarus/components/IdeLazLogger/idelazlogger.lpk"/>
+      <LastUsed Value="2014/03/27 00:00:00"/>
+    </Item67>
+    <Item68>
+      <Name Value="idescout"/>
+      <Version Release="1"/>
+      <Filename Value="components/idescout/idescout.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item68>
+    <Item69>
+      <Name Value="InterbaseLaz"/>
+      <Version Major="1"/>
+      <Filename Value="components/interbase/interbaselaz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item69>
+    <Item70>
+      <Name Value="janai"/>
+      <Version Minor="9" Release="1"/>
+      <Filename Value="components/aissist/api/janai/janai.lpk"/>
+      <LastUsed Value="2025/10/08 23:22:13"/>
+    </Item70>
+    <Item71>
+      <Name Value="jcfnogui"/>
+      <Version Major="2"/>
+      <Filename Value="components/jcf2/CommandLine/jcfnogui.lpk"/>
+      <LastUsed Value="2023/06/06 19:42:08"/>
+    </Item71>
+    <Item72>
+      <Name Value="JPEGForLazarus"/>
+      <Version Major="1" Release="1"/>
+      <Filename Value="components/jpeg/jpegforlazarus.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item72>
+    <Item73>
+      <Name Value="lazads"/>
+      <Version Major="8"/>
+      <Filename Value="/home/michael/source/ads/lazads.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item73>
+    <Item74>
+      <Name Value="lazaissist"/>
+      <Filename Value="/home/michael/source/aissist/gui/lazaissist.lpk"/>
+      <LastUsed Value="2024/09/21 17:51:20"/>
+    </Item74>
+    <Item75>
+      <Name Value="lazanalogclock"/>
+      <Filename Value="/home/michael/tmp/clock/src/lazanalogclock.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item75>
+    <Item76>
+      <Name Value="lazchart"/>
+      <Filename Value="components/chart/lazchart.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item76>
+    <Item77>
+      <Name Value="lazchatctrl"/>
+      <Version Minor="9" Release="1"/>
+      <Filename Value="components/chatcontrol/lazchatctrl.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item77>
+    <Item78>
+      <Name Value="LazControls"/>
+      <Version Major="1" Release="1"/>
+      <Filename Value="components/lazcontrols/lazcontrols.lpk"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item78>
+    <Item79>
+      <Name Value="LazCustForms"/>
+      <Version Major="1"/>
+      <Filename Value="articles/customform/lazcustforms.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item79>
+    <Item80>
+      <Name Value="lazdaemon"/>
+      <Version Minor="9" Release="9"/>
+      <Filename Value="components/daemon/lazdaemon.lpk"/>
+      <LastUsed Value="2025/11/14 21:59:23"/>
+    </Item80>
+    <Item81>
+      <Name Value="lazdatadict"/>
+      <Filename Value="components/datadict/lazdatadict.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item81>
+    <Item82>
+      <Name Value="lazdbexport"/>
+      <Version Major="1"/>
+      <Filename Value="components/dbexport/lazdbexport.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item82>
+    <Item83>
+      <Name Value="lazdddesign"/>
+      <Filename Value="/home/michael/source/Articles/laznonwidget/lazdddesign.lpk"/>
+      <LastUsed Value="2025/05/24 17:23:06"/>
+    </Item83>
+    <Item84>
+      <Name Value="lazextpascal"/>
+      <Version Minor="9" Release="6"/>
+      <Filename Value="/home/michael/source/extpascal/lazextpascal.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item84>
+    <Item85>
+      <Name Value="lazextpascalide"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/source/extpascal/lazextpascalide.lpk"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item85>
+    <Item86>
+      <Name Value="lazfpreportdesign"/>
+      <Filename Value="components/fpreport/design/lazfpreportdesign.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item86>
+    <Item87>
+      <Name Value="LazFreeBase"/>
+      <Version Major="1" Minor="2" Release="1"/>
+      <Filename Value="/home/michael/source/freebase/lazfreebase.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item87>
+    <Item88>
+      <Name Value="lazgoogleapis"/>
+      <Filename Value="/home/michael/source/rest/googleapi/lazgoogleapis.lpk"/>
+      <LastUsed Value="2020/05/12 13:11:03"/>
+    </Item88>
+    <Item89>
+      <Name Value="lazgoogleapis"/>
+      <Version Major="1"/>
+      <Filename Value="components/googleapis/lazgoogleapis.lpk"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item89>
+    <Item90>
+      <Name Value="lazhtml"/>
+      <Filename Value="/home/michael/lazhtml.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item90>
+    <Item91>
+      <Name Value="lazidefpreport"/>
+      <Filename Value="components/fpreport/design/lazidefpreport.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:33"/>
+    </Item91>
+    <Item92>
+      <Name Value="lazinstantsearch"/>
+      <Version Release="1"/>
+      <Filename Value="components/instantsearch/lazinstantsearch.lpk"/>
+      <LastUsed Value="2025/11/14 20:55:30"/>
+    </Item92>
+    <Item93>
+      <Name Value="lazleap"/>
+      <Version Major="1" Minor="1"/>
+      <Filename Value="/home/michael/source/Leap/lazleap.lpk"/>
+      <LastUsed Value="2013/08/31 00:00:00"/>
+    </Item93>
+    <Item94>
+      <Name Value="lazllmrag"/>
+      <Filename Value="/home/michael/source/Dev/LLM/Src/RAG/lazllmrag.lpk"/>
+      <LastUsed Value="2026/06/16 00:21:59"/>
+    </Item94>
+    <Item95>
+      <Name Value="lazllms"/>
+      <Filename Value="/home/michael/source/Dev/LLM/Src/lazllms.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item95>
+    <Item96>
+      <Name Value="lazmarkdown"/>
+      <Version Major="1"/>
+      <Filename Value="components/markdown/lazmarkdown.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item96>
+    <Item97>
+      <Name Value="lazmda"/>
+      <Filename Value="articles/rtti/lazmda/lazmda.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item97>
+    <Item98>
+      <Name Value="lazmediators"/>
+      <Version Major="1"/>
+      <Filename Value="components/mediators/lazmediators.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:31"/>
+    </Item98>
+    <Item99>
+      <Name Value="lazopenapi"/>
+      <Version Minor="9" Release="1"/>
+      <Filename Value="components/openapi/lazopenapi.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item99>
+    <Item100>
+      <Name Value="lazpdf"/>
+      <Filename Value="/home/michael/source/articles/lazpdf/lazpdf.lpk"/>
+      <LastUsed Value="2017/06/10 09:58:40"/>
+    </Item100>
+    <Item101>
+      <Name Value="lazplotpanel"/>
+      <Version Release="1"/>
+      <Filename Value="/home/michael/source/articles/plotpanel/lazplotpanel.lpk"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item101>
+    <Item102>
+      <Name Value="lazprojectgroups"/>
+      <Version Minor="7"/>
+      <Filename Value="components/projectgroups/lazprojectgroups.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item102>
+    <Item103>
+      <Name Value="lazreport"/>
+      <Version Minor="9" Release="9"/>
+      <Filename Value="components/lazreport/source/lazreport.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item103>
+    <Item104>
+      <Name Value="lazsqldbrest"/>
+      <Filename Value="components/sqldbrest/lazsqldbrest.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item104>
+    <Item105>
+      <Name Value="lazsqldbrestbridge"/>
+      <Filename Value="components/web/lazsqldbrestbridge.lpk"/>
+      <LastUsed Value="2019/02/24 11:09:37"/>
+    </Item105>
+    <Item106>
+      <Name Value="lazsreportdesign"/>
+      <Filename Value="/home/michael/source/fpreport/design/lazsreportdesign.lpk"/>
+      <LastUsed Value="2017/06/10 11:36:59"/>
+    </Item106>
+    <Item107>
+      <Name Value="laztestinsight"/>
+      <Filename Value="components/fpcunit/testinsight/laztestinsight.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item107>
+    <Item108>
+      <Name Value="LazUtils"/>
+      <Version Major="1"/>
+      <Filename Value="components/lazutils/lazutils.lpk"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item108>
+    <Item109>
+      <Name Value="lazwebclient"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/webclient/lazwebclient.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item109>
+    <Item110>
+      <Name Value="lazwebwidgets"/>
+      <Filename Value="/home/michael/P2JS/martin/packages/webwidget/lazwebwidgets.lpk"/>
+      <LastUsed Value="2021/10/17 20:21:00"/>
+    </Item110>
+    <Item111>
+      <Name Value="lazwebwidgets_namespaced"/>
+      <Filename Value="/home/michael/P2JS/main/packages/webwidget/namespaced/lazwebwidgets_namespaced.lpk"/>
+      <LastUsed Value="2023/11/27 21:53:35"/>
+    </Item111>
+    <Item112>
+      <Name Value="laz_aissist"/>
+      <Version Minor="9" Release="1"/>
+      <Filename Value="components/aissist/ide/laz_aissist.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item112>
+    <Item113>
+      <Name Value="laz_fpspreadsheet"/>
+      <Version Major="1" Minor="7"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/fpspreadsheet/laz_fpspreadsheet.lpk"/>
+      <LastUsed Value="2022/06/13 20:27:53"/>
+    </Item113>
+    <Item114>
+      <Name Value="laz_fpspreadsheet"/>
+      <Version Major="2"/>
+      <Filename Value="/home/michael/source/lazarus/lazarus-ccr/components/fpspreadsheet/laz_fpspreadsheet.lpk"/>
+      <LastUsed Value="2026/05/28 22:41:32"/>
+    </Item114>
+    <Item115>
+      <Name Value="laz_fpspreadsheet_dataset"/>
+      <Version Major="1" Minor="14"/>
+      <Filename Value="/home/michael/source/lazarus/lazarus-ccr/components/fpspreadsheet/laz_fpspreadsheet_dataset.lpk"/>
+      <LastUsed Value="2025/04/13 20:46:32"/>
+    </Item115>
+    <Item116>
+      <Name Value="laz_raspberry"/>
+      <Filename Value="/home/michael/source/raspberry/laz_raspberry.lpk"/>
+      <LastUsed Value="2013/11/08 00:00:00"/>
+    </Item116>
+    <Item117>
+      <Name Value="laz_synapse"/>
+      <Version Major="40" Minor="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/synapse/source/lib/laz_synapse.lpk"/>
+      <LastUsed Value="2026/06/23 22:45:33"/>
+    </Item117>
+    <Item118>
+      <Name Value="laz_synapsewebclientlpk"/>
+      <Filename Value="/home/michael/source/rest/synapse/laz_synapsewebclientlpk.lpk"/>
+      <LastUsed Value="2017/12/16 21:19:32"/>
+    </Item118>
+    <Item119>
+      <Name Value="LCL"/>
+      <Version Major="1" Minor="3"/>
+      <Filename Value="lcl/interfaces/lcl.lpk"/>
+      <LastUsed Value="2015/01/24 00:00:00"/>
+    </Item119>
+    <Item120>
+      <Name Value="LCLBase"/>
+      <Version Major="1" Minor="3"/>
+      <Filename Value="lcl/lclbase.lpk"/>
+      <LastUsed Value="2015/01/24 00:00:00"/>
+    </Item120>
+    <Item121>
+      <Name Value="lclfpreport"/>
+      <Filename Value="components/fpreport/lclfpreport.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item121>
+    <Item122>
+      <Name Value="lclreport"/>
+      <Filename Value="/home/michael/source/fpreport/lcl/lclreport.lpk"/>
+      <LastUsed Value="2017/06/10 21:32:26"/>
+    </Item122>
+    <Item123>
+      <Name Value="LCLTMSCloudLazarusPkg"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/tmscloudpack/LCLTMSCloudLazarusPkg.lpk"/>
+      <LastUsed Value="2017/12/16 21:19:32"/>
+    </Item123>
+    <Item124>
+      <Name Value="LCLTMSFNCCorePkg"/>
+      <Version Major="1" Release="7"/>
+      <Filename Value="/home/michael/source/TMS/FNC/core/LCLTMSFNCCorePkg.lpk"/>
+      <LastUsed Value="2019/05/03 11:08:03"/>
+    </Item124>
+    <Item125>
+      <Name Value="LCLTMSFNCCorePkgDE"/>
+      <Version Major="1" Release="7"/>
+      <Filename Value="/home/michael/source/TMS/FNC/core/LCLTMSFNCCorePkgDE.lpk"/>
+      <LastUsed Value="2019/05/03 11:07:48"/>
+    </Item125>
+    <Item126>
+      <Name Value="LCLTMSFNCUIPackPkg"/>
+      <Version Major="2" Minor="1"/>
+      <Filename Value="/home/michael/source/TMS/FNC/uipack/LCLTMSFNCUIPackPkg.lpk"/>
+      <LastUsed Value="2018/02/18 10:05:11"/>
+    </Item126>
+    <Item127>
+      <Name Value="LCLTMSFNCUIPackPkgDE"/>
+      <Version Major="2"/>
+      <Filename Value="/home/michael/source/TMS/FNC/uipack/LCLTMSFNCUIPackPkgDE.lpk"/>
+      <LastUsed Value="2018/02/18 10:05:11"/>
+    </Item127>
+    <Item128>
+      <Name Value="lspclient"/>
+      <Filename Value="/home/michael/source/LSP/pascal-language-server/src/clientprotocol/lspclient.lpk"/>
+      <LastUsed Value="2023/08/18 08:55:37"/>
+    </Item128>
+    <Item129>
+      <Name Value="lspprotocol"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/Projects/LSP/pascal-language-server/src/protocol/lspprotocol.lpk"/>
+      <LastUsed Value="2026/01/01 23:13:04"/>
+    </Item129>
+    <Item130>
+      <Name Value="lspserver"/>
+      <Filename Value="/home/michael/source/Projects/LSP/pascal-language-server/src/serverprotocol/lspserver.lpk"/>
+      <LastUsed Value="2026/01/02 00:13:57"/>
+    </Item130>
+    <Item131>
+      <Name Value="MarkdownEngine"/>
+      <Filename Value="/home/michael/source/Dev/markdown/fpc-markdown/packages/markdownengine.lpk"/>
+      <LastUsed Value="2025/12/22 20:29:08"/>
+    </Item131>
+    <Item132>
+      <Name Value="mcpbase"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/Dev/MCP/Src/Base/mcpbase.lpk"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item132>
+    <Item133>
+      <Name Value="mcpclient"/>
+      <Filename Value="/home/michael/source/Dev/MCP/Src/Client/mcpclient.lpk"/>
+      <LastUsed Value="2025/09/14 09:39:15"/>
+    </Item133>
+    <Item134>
+      <Name Value="mcpdesign"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/Dev/MCP/Src/IDE/mcpdesign.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item134>
+    <Item135>
+      <Name Value="mcpguicontrol"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/Dev/MCP/guicontrol/mcpguicontrol.lpk"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item135>
+    <Item136>
+      <Name Value="mcplazcontrol"/>
+      <Filename Value="/home/michael/source/Dev/MCP/Src/IDE/mcplazcontrol.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item136>
+    <Item137>
+      <Name Value="mcplazide"/>
+      <Filename Value="/home/michael/source/Dev/MCP/Src/Base/mcplazide.lpk"/>
+      <LastUsed Value="2025/07/11 21:48:27"/>
+    </Item137>
+    <Item138>
+      <Name Value="MemDSLaz"/>
+      <Version Major="1" Minor="2" Release="1"/>
+      <Filename Value="components/memds/memdslaz.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item138>
+    <Item139>
+      <Name Value="MJTI2Stream"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/Mailjet/svn/api/mailjetstreamer/src/mjti2stream.lpk"/>
+      <LastUsed Value="2013/02/11 00:00:00"/>
+    </Item139>
+    <Item140>
+      <Name Value="mormot2"/>
+      <Version Major="2" Release="1"/>
+      <Filename Value="/home/michael/source/mORMot2/packages/lazarus/mormot2.lpk"/>
+      <LastUsed Value="2024/03/18 20:45:42"/>
+    </Item140>
+    <Item141>
+      <Name Value="msapis"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/msapis/msapis.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item141>
+    <Item142>
+      <Name Value="mycontrols"/>
+      <Filename Value="demo/mycontrols.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item142>
+    <Item143>
+      <Name Value="mysql4connectionlaz"/>
+      <Filename Value="components/sqldb/mysql/mysql4connectionlaz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item143>
+    <Item144>
+      <Name Value="MySQL4Laz"/>
+      <Version Minor="1" Release="1"/>
+      <Filename Value="components/mysql/mysql4laz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item144>
+    <Item145>
+      <Name Value="mysqlconnectionlaz"/>
+      <Filename Value="components/sqldb/mysql/mysqlconnectionlaz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item145>
+    <Item146>
+      <Name Value="MySQLLaz"/>
+      <Version Minor="1" Release="1"/>
+      <Filename Value="components/mysql/mysqllaz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item146>
+    <Item147>
+      <Name Value="office365apiclient"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/webclient/office365api/office365apiclient.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item147>
+    <Item148>
+      <Name Value="openai"/>
+      <Filename Value="components/aissist/api/openai/openai.lpk"/>
+      <LastUsed Value="2024/09/19 08:08:16"/>
+    </Item148>
+    <Item149>
+      <Name Value="p2jsfresnelapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/projects/fresnel/src/pas2js/p2jsfresnelapi.lpk"/>
+      <LastUsed Value="2025/05/17 16:42:09"/>
+    </Item149>
+    <Item150>
+      <Name Value="packagea"/>
+      <Filename Value="/home/michael/source/packagesbug/packagea.lpk"/>
+      <LastUsed Value="2015/03/24 12:47:45"/>
+    </Item150>
+    <Item151>
+      <Name Value="packageb"/>
+      <Filename Value="/home/michael/source/packagesbug/packageb.lpk"/>
+      <LastUsed Value="2015/03/24 12:50:52"/>
+    </Item151>
+    <Item152>
+      <Name Value="pas2jsatom"/>
+      <Filename Value="/home/michael/source/lazarus/pas2jsatom/pas2jsatom.lpk"/>
+      <LastUsed Value="2020/12/22 11:06:15"/>
+    </Item152>
+    <Item153>
+      <Name Value="pas2jscomponents"/>
+      <Version Minor="1"/>
+      <Filename Value="components/pas2js/components/pas2jscomponents.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item153>
+    <Item154>
+      <Name Value="Pas2JSDsgn"/>
+      <Version Major="1" Release="2"/>
+      <Filename Value="components/pas2js/pas2jsdsgn.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item154>
+    <Item155>
+      <Name Value="pas2js_fcldb"/>
+      <Filename Value="/home/michael/P2JS/main/packages/fcl-db/src/pas2js_fcldb.lpk"/>
+      <LastUsed Value="2023/12/25 13:44:35"/>
+    </Item155>
+    <Item156>
+      <Name Value="pas2js_fcldb_namespaced"/>
+      <Filename Value="/home/michael/P2JS/main/packages/fcl-db/namespaced/pas2js_fcldb_namespaced.lpk"/>
+      <LastUsed Value="2023/11/27 21:52:52"/>
+    </Item156>
+    <Item157>
+      <Name Value="pas2js_rtl"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/P2JS/main/packages/rtl/src/pas2js_rtl.lpk"/>
+      <LastUsed Value="2023/12/25 13:44:35"/>
+    </Item157>
+    <Item158>
+      <Name Value="pas2js_rtl_namespaced"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/P2JS/main/packages/rtl/namespaced/pas2js_rtl_namespaced.lpk"/>
+      <LastUsed Value="2023/11/27 21:52:52"/>
+    </Item158>
+    <Item159>
+      <Name Value="PkgEkRTF"/>
+      <Filename Value="/home/michael/source/BBT/Src/ThirdParty/EkRtf/PkgEkRTF.lpk"/>
+      <LastUsed Value="2023/09/20 08:37:34"/>
+    </Item159>
+    <Item160>
+      <Name Value="pkgmailjetapi"/>
+      <Filename Value="/home/michael/Mailjet/svn/api/pkgmailjetapi.lpk"/>
+      <LastUsed Value="2017/02/27 16:16:09"/>
+    </Item160>
+    <Item161>
+      <Name Value="pkgmailjetbase"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/Mailjet/svn/lib/pkgmailjetbase.lpk"/>
+      <LastUsed Value="2017/02/27 16:16:09"/>
+    </Item161>
+    <Item162>
+      <Name Value="pkgtestduplicates"/>
+      <Filename Value="/home/michael/source/TMS/testduplicates/pkgtestduplicates.lpk"/>
+      <LastUsed Value="2018/09/13 16:11:54"/>
+    </Item162>
+    <Item163>
+      <Name Value="pkgwautils"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/wa/utils/pkgwautils.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item163>
+    <Item164>
+      <Name Value="prettyformat"/>
+      <Filename Value="articles/prettyformat/prettyformat.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item164>
+    <Item165>
+      <Name Value="ProjInfo"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/Documents/projinfo.lpk"/>
+      <LastUsed Value="2011/06/14 00:00:00"/>
+    </Item165>
+    <Item166>
+      <Name Value="ProjTemplates"/>
+      <Version Major="1"/>
+      <Filename Value="components/projecttemplates/projtemplates.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item166>
+    <Item167>
+      <Name Value="propform"/>
+      <Filename Value="components/rtticontrols/propertyform/propform.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item167>
+    <Item168>
+      <Name Value="puttyftp"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/puttyftp/puttyftp.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item168>
+    <Item169>
+      <Name Value="RunTimeTypeInfoControls"/>
+      <Version Minor="1"/>
+      <Filename Value="components/rtticontrols/runtimetypeinfocontrols.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item169>
+    <Item170>
+      <Name Value="SDFLaz"/>
+      <Version Minor="1" Release="1"/>
+      <Filename Value="components/sdf/sdflaz.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item170>
+    <Item171>
+      <Name Value="serial44"/>
+      <Version Major="4" Minor="4"/>
+      <Filename Value="/home/michael/source/lazarus/serial/serial44.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item171>
+    <Item172>
+      <Name Value="servermanagerapi"/>
+      <Filename Value="/home/michael/wisa/projects/servermanager/src/api/servermanagerapi.lpk"/>
+      <LastUsed Value="2016/04/23 23:08:46"/>
+    </Item172>
+    <Item173>
+      <Name Value="sesspropslpk"/>
+      <Filename Value="components/SessProps/sesspropslpk.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item173>
+    <Item174>
+      <Name Value="sgcWebSocketsLazarus"/>
+      <Version Major="4" Minor="4"/>
+      <Filename Value="/home/michael/source/sgcWebSockets/Indy/Packages/sgcWebSocketsLazarus.lpk"/>
+      <LastUsed Value="2020/06/18 17:32:47"/>
+    </Item174>
+    <Item175>
+      <Name Value="signinghub"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/signinghub/src/signinghub.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item175>
+    <Item176>
+      <Name Value="SimpleBaseLib4PascalPackage"/>
+      <Version Major="2" Minor="6"/>
+      <Filename Value="/home/michael/source/Projects/CryptoLib/Base/SimpleBaseLib/src/Packages/FPC/SimpleBaseLib4PascalPackage.lpk"/>
+      <LastUsed Value="2026/01/09 08:43:33"/>
+    </Item176>
+    <Item177>
+      <Name Value="sitemanagerapi"/>
+      <Filename Value="/home/michael/source/wisa/projects/sitemanager/src/api/sitemanagerapi.lpk"/>
+      <LastUsed Value="2026/01/18 17:24:06"/>
+    </Item177>
+    <Item178>
+      <Name Value="smartschoolapi"/>
+      <Filename Value="/home/michael/wisa/projects/webwisad/src/smartschool/smartschoolapi.lpk"/>
+      <LastUsed Value="2017/09/02 09:21:31"/>
+    </Item178>
+    <Item179>
+      <Name Value="SQLDBLaz"/>
+      <Version Major="1" Release="1"/>
+      <Filename Value="components/sqldb/sqldblaz.lpk"/>
+      <LastUsed Value="2015/01/24 00:00:00"/>
+    </Item179>
+    <Item180>
+      <Name Value="sqldbrestschemadesigner"/>
+      <Filename Value="components/sqldbrest/design/sqldbrestschemadesigner.lpk"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item180>
+    <Item181>
+      <Name Value="sqlitedslaz"/>
+      <Version Minor="3"/>
+      <Filename Value="components/sqlite/sqlitedslaz.lpk"/>
+      <LastUsed Value="1899/12/30 00:00:00"/>
+    </Item181>
+    <Item182>
+      <Name Value="textinfo"/>
+      <Filename Value="/home/michael/P2JS/martin/packages/TextInfo/textinfo.lpk"/>
+      <LastUsed Value="2021/10/17 20:21:00"/>
+    </Item182>
+    <Item183>
+      <Name Value="tiOPF"/>
+      <Version Major="2"/>
+      <Filename Value="/home/michael/source/lazarus/tiOPF2/Source/Compilers/FPC/tiOPF.lpk"/>
+      <LastUsed Value="2025/06/28 23:07:24"/>
+    </Item183>
+    <Item184>
+      <Name Value="tiOPF"/>
+      <Version Major="2" Release="4"/>
+      <Filename Value="/home/michael/source/Old/tiopf/Source-org/Compilers/FPC/tiOPF.lpk"/>
+      <LastUsed Value="2026/04/18 10:29:17"/>
+    </Item184>
+    <Item185>
+      <Name Value="tiOPFfpGUI"/>
+      <Version Major="2" Release="5"/>
+      <Filename Value="/home/michael/source/tiopf/Source/Compilers/FPC/tiOPFfpGUI.lpk"/>
+      <LastUsed Value="2011/03/26 00:00:00"/>
+    </Item185>
+    <Item186>
+      <Name Value="tiopfLCL"/>
+      <Version Major="2" Release="5"/>
+      <Filename Value="/home/michael/source/Old/tiopf/Source-org/Compilers/FPC/tiopflcl.lpk"/>
+      <LastUsed Value="2026/04/18 10:29:17"/>
+    </Item186>
+    <Item187>
+      <Name Value="tiOPF_Puntenboek"/>
+      <Version Major="2" Release="5"/>
+      <Filename Value="/home/michael/wisa/projects/fpcpackages/tiopf/Compilers/FPC/tiopf_puntenboek.lpk"/>
+      <LastUsed Value="2017/08/27 15:52:00"/>
+    </Item187>
+    <Item188>
+      <Name Value="tmswebcode_dsgn"/>
+      <Filename Value="/home/michael/source/TMS/tmswebcode_dsgn.lpk"/>
+      <LastUsed Value="2018/08/27 11:25:39"/>
+    </Item188>
+    <Item189>
+      <Name Value="TMSWebCore"/>
+      <Filename Value="/home/michael/source/TMS/webcore/tmswebcore.lpk"/>
+      <LastUsed Value="2018/09/17 10:51:06"/>
+    </Item189>
+    <Item190>
+      <Name Value="TMSWebCoreFNCCorePkg"/>
+      <Filename Value="/home/michael/source/TMS/FNC/core/tmswebcorefnccorepkg.lpk"/>
+      <LastUsed Value="2018/09/15 11:51:49"/>
+    </Item190>
+    <Item191>
+      <Name Value="tmswebcorefncuipackpkg"/>
+      <Filename Value="/home/michael/source/TMS/FNC/uipack/tmswebcorefncuipackpkg.lpk"/>
+      <LastUsed Value="2018/09/15 11:54:10"/>
+    </Item191>
+    <Item192>
+      <Name Value="TMSWEBCorePkgDeLaz"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/TMS/webcore/tmswebcorepkgdelaz.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item192>
+    <Item193>
+      <Name Value="TMSWEBCorePkgLibLaz"/>
+      <Version Major="1" Release="4"/>
+      <Filename Value="/home/michael/source/TMS/webcore/tmswebcorepkgliblaz.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item193>
+    <Item194>
+      <Name Value="UIBLaz"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/3rdParty/uib/source/uiblaz.lpk"/>
+      <LastUsed Value="2025/08/16 16:58:19"/>
+    </Item194>
+    <Item195>
+      <Name Value="volgsysteemapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/volgsysteem/src/volgsysteemapi.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item195>
+    <Item196>
+      <Name Value="waclouddata"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/clouddata/src/waclouddata.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item196>
+    <Item197>
+      <Name Value="waopf"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/wa/opf/waopf.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item197>
+    <Item198>
+      <Name Value="wawebprocess"/>
+      <Filename Value="/home/michael/wisa/projects/wisaweb/src/wa/webprocess/wawebprocess.lpk"/>
+      <LastUsed Value="2016/04/23 23:07:30"/>
+    </Item198>
+    <Item199>
+      <Name Value="wawst"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/wa/wst/wawst.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item199>
+    <Item200>
+      <Name Value="wclcomponents"/>
+      <Filename Value="/home/michael/source/Extended-wcl/wclcomponents.lpk"/>
+      <LastUsed Value="2021/11/17 13:35:42"/>
+    </Item200>
+    <Item201>
+      <Name Value="WebBrowser"/>
+      <Filename Value="/home/michael/source/lazarus/Lazarus.WebBrowser/webbrowser.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item201>
+    <Item202>
+      <Name Value="WebBrowserDsgn"/>
+      <Filename Value="/home/michael/source/lazarus/Lazarus.WebBrowser/webbrowserdsgn.lpk"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item202>
+    <Item203>
+      <Name Value="webdkoapi"/>
+      <Filename Value="/home/michael/wisa/projects/webdko/src/api/webdkoapi.lpk"/>
+      <LastUsed Value="2017/08/27 16:59:30"/>
+    </Item203>
+    <Item204>
+      <Name Value="webeventsapi"/>
+      <Filename Value="/home/michael/source/wisa/projects/webevents/src/api/webeventsapi.lpk"/>
+      <LastUsed Value="2026/02/02 21:35:46"/>
+    </Item204>
+    <Item205>
+      <Name Value="weblaz"/>
+      <Version Major="1"/>
+      <Filename Value="components/fpweb/weblaz.lpk"/>
+      <LastUsed Value="2022/04/02 13:21:17"/>
+    </Item205>
+    <Item206>
+      <Name Value="webleerlingapi"/>
+      <Filename Value="/home/michael/wisa/projects/webleerling/src/api/webleerlingapi.lpk"/>
+      <LastUsed Value="2017/02/17 09:57:33"/>
+    </Item206>
+    <Item207>
+      <Name Value="weboudersapi"/>
+      <Version Major="1" Minor="2" Release="3" Build="4"/>
+      <Filename Value="/home/michael/wisa/projects/webouders/src/api/weboudersapi.lpk"/>
+      <LastUsed Value="2017/02/17 10:10:53"/>
+    </Item207>
+    <Item208>
+      <Name Value="webvwoapi"/>
+      <Filename Value="/home/michael/source/wisa/projects/webvwo/src/api/webvwoapi.lpk"/>
+      <LastUsed Value="2025/11/24 22:29:59"/>
+    </Item208>
+    <Item209>
+      <Name Value="webvwoapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webcommon/vwo/src/webvwoapi.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item209>
+    <Item210>
+      <Name Value="webwisadapi"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/webwisad/src/api/webwisadapi.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item210>
+    <Item211>
+      <Name Value="wisadreports"/>
+      <Filename Value="/home/michael/wisa/projects/webwisad/src/reports/api/wisadreports.lpk"/>
+      <LastUsed Value="2017/05/09 15:17:12"/>
+    </Item211>
+    <Item212>
+      <Name Value="wisafpweb"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/fpweb/wisafpweb.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item212>
+    <Item213>
+      <Name Value="wisafpwebcore"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/fpweb/wisafpwebcore.lpk"/>
+      <LastUsed Value="2026/03/21 14:43:02"/>
+    </Item213>
+    <Item214>
+      <Name Value="wisagoogleapis"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/googleapis/wisagoogleapis.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item214>
+    <Item215>
+      <Name Value="wisavolgapi"/>
+      <Filename Value="/home/michael/wisa/projects/wisavolg/src/api/wisavolgapi.lpk"/>
+      <LastUsed Value="2017/10/03 19:17:02"/>
+    </Item215>
+    <Item216>
+      <Name Value="wisawebdb"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/core/wisawebdb.lpk"/>
+      <LastUsed Value="2026/05/17 20:19:51"/>
+    </Item216>
+    <Item217>
+      <Name Value="wst_core"/>
+      <Version Minor="6"/>
+      <Filename Value="/home/michael/source/3rdParty/WST/ide/lazarus/wst_core.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item217>
+    <Item218>
+      <Name Value="wst_design"/>
+      <Version Minor="1"/>
+      <Filename Value="/home/michael/source/fpc/wst/ide/lazarus/wst_design.lpk"/>
+      <LastUsed Value="2011/09/04 00:00:00"/>
+    </Item218>
+    <Item219>
+      <Name Value="wst_synapse"/>
+      <Version Minor="6"/>
+      <Filename Value="/home/michael/source/wisa/projects/fpcpackages/wst/ide/lazarus/wst_synapse.lpk"/>
+      <LastUsed Value="2025/06/29 10:28:35"/>
+    </Item219>
+    <Item220>
+      <Name Value="wst_synapse"/>
+      <Version Minor="8"/>
+      <Filename Value="/home/michael/source/3rdParty/WST/ide/lazarus/wst_synapse.lpk"/>
+      <LastUsed Value="2026/05/17 19:47:54"/>
+    </Item220>
+    <Item221>
+      <Name Value="wwclient"/>
+      <Version Major="1"/>
+      <Filename Value="/home/michael/source/wisa/projects/wisaweb/src/wwclient/wwclient.lpk"/>
+      <LastUsed Value="2026/03/21 16:37:50"/>
+    </Item221>
+    <Item222>
+      <Name Value="wwclient"/>
+      <Version Major="1" Minor="2" Release="2"/>
+      <Filename Value="/home/michael/wisa/projects/wisaweb/src/wwclient/wwclient.lpk"/>
+      <LastUsed Value="2017/08/27 15:52:00"/>
+    </Item222>
+  </UserPkgLinks>
+  <GlobalPkgLinks Version="3" Count="69">
+    <Item1>
+      <Name Value="anchordocking"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item1>
+    <Item2>
+      <Name Value="anchordockingdsgn"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item2>
+    <Item3>
+      <Name Value="appforms"/>
+      <Version Major="1"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item3>
+    <Item4>
+      <Name Value="buildintf"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item4>
+    <Item5>
+      <Name Value="charactermappkg"/>
+      <Version Minor="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item5>
+    <Item6>
+      <Name Value="charactermap_ide_pkg"/>
+      <Version Minor="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item6>
+    <Item7>
+      <Name Value="chmhelppkg"/>
+      <Version Minor="2" Release="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item7>
+    <Item8>
+      <Name Value="cmdlinedebuggerbase"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item8>
+    <Item9>
+      <Name Value="cody"/>
+      <Version Major="1" Minor="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item9>
+    <Item10>
+      <Name Value="datetimectrls"/>
+      <Version Major="1" Minor="5" Release="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item10>
+    <Item11>
+      <Name Value="datetimectrlsdsgn"/>
+      <Version Major="1" Minor="5" Release="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item11>
+    <Item12>
+      <Name Value="debuggerintf"/>
+      <Version Minor="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item12>
+    <Item13>
+      <Name Value="editormacroscript"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item13>
+    <Item14>
+      <Name Value="exampleprojects"/>
+      <Version Minor="8"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item14>
+    <Item15>
+      <Name Value="externhelp"/>
+      <Version Major="1" Minor="3"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item15>
+    <Item16>
+      <Name Value="fcl"/>
+      <Version Major="1" Release="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item16>
+    <Item17>
+      <Name Value="fpcunitconsolerunner"/>
+      <Version Major="1"/>
+      <LastUsed Value="2018/10/26 09:43:24"/>
+    </Item17>
+    <Item18>
+      <Name Value="fpdebug"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item18>
+    <Item19>
+      <Name Value="fpvectorialpkg"/>
+      <LastUsed Value="2022/10/20 21:23:54"/>
+    </Item19>
+    <Item20>
+      <Name Value="freetypelaz"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item20>
+    <Item21>
+      <Name Value="h2paswizard"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item21>
+    <Item22>
+      <Name Value="ideconfig"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item22>
+    <Item23>
+      <Name Value="idedebugger"/>
+      <Version Release="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item23>
+    <Item24>
+      <Name Value="ideintf"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item24>
+    <Item25>
+      <Name Value="idepackager"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item25>
+    <Item26>
+      <Name Value="ideproject"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item26>
+    <Item27>
+      <Name Value="ideutilspkg"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item27>
+    <Item28>
+      <Name Value="instantfpclaz"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item28>
+    <Item29>
+      <Name Value="jcfbase"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item29>
+    <Item30>
+      <Name Value="jcfidelazarus"/>
+      <Version Major="2"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item30>
+    <Item31>
+      <Name Value="jitclasses"/>
+      <Version Major="1"/>
+      <LastUsed Value="2021/10/17 20:22:02"/>
+    </Item31>
+    <Item32>
+      <Name Value="laz.virtualtreeview_package"/>
+      <Version Major="5" Minor="5" Release="3" Build="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item32>
+    <Item33>
+      <Name Value="lazcontroldsgn"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item33>
+    <Item34>
+      <Name Value="lazcustforms"/>
+      <Version Major="1"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item34>
+    <Item35>
+      <Name Value="lazdebuggerfp"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item35>
+    <Item36>
+      <Name Value="lazdebuggerfplldb"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item36>
+    <Item37>
+      <Name Value="lazdebuggergdbmi"/>
+      <Version Minor="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item37>
+    <Item38>
+      <Name Value="lazdebuggerintf"/>
+      <Version Release="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item38>
+    <Item39>
+      <Name Value="lazdebuggerlldb"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item39>
+    <Item40>
+      <Name Value="lazdelphi"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item40>
+    <Item41>
+      <Name Value="lazedit"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item41>
+    <Item42>
+      <Name Value="lazminimap"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item42>
+    <Item43>
+      <Name Value="lazmrumenu"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item43>
+    <Item44>
+      <Name Value="lazopenglcontext"/>
+      <Version Release="1"/>
+      <LastUsed Value="2017/12/16 21:19:32"/>
+    </Item44>
+    <Item45>
+      <Name Value="lazparadox"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item45>
+    <Item46>
+      <Name Value="lazprojectgroups"/>
+      <Version Minor="7"/>
+      <LastUsed Value="2017/12/16 12:37:57"/>
+    </Item46>
+    <Item47>
+      <Name Value="lazreport"/>
+      <Version Major="1"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item47>
+    <Item48>
+      <Name Value="lcl"/>
+      <Version Major="4" Minor="99"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item48>
+    <Item49>
+      <Name Value="lclbase"/>
+      <Version Major="4" Minor="99"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item49>
+    <Item50>
+      <Name Value="lclextensions_package"/>
+      <Version Minor="6" Release="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item50>
+    <Item51>
+      <Name Value="leakview"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item51>
+    <Item52>
+      <Name Value="lhelpcontrolpkg"/>
+      <Version Minor="2"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item52>
+    <Item53>
+      <Name Value="messagecomposerpkg"/>
+      <LastUsed Value="2020/11/18 20:17:32"/>
+    </Item53>
+    <Item54>
+      <Name Value="notlcldesigner"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item54>
+    <Item55>
+      <Name Value="onlinepackagemanager"/>
+      <Version Major="1" Release="1" Build="2"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item55>
+    <Item56>
+      <Name Value="pas2jsdsgn"/>
+      <Version Major="1" Release="2"/>
+      <LastUsed Value="2020/02/08 10:47:58"/>
+    </Item56>
+    <Item57>
+      <Name Value="pascalscript"/>
+      <Version Build="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item57>
+    <Item58>
+      <Name Value="printer4lazarus"/>
+      <Version Minor="5"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item58>
+    <Item59>
+      <Name Value="printers4lazide"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item59>
+    <Item60>
+      <Name Value="simplewebservergui"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item60>
+    <Item61>
+      <Name Value="sqldblaz"/>
+      <Version Major="1" Release="2"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item61>
+    <Item62>
+      <Name Value="synedit"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/25 14:56:52"/>
+    </Item62>
+    <Item63>
+      <Name Value="syneditdsgn"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item63>
+    <Item64>
+      <Name Value="tachartlazaruspkg"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item64>
+    <Item65>
+      <Name Value="tachartprint"/>
+      <Version Major="1"/>
+      <LastUsed Value="2024/01/07 11:28:51"/>
+    </Item65>
+    <Item66>
+      <Name Value="todolistlaz"/>
+      <Version Major="1" Release="3"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item66>
+    <Item67>
+      <Name Value="turbopoweripro"/>
+      <Version Major="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item67>
+    <Item68>
+      <Name Value="turbopoweriprodsgn"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item68>
+    <Item69>
+      <Name Value="weblaz"/>
+      <Version Major="1" Release="1"/>
+      <LastUsed Value="2026/06/23 22:44:46"/>
+    </Item69>
+  </GlobalPkgLinks>
+</CONFIG>
