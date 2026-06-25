@@ -18,25 +18,21 @@
 {
   WHY THIS EXISTS
   ---------------
-  An MCP GUI-control server lives *inside* the application under test, 
-  so its lifetime is the application's, not Claude's. 
-  But an MCP client enumerates its servers at its OWN startup -
-  when the app is usually not running yet and during a build/debug loop 
-  it is repeatedly stopped, recompiled and restarted.
+  An MCP GUI-control server lives *inside* the application under test, so its
+  lifetime is the app's, not Claude's. But an MCP client enumerates its servers
+  at its OWN startup - when the app is usually not running yet (and during a
+  build/debug loop it is repeatedly stopped, recompiled and restarted).
 
-  This program inverts the dependency. 
-  It is a tiny, headless STDIO MCP server that the client spawns at startup:
-  always available, no display needed to exist. 
-  It exposes four lifecycle tools - start, stop, restart, status - and
+  This program inverts the dependency. It is a tiny, headless STDIO MCP server
+  that the client spawns at startup (always available, no display needed to
+  exist). It exposes four lifecycle tools - start, stop, restart, status - and
   forwards every other MCP request to the target app's HTTP MCP endpoint.
 
-  It does NOT hardcode the app's tool set: 
-  tools/list is answered with the four lifecycle tools PLUS, 
-  when the app is running, the app's own live tools/list fetched over HTTP. 
-  start/stop emit notifications/tools/list_changed so the
+  It does NOT hardcode the app's tool set: tools/list is answered with the four
+  lifecycle tools PLUS, when the app is running, the app's own live tools/list
+  fetched over HTTP. start/stop emit notifications/tools/list_changed so the
   client refreshes and the app's tools appear/disappear.
 }
-
 program mcpsupervisor;
 
 {$mode objfpc}{$H+}
@@ -57,6 +53,20 @@ const
 
 type
 
+  { TPipeDrainThread }
+
+  // Keeps the child's merged stdout/stderr pipe empty so the child can never
+  // block (or die with RTE 101 "Disk full") on a write to it. Reads to EOF and
+  // discards everything.
+  TPipeDrainThread = class(TThread)
+  private
+    FPipe : TStream;
+  protected
+    procedure Execute; override;
+  public
+    constructor Create(aPipe : TStream);
+  end;
+
   { TMCPSupervisorApp }
 
   TMCPSupervisorApp = class(TCustomApplication)
@@ -66,8 +76,10 @@ type
     FController : TMCPController;
     FText : TMCPSTDIOTransport;
     FProc : TProcess;        // the launched app (nil when not running)
+    FDrain : TThread;        // drains the launched app's stdout/stderr pipe
     FAppId : Integer;        // id counter for proxy->app requests
     function AppRunning : Boolean;
+    procedure StopApp;
     function PostToApp(const aBody : String; aTimeoutMs : Integer; out aResponse : String) : Boolean;
     function ForwardRaw(aRequest : TJSONObject) : TJSONObject;
     function ProbeReady : Boolean;
@@ -110,21 +122,62 @@ begin
 end;
 
 
+{ TPipeDrainThread }
+
+constructor TPipeDrainThread.Create(aPipe : TStream);
+
+begin
+  FPipe := aPipe;
+  FreeOnTerminate := False; // the supervisor WaitFor's it, so it must survive
+  inherited Create(False);
+end;
+
+
+procedure TPipeDrainThread.Execute;
+
+var
+  lBuf : array[0..4095] of Byte;
+  lCount : LongInt;
+
+begin
+  // Read blocks while the child lives and is silent; it returns 0 once the
+  // child exits and the pipe's write end closes, ending the loop.
+  repeat
+    lCount := FPipe.Read(lBuf, SizeOf(lBuf));
+  until Terminated or (lCount <= 0);
+end;
+
+
 { TMCPSupervisorApp }
 
 destructor TMCPSupervisorApp.Destroy;
 
 begin
   // Never orphan the launched app when the client disconnects.
-  if Assigned(FProc) then
-    begin
-    if FProc.Running then
-      FProc.Terminate(0);
-    FreeAndNil(FProc);
-    end;
+  StopApp;
   FreeAndNil(FText);
   FreeAndNil(FController);
   inherited Destroy;
+end;
+
+
+// Terminates the launched app and reaps its drain thread, in that order: the
+// child must die first so the pipe's write end closes and the drain's blocking
+// Read returns, before we free the pipe the thread is reading.
+procedure TMCPSupervisorApp.StopApp;
+
+begin
+  if not Assigned(FProc) then
+    Exit;
+  if FProc.Running then
+    FProc.Terminate(0);
+  if Assigned(FDrain) then
+    begin
+    FDrain.Terminate;
+    FDrain.WaitFor;
+    FreeAndNil(FDrain);
+    end;
+  FreeAndNil(FProc);
 end;
 
 
@@ -235,12 +288,19 @@ begin
     aText := Format('{"ok":false,"error":"target binary not found","target":%s}', [JStr(FTarget).AsJSON]);
     Exit;
     end;
-  FreeAndNil(FProc);
+  StopApp; // reap any stale process/drain from a previous run
   FProc := TProcess.Create(nil);
   FProc.Executable := FTarget;
   FProc.CurrentDirectory := ExtractFileDir(FTarget);
-  FProc.Options := []; // do not wait; inherit environment (DISPLAY, etc.)
+  // Capture the child's stdout+stderr instead of inheriting OURS. poUsePipes
+  // redirects both onto supervisor-owned pipes (so the child can no longer
+  // write to our stdout - the MCP JSON-RPC channel); poStderrToOutPut merges
+  // stderr into that one pipe, which the drain thread keeps empty. Without
+  // this an undrained stderr fills its pipe and the child blocks, then fails
+  // RTE 101 "Disk full" on its next write. Environment is still inherited.
+  FProc.Options := [poUsePipes, poStderrToOutPut];
   FProc.Execute;
+  FDrain := TPipeDrainThread.Create(FProc.Output);
 
   lElapsed := 0;
   while lElapsed < ReadyTimeoutMs do
@@ -248,7 +308,7 @@ begin
     if not FProc.Running then
       begin
       aText := '{"ok":false,"error":"target exited during startup"}';
-      FreeAndNil(FProc);
+      StopApp;
       Exit;
       end;
     if ProbeReady then
@@ -269,12 +329,11 @@ procedure TMCPSupervisorApp.DoStop(out aText : String);
 begin
   if not AppRunning then
     begin
+    StopApp; // clears any stale process/drain
     aText := '{"ok":true,"alreadyStopped":true}';
-    FreeAndNil(FProc);
     Exit;
     end;
-  FProc.Terminate(0);
-  FreeAndNil(FProc);
+  StopApp;
   aText := '{"ok":true}';
   NotifyToolsChanged;
 end;
