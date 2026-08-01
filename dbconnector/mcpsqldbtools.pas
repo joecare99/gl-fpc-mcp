@@ -524,13 +524,16 @@ const
 var
   lQry : TSQLQuery;
   lType : string;
+  lIsWrite : Boolean;
 begin
+  lIsWrite:=False;
   lQry:=GetQuery(aConnection);
   try
     lQry.SQL.Text:=aSQL;
     DoLog(mltInfo,'Executing SQL on %s : %s',[aConnection.ConnectionURL(''),CapString(aSql)]);
     lQry.Prepare;
-    if not (lQry.StatementType in ReadStatements) then
+    lIsWrite:=not (lQry.StatementType in ReadStatements);
+    if lIsWrite and not ConnMgr.AllowModify then
       begin
       writeStr(lType,lQry.StatementType);
       Raise EMCPException.CreateFmt('Executing a statement of type %s is not allowed',[lType]);
@@ -539,7 +542,14 @@ begin
       begin
       FillParams(lQry.Params,aParams);
       end;
-    lQry.Open;
+    if lIsWrite then
+      begin
+      lQry.ExecSQL;
+      if lQry.SQLTransaction.Active then
+        lQry.SQLTransaction.Commit;
+      end
+    else
+      lQry.Open;
     Result:=QueryToJSON(lQry);
   finally
     ReleaseQuery(lQry);
