@@ -1,4 +1,4 @@
-{
+﻿{
     This file is part of the Free Component Library
 
     MCP socket server class, socket loop
@@ -22,7 +22,7 @@ unit mcp.dispatcher.serversocket;
 interface
 
 uses
-  Classes, SysUtils, fpjson, ssockets,
+  Classes, SysUtils, fpjson, ssockets, SyncObjs,
   mcp.controller, mcp.handler, mcp.dispatcher.base, mcp.transport.base, mcp.transport.socket;
 
 Const
@@ -65,6 +65,7 @@ Type
     FSingleConnect: Boolean;
     FSocket: TSocketServer;
     FThreadMode: TThreadMode;
+    FCS: TCriticalSection;
     FConns : TFPList;
     procedure SetController(const aValue: TMCPController);
   Protected
@@ -136,8 +137,6 @@ implementation
 
 uses mcp.logging, typinfo, sockets;
 
-
-
 { TMCPServerSocketConnectionDispatcher }
 
 procedure TMCPServerSocketConnection.SetController(const aValue: TMCPController);
@@ -164,7 +163,6 @@ end;
 procedure TMCPServerSocketConnection.SetTransport(const aValue: TMCPSocketTransport);
 begin
   if FTransport=aValue then Exit;
-
   FTransport:=aValue;
 end;
 
@@ -191,7 +189,6 @@ begin
 end;
 
 constructor TMCPServerSocketConnection.create(aOwner: TComponent);
-
 begin
   MCPLogger.Trace('%s Creating connection',[ClassName]);
   Inherited ;
@@ -206,7 +203,6 @@ begin
 end;
 
 procedure TMCPServerSocketConnection.RunLoop;
-
 Var
   Req,Resp : TJSONData;
   lRes : String;
@@ -255,14 +251,11 @@ begin
   FTerminated:=True;
 end;
 
-
 { TMCPSocketServer }
 
 function TMCPSocketServer.CreateConnection(Data: TSocketStream): TMCPServerSocketConnection;
-
 Var
   Trans : TMCPSocketTransport;
-
 begin
   Trans:=TMCPSocketTransport.Create(Data);
   Result:=TMCPServerSocketConnection.Create(Self);
@@ -272,10 +265,8 @@ end;
 
 procedure TMCPSocketServer.HandleConnection(Sender: TObject;
   Data: TSocketStream);
-
 var
   Conn : TMCPServerSocketConnection;
-
 begin
   Conn:=CreateConnection(Data);
   try
@@ -290,7 +281,8 @@ begin
         end;
     end;
   finally
-    Conn.Free;
+    if (ThreadMode = tmNone) or (Conn <> Nil) then
+      Conn.Free;
   end;
   if FSingleConnect then
     Terminate;
@@ -306,12 +298,14 @@ constructor TMCPSocketServer.Create(aOwner: TComponent);
 begin
   Inherited create(aOwner);
   FConns:=TFPList.Create;
+  FCS:=TCriticalSection.Create;
 end;
 
 destructor TMCPSocketServer.Destroy;
 begin
   FreeAndNil(FSocket);
   FreeAndNil(FConns);
+  FCS.Free;
   inherited Destroy;
 end;
 
@@ -336,28 +330,40 @@ begin
 end;
 
 procedure TMCPSocketServer.TerminateConnections;
-
 Var
   I : Integer;
-
 begin
-  For I:=FConns.Count-1 downto 0 do
-    TMCPServerSocketConnection(FConns[i]).Terminate;
+  FCS.Enter;
+  try
+    For I:=FConns.Count-1 downto 0 do
+      TMCPServerSocketConnection(FConns[i]).Terminate;
+  finally
+    FCS.Leave;
+  end;
 end;
 
 procedure TMCPSocketServer.RemoveConn(Sender: TObject);
 begin
-  FConns.Remove(Sender);
+  FCS.Enter;
+  try
+    FConns.Remove(Sender);
+  finally
+    FCS.Leave;
+  end;
 end;
 
 procedure TMCPSocketServer.AddConnection(aConn: TMCPServerSocketConnection);
 begin
   aConn.OnDestroy:=@RemoveConn;
-  FConns.Add(aConn);
+  FCS.Enter;
+  try
+    FConns.Add(aConn);
+  finally
+    FCS.Leave;
+  end;
 end;
 
 procedure TMCPSocketServer.RunLoop;
-
 begin
   if not assigned(FSocket) then
     Raise EMCPSocket.Create('Cannot run loop: Socket not assigned');
@@ -392,7 +398,6 @@ end;
 {$ENDIF}
 
 { TMCPServerTCPSocketDispatcher }
-
 procedure TMCPServerTCPSocketDispatcher.setPort(const aValue: Integer);
 begin
   if FPort=aValue then Exit;
@@ -422,7 +427,6 @@ begin
 end;
 
 { TMCPThread }
-
 procedure TMCPThread.DoTerminate;
 begin
   inherited DoTerminate;
@@ -446,4 +450,3 @@ begin
 end;
 
 end.
-
