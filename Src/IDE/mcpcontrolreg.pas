@@ -1,4 +1,4 @@
-{
+﻿{
     This file is part of the Free Component Library
 
     MCP Lazarus tool & resource registrations
@@ -187,7 +187,8 @@ var
   lFilename : string;
   lRes : TJSONObject;
 begin
-  lFileName:=(aInput as TJSONObject).Get('filename','');
+  lFileName:=(aInput as TJSONObject).Get('projectfile','');
+  if lFileName='' then lFileName:=(aInput as TJSONObject).Get('filename','');
   if lFileName='' then
     Raise EMCPException.Create('Need a filename');
   With TAddUnitCmd.Create(lFileName,False) do
@@ -237,7 +238,8 @@ var
   OK : Boolean;
 
 begin
-  lFileName:=(aInput as TJSONObject).Get('filename','');
+  lFileName:=(aInput as TJSONObject).Get('projectfile','');
+  if lFileName='' then lFileName:=(aInput as TJSONObject).Get('filename','');
   if lFileName='' then
     Raise EMCPException.Create('Need a filename');
   With TOpenProjectCmd.Create(lFileName) do
@@ -332,4 +334,5 @@ finalization
     _ToolController.Terminate;
   FreeAndNil(_ToolController);
 end.
+
 
