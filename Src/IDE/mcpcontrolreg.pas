@@ -293,6 +293,8 @@ begin
   RegisterStandardHandlers;
     FServer.Controller.ServiceName := 'lazarus-ide';
   FServer.Controller.ServiceVersion := '1.0.0';
+    FServer.SingleConnect := False;
+  FServer.ThreadMode := tmThreadPerConnection;
   FServer.Port:=10987;
   FServer.InitSocket;
   TThread.CreateAnonymousThread(@DoRunLoop).Start;
@@ -336,6 +338,7 @@ finalization
     _ToolController.Terminate;
   FreeAndNil(_ToolController);
 end.
+
 
 
 
