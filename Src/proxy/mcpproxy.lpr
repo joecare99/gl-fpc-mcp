@@ -58,6 +58,8 @@ Type
     function ParseOptions: Boolean;
     // Setup socket transport
     function SetupRemoteTransport: TMCPSocketTransport;
+    procedure EnsureRemoteTransport;
+    function CreateTransportError(aRequest: TJSONObject; const AMessage: String): TJSONObject;
     // Text loop callback to handle a request
     procedure HandleRequest(aRequest: TJSONObject; var aResponse: TJSONObject);
     // Socket transport non-response handling
@@ -80,6 +82,7 @@ begin
     mpmtDiagnostic: FText.SendDiagnostic(aMsg);
     mpmtRequest:
       begin
+      lData:=nil;
       try
         lData:=GetJSON(aMsg);
       except
@@ -175,15 +178,57 @@ begin
   Result.OnHandleFrame:=@DoHandleFrame;
 end;
 
+procedure TMCPProxyApplication.EnsureRemoteTransport;
+begin
+  if not Assigned(FDisp.Transport) or FDisp.Transport.SocketClosed then
+    FDisp.Transport:=SetupRemoteTransport;
+end;
+
+function TMCPProxyApplication.CreateTransportError(aRequest: TJSONObject;
+  const AMessage: String): TJSONObject;
+var
+  lID: TJSONData;
+begin
+  Result:=TJSONObject.Create;
+  Result.Add('jsonrpc','2.0');
+  lID:=aRequest.Find('id');
+  if Assigned(lID) then
+    Result.Add('id',lID.Clone)
+  else
+    Result.Add('id',TJSONNull.Create);
+  Result.Add('error',TJSONObject.Create([
+    'code',-32000,
+    'message','Remote MCP server unavailable: '+AMessage
+  ]));
+end;
+
 procedure TMCPProxyApplication.HandleRequest(aRequest : TJSONObject; var aResponse : TJSONObject);
 var
   lData : TJSONData;
 begin
-  lData:=FDisp.ExecuteRequest(aRequest);
-  if lData is TJSONObject then
-    aResponse:=TJSONObject(lData)
-  else
-    lData.Free;
+  aResponse:=nil;
+  try
+    EnsureRemoteTransport;
+    lData:=FDisp.ExecuteRequest(aRequest);
+    if lData is TJSONObject then
+      aResponse:=TJSONObject(lData)
+    else
+      lData.Free;
+    if not Assigned(aResponse) then
+      begin
+      FDisp.Transport:=nil;
+      if aRequest.IndexOfName('id')<>-1 then
+        aResponse:=CreateTransportError(aRequest,'The remote server closed the connection');
+      end;
+  except
+    on E: Exception do
+      begin
+      MCPLogger.LogException(E,'Remote MCP request failed');
+      FDisp.Transport:=nil;
+      if aRequest.IndexOfName('id')<>-1 then
+        aResponse:=CreateTransportError(aRequest,E.Message);
+      end;
+  end;
 end;
 
 procedure TMCPProxyApplication.DoMCPLog(aType: TMCPLogLevel; const Msg: string);
@@ -227,7 +272,6 @@ begin
   FController.RegisterTransport(FText);
   // Dispatcher is using remote transport
   FDisp:=TMCPClientSocketDispatcher.Create(FController);
-  FDisp.Transport:=SetupRemoteTransport;
   // Set up text loop
 
   FText.RunMessageLoop(@HandleRequest);
@@ -244,4 +288,3 @@ begin
 end.
 
 end.
-

@@ -1,4 +1,4 @@
-{
+﻿{
     This file is part of the Free Component Library
 
     MCP socket server class, socket loop
@@ -22,7 +22,7 @@ unit mcp.dispatcher.serversocket;
 interface
 
 uses
-  Classes, SysUtils, fpjson, ssockets,
+  Classes, SysUtils, fpjson, ssockets, SyncObjs,
   mcp.controller, mcp.handler, mcp.dispatcher.base, mcp.transport.base, mcp.transport.socket;
 
 Const
@@ -65,6 +65,8 @@ Type
     FSingleConnect: Boolean;
     FSocket: TSocketServer;
     FThreadMode: TThreadMode;
+    FConnectionTimeout: Integer;
+    FCS: TCriticalSection;
     FConns : TFPList;
     procedure SetController(const aValue: TMCPController);
   Protected
@@ -87,6 +89,9 @@ Type
   Published
     Property ThreadMode : TThreadMode Read FThreadMode Write FThreadMode;
     Property SingleConnect : Boolean Read FSingleConnect Write FSingleConnect;
+    // Maximum idle time for a connection's socket reads, in milliseconds.
+    // Zero disables the timeout.
+    Property ConnectionTimeout : Integer Read FConnectionTimeout Write FConnectionTimeout;
   end;
 
 {$IFDEF UNIX}
@@ -136,8 +141,6 @@ implementation
 
 uses mcp.logging, typinfo, sockets;
 
-
-
 { TMCPServerSocketConnectionDispatcher }
 
 procedure TMCPServerSocketConnection.SetController(const aValue: TMCPController);
@@ -154,6 +157,8 @@ begin
     begin
     FreeAndNil(FLocalDispatch);
     FLocalDispatch:=TMCPLocalDispatcher.Create(FController);
+    // The dispatcher belongs to this connection, not to the shared controller.
+    FController.RemoveComponent(FLocalDispatch);
     FLocalDispatch.OnMethodResult:=@DoMethodResult;
     FLocalDispatch.OnMethodError:=@DoMethodError;
     if Assigned(FTransport) then
@@ -164,8 +169,9 @@ end;
 procedure TMCPServerSocketConnection.SetTransport(const aValue: TMCPSocketTransport);
 begin
   if FTransport=aValue then Exit;
-
   FTransport:=aValue;
+  if Assigned(FLocalDispatch) then
+    FLocalDispatch.Transport:=FTransport;
 end;
 
 procedure TMCPServerSocketConnection.DoMethodResult(Sender: TObject;
@@ -191,7 +197,6 @@ begin
 end;
 
 constructor TMCPServerSocketConnection.create(aOwner: TComponent);
-
 begin
   MCPLogger.Trace('%s Creating connection',[ClassName]);
   Inherited ;
@@ -201,51 +206,62 @@ destructor TMCPServerSocketConnection.Destroy;
 begin
   If Assigned(FOnDestroy) then
     FOnDestroy(Self);
+  if Assigned(FController) and Assigned(FTransport) then
+    FController.UnRegisterTransport(FTransport);
+  FreeAndNil(FTransport);
+  FreeAndNil(FLocalDispatch);
   FreeAndNil(FContext);
   inherited Destroy;
 end;
 
 procedure TMCPServerSocketConnection.RunLoop;
-
 Var
   Req,Resp : TJSONData;
   lRes : String;
 begin
   MCPLogger.Trace('%s RunLoop - start',[ClassName]);
-  if not assigned(FLocalDispatch) then
-    begin
-    MCPLogger.Error('%s RunLoop - start but no local dispatcher',[ClassName]);
-    Raise EMCPSocket.Create('No local dispatcher available yet');
-    end;
-  Req:=Nil;
-  Resp:=Nil;
   try
-    While not Terminated do
+    if not assigned(FLocalDispatch) then
       begin
-      Req:=SocketTransport.ReceiveJSON(mpmtRequest);
-      if Assigned(Req) then
-        begin
-        MCPLogger.Trace('%s RunLoop - receive JSON: %s',[ClassName,Req.AsJSON]);
-        Resp:=FLocalDispatch.ExecuteRequest(req);
-        if Assigned(Resp) then
-          lRes:=Resp.AsJSON
-        else
-          lRes:='<NIL>';
-        MCPLogger.Trace('%s RunLoop - sending result: %s',[ClassName,lRes]);
-        if not SocketTransport.SendJSON(mpmtResponse,Resp) then
-          begin
-          MCPLogger.Debug('%s RunLoop - ending, response sent: %s',[ClassName,lRes]);
-          Terminate;
-          end;
-        end;
-      FreeAndNil(Resp);
-      FreeAndNil(Req);
-      if SocketTransport.SocketClosed then
-        Terminate;
+      MCPLogger.Error('%s RunLoop - start but no local dispatcher',[ClassName]);
+      Raise EMCPSocket.Create('No local dispatcher available yet');
       end;
-  finally
-    Req.Free;
-    Resp.Free;
+    Req:=Nil;
+    Resp:=Nil;
+    try
+      While not Terminated do
+        begin
+        Req:=SocketTransport.ReceiveJSON(mpmtRequest);
+        if Assigned(Req) then
+          begin
+          MCPLogger.Trace('%s RunLoop - receive JSON: %s',[ClassName,Req.AsJSON]);
+          Resp:=FLocalDispatch.ExecuteRequest(req);
+          if Assigned(Resp) then
+            lRes:=Resp.AsJSON
+          else
+            lRes:='<NIL>';
+          MCPLogger.Trace('%s RunLoop - sending result: %s',[ClassName,lRes]);
+          if not SocketTransport.SendJSON(mpmtResponse,Resp) then
+            begin
+            MCPLogger.Debug('%s RunLoop - ending, response send failed: %s',[ClassName,lRes]);
+            Terminate;
+            end;
+          end;
+        FreeAndNil(Resp);
+        FreeAndNil(Req);
+        if SocketTransport.SocketClosed then
+          Terminate;
+        end;
+    finally
+      Req.Free;
+      Resp.Free;
+    end;
+  except
+    on E: Exception do
+      begin
+      MCPLogger.LogException(E,'%s RunLoop disconnected',[ClassName]);
+      Terminate;
+      end;
   end;
   MCPLogger.Trace('%s RunLoop - end',[ClassName]);
 end;
@@ -253,17 +269,18 @@ end;
 procedure TMCPServerSocketConnection.Terminate;
 begin
   FTerminated:=True;
+  if Assigned(FTransport) then
+    FTransport.Close;
 end;
-
 
 { TMCPSocketServer }
 
 function TMCPSocketServer.CreateConnection(Data: TSocketStream): TMCPServerSocketConnection;
-
 Var
   Trans : TMCPSocketTransport;
-
 begin
+  if FConnectionTimeout>0 then
+    Data.IOTimeout:=FConnectionTimeout;
   Trans:=TMCPSocketTransport.Create(Data);
   Result:=TMCPServerSocketConnection.Create(Self);
   Result.SocketTransport:=Trans;
@@ -272,10 +289,8 @@ end;
 
 procedure TMCPSocketServer.HandleConnection(Sender: TObject;
   Data: TSocketStream);
-
 var
   Conn : TMCPServerSocketConnection;
-
 begin
   Conn:=CreateConnection(Data);
   try
@@ -290,7 +305,8 @@ begin
         end;
     end;
   finally
-    Conn.Free;
+    if (ThreadMode = tmNone) or (Conn <> Nil) then
+      Conn.Free;
   end;
   if FSingleConnect then
     Terminate;
@@ -306,12 +322,15 @@ constructor TMCPSocketServer.Create(aOwner: TComponent);
 begin
   Inherited create(aOwner);
   FConns:=TFPList.Create;
+  FCS:=TCriticalSection.Create;
+  FConnectionTimeout:=300000;
 end;
 
 destructor TMCPSocketServer.Destroy;
 begin
   FreeAndNil(FSocket);
   FreeAndNil(FConns);
+  FCS.Free;
   inherited Destroy;
 end;
 
@@ -336,28 +355,40 @@ begin
 end;
 
 procedure TMCPSocketServer.TerminateConnections;
-
 Var
   I : Integer;
-
 begin
-  For I:=FConns.Count-1 downto 0 do
-    TMCPServerSocketConnection(FConns[i]).Terminate;
+  FCS.Enter;
+  try
+    For I:=FConns.Count-1 downto 0 do
+      TMCPServerSocketConnection(FConns[i]).Terminate;
+  finally
+    FCS.Leave;
+  end;
 end;
 
 procedure TMCPSocketServer.RemoveConn(Sender: TObject);
 begin
-  FConns.Remove(Sender);
+  FCS.Enter;
+  try
+    FConns.Remove(Sender);
+  finally
+    FCS.Leave;
+  end;
 end;
 
 procedure TMCPSocketServer.AddConnection(aConn: TMCPServerSocketConnection);
 begin
   aConn.OnDestroy:=@RemoveConn;
-  FConns.Add(aConn);
+  FCS.Enter;
+  try
+    FConns.Add(aConn);
+  finally
+    FCS.Leave;
+  end;
 end;
 
 procedure TMCPSocketServer.RunLoop;
-
 begin
   if not assigned(FSocket) then
     Raise EMCPSocket.Create('Cannot run loop: Socket not assigned');
@@ -392,7 +423,6 @@ end;
 {$ENDIF}
 
 { TMCPServerTCPSocketDispatcher }
-
 procedure TMCPServerTCPSocketDispatcher.setPort(const aValue: Integer);
 begin
   if FPort=aValue then Exit;
@@ -422,7 +452,6 @@ begin
 end;
 
 { TMCPThread }
-
 procedure TMCPThread.DoTerminate;
 begin
   inherited DoTerminate;
@@ -446,4 +475,3 @@ begin
 end;
 
 end.
-

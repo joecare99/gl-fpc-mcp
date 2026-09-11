@@ -1,0 +1,9 @@
+object MCPOptionsFrame: TMCPOptionsFrame
+  Left = 0
+  Height = 400
+  Top = 0
+  Width = 600
+  ClientHeight = 400
+  ClientWidth = 600
+  TabOrder = 0
+end
