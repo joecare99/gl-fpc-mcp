@@ -18,6 +18,7 @@ const
   );
 
 function MCPToolPolicyName(APolicy: TMCPToolPolicy): string;
+function MCPToolDescription(const AToolName: string): string;
 function MCPToolPolicyFromName(const AName: string;
   ADefault: TMCPToolPolicy): TMCPToolPolicy;
 function MCPDefaultToolPolicy(const AToolName: string): TMCPToolPolicy;
@@ -54,6 +55,34 @@ begin
   else
     Result:='Ask';
   end;
+end;
+
+function MCPToolDescription(const AToolName: string): string;
+begin
+  if SameText(AToolName,'openproject') then
+    Result:='Open an existing Lazarus project.'
+  else if SameText(AToolName,'newproject') then
+    Result:='Create a new Lazarus project.'
+  else if SameText(AToolName,'newnunit') then
+    Result:='Create and add a new unit to the active project.'
+  else if SameText(AToolName,'addnunit') then
+    Result:='Open and add an existing unit to the active project.'
+  else if SameText(AToolName,'compile') then
+    Result:='Compile or build the active Lazarus project.'
+  else if SameText(AToolName,'getWorkspaceInfo') then
+    Result:='Inspect the active project and its main file.'
+  else if SameText(AToolName,'listProjectFiles') then
+    Result:='List files belonging to the active project.'
+  else if SameText(AToolName,'listOpenEditors') then
+    Result:='List open source editors and their state.'
+  else if SameText(AToolName,'getActiveEditor') then
+    Result:='Inspect the active editor, cursor, and selection.'
+  else if SameText(AToolName,'readEditorText') then
+    Result:='Read a bounded range from an open project editor.'
+  else if SameText(AToolName,'getBuildMessages') then
+    Result:='Read messages from the Lazarus build window.'
+  else
+    Result:='';
 end;
 
 function MCPToolPolicyFromName(const AName: string;

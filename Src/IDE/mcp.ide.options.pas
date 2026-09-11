@@ -13,6 +13,7 @@ type
   TMCPOptionsFrame = class(TAbstractIDEOptionsEditor)
   private
     FCombos: array[Low(MCPToolNames)..High(MCPToolNames)] of TComboBox;
+    FScrollBox: TScrollBox;
     procedure ComboChanged(Sender: TObject);
     procedure LoadPolicies(AConfig: TConfigStorage);
     procedure SavePolicies(AConfig: TConfigStorage);
@@ -39,26 +40,39 @@ var
 begin
   inherited Create(AOwner);
   Align:=alClient;
+  FScrollBox:=TScrollBox.Create(Self);
+  FScrollBox.Parent:=Self;
+  FScrollBox.Align:=alClient;
+  FScrollBox.BorderStyle:=bsNone;
   for I:=Low(MCPToolNames) to High(MCPToolNames) do
     begin
     L:=TLabel.Create(Self);
-    L.Parent:=Self;
+    L.Parent:=FScrollBox;
     L.Caption:=MCPToolNames[I];
     L.Left:=12;
-    L.Top:=12+I*30;
+    L.Top:=12+I*42;
     L.AutoSize:=True;
     FCombos[I]:=TComboBox.Create(Self);
-    FCombos[I].Parent:=Self;
+    FCombos[I].Parent:=FScrollBox;
     FCombos[I].Style:=csDropDownList;
     FCombos[I].Items.Add('Disabled');
     FCombos[I].Items.Add('Allowed');
     FCombos[I].Items.Add('Ask');
     FCombos[I].ItemIndex:=2;
     FCombos[I].Left:=180;
-    FCombos[I].Top:=8+I*30;
+    FCombos[I].Top:=8+I*42;
     FCombos[I].Width:=120;
     FCombos[I].Tag:=I;
     FCombos[I].OnChange:=@ComboChanged;
+    L:=TLabel.Create(Self);
+    L.Parent:=FScrollBox;
+    L.Caption:=MCPToolDescription(MCPToolNames[I]);
+    L.Left:=320;
+    L.Top:=12+I*42;
+    L.Width:=360;
+    L.Height:=34;
+    L.AutoSize:=False;
+    L.WordWrap:=True;
     end;
 end;
 

@@ -14,6 +14,7 @@ type
     procedure TestActionToolsAskByDefault;
     procedure TestPolicyParsingUsesFallback;
     procedure TestArgumentSummaryIsBounded;
+    procedure TestEveryToolHasDescription;
   end;
 
 implementation
@@ -53,6 +54,14 @@ begin
   finally
     O.Free;
   end;
+end;
+
+procedure TMCPIDEPolicyTest.TestEveryToolHasDescription;
+var
+  I: Integer;
+begin
+  for I:=Low(MCPToolNames) to High(MCPToolNames) do
+    AssertTrue(MCPToolNames[I],MCPToolDescription(MCPToolNames[I])<>'');
 end;
 
 initialization
