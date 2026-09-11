@@ -22,7 +22,8 @@ interface
 uses
   SysUtils, Controls, Classes, LazIDEIntf, ProjectIntf, CompOptsIntf,
   SrcEditorIntf, IDEMsgIntf, IDEExternToolIntf, fpjson, mcp.types,
-  mcp.tools, mcp.dispatcher.serversocket, mcp.stdhandlers, mcp.controller, mcp.logging;
+  mcp.tools, mcp.ide.tooldata, mcp.dispatcher.serversocket, mcp.stdhandlers,
+  mcp.controller, mcp.logging;
 
 type
 
@@ -264,15 +265,11 @@ begin
   P:=LazarusIDE.ActiveProject;
   if not Assigned(P) or (E.GetProjectFile=nil) then
     raise EMCPException.Create('File is not part of the active project');
-  if not SameText(ExpandFileName(E.GetProjectFile.GetFullFilename),
-    ExpandFileName(FileName)) then
+  if not SameIDEFile(E.GetProjectFile.GetFullFilename,FileName) then
     raise EMCPException.Create('File is not part of the active project');
-  if StartLine<1 then StartLine:=1;
-  LastLine:=EndLine;
-  if LastLine<StartLine then LastLine:=StartLine;
-  if LastLine-StartLine>499 then
-    raise EMCPException.Create('Maximum range is 500 lines');
-  if LastLine>E.LineCount then LastLine:=E.LineCount;
+  if not NormalizeEditorRange(StartLine,EndLine,E.LineCount,
+    StartLine,LastLine) then
+    raise EMCPException.Create('Invalid editor range; maximum range is 500 lines');
   Lines:=TJSONArray.Create;
   for I:=StartLine-1 to LastLine-1 do
     Lines.Add(E.Lines[I]);
