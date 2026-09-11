@@ -294,7 +294,10 @@ begin
     FServer.Controller.ServiceName := 'lazarus-ide';
   FServer.Controller.ServiceVersion := '1.0.0';
     FServer.SingleConnect := False;
-  FServer.ThreadMode := tmThreadPerConnection;
+    // Keep the controller and its registries single-threaded. A disconnected
+    // client is handled as a normal end-of-stream and the accept loop continues.
+    FServer.ThreadMode := tmNone;
+    FServer.ConnectionTimeout := 300000;
   FServer.Port:=10987;
   FServer.InitSocket;
   TThread.CreateAnonymousThread(@DoRunLoop).Start;
@@ -338,4 +341,3 @@ finalization
     _ToolController.Terminate;
   FreeAndNil(_ToolController);
 end.
-

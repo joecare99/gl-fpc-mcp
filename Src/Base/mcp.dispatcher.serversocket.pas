@@ -65,6 +65,7 @@ Type
     FSingleConnect: Boolean;
     FSocket: TSocketServer;
     FThreadMode: TThreadMode;
+    FConnectionTimeout: Integer;
     FCS: TCriticalSection;
     FConns : TFPList;
     procedure SetController(const aValue: TMCPController);
@@ -88,6 +89,9 @@ Type
   Published
     Property ThreadMode : TThreadMode Read FThreadMode Write FThreadMode;
     Property SingleConnect : Boolean Read FSingleConnect Write FSingleConnect;
+    // Maximum idle time for a connection's socket reads, in milliseconds.
+    // Zero disables the timeout.
+    Property ConnectionTimeout : Integer Read FConnectionTimeout Write FConnectionTimeout;
   end;
 
 {$IFDEF UNIX}
@@ -153,6 +157,8 @@ begin
     begin
     FreeAndNil(FLocalDispatch);
     FLocalDispatch:=TMCPLocalDispatcher.Create(FController);
+    // The dispatcher belongs to this connection, not to the shared controller.
+    FController.RemoveComponent(FLocalDispatch);
     FLocalDispatch.OnMethodResult:=@DoMethodResult;
     FLocalDispatch.OnMethodError:=@DoMethodError;
     if Assigned(FTransport) then
@@ -164,6 +170,8 @@ procedure TMCPServerSocketConnection.SetTransport(const aValue: TMCPSocketTransp
 begin
   if FTransport=aValue then Exit;
   FTransport:=aValue;
+  if Assigned(FLocalDispatch) then
+    FLocalDispatch.Transport:=FTransport;
 end;
 
 procedure TMCPServerSocketConnection.DoMethodResult(Sender: TObject;
@@ -198,6 +206,10 @@ destructor TMCPServerSocketConnection.Destroy;
 begin
   If Assigned(FOnDestroy) then
     FOnDestroy(Self);
+  if Assigned(FController) and Assigned(FTransport) then
+    FController.UnRegisterTransport(FTransport);
+  FreeAndNil(FTransport);
+  FreeAndNil(FLocalDispatch);
   FreeAndNil(FContext);
   inherited Destroy;
 end;
@@ -208,40 +220,48 @@ Var
   lRes : String;
 begin
   MCPLogger.Trace('%s RunLoop - start',[ClassName]);
-  if not assigned(FLocalDispatch) then
-    begin
-    MCPLogger.Error('%s RunLoop - start but no local dispatcher',[ClassName]);
-    Raise EMCPSocket.Create('No local dispatcher available yet');
-    end;
-  Req:=Nil;
-  Resp:=Nil;
   try
-    While not Terminated do
+    if not assigned(FLocalDispatch) then
       begin
-      Req:=SocketTransport.ReceiveJSON(mpmtRequest);
-      if Assigned(Req) then
-        begin
-        MCPLogger.Trace('%s RunLoop - receive JSON: %s',[ClassName,Req.AsJSON]);
-        Resp:=FLocalDispatch.ExecuteRequest(req);
-        if Assigned(Resp) then
-          lRes:=Resp.AsJSON
-        else
-          lRes:='<NIL>';
-        MCPLogger.Trace('%s RunLoop - sending result: %s',[ClassName,lRes]);
-        if not SocketTransport.SendJSON(mpmtResponse,Resp) then
-          begin
-          MCPLogger.Debug('%s RunLoop - ending, response sent: %s',[ClassName,lRes]);
-          Terminate;
-          end;
-        end;
-      FreeAndNil(Resp);
-      FreeAndNil(Req);
-      if SocketTransport.SocketClosed then
-        Terminate;
+      MCPLogger.Error('%s RunLoop - start but no local dispatcher',[ClassName]);
+      Raise EMCPSocket.Create('No local dispatcher available yet');
       end;
-  finally
-    Req.Free;
-    Resp.Free;
+    Req:=Nil;
+    Resp:=Nil;
+    try
+      While not Terminated do
+        begin
+        Req:=SocketTransport.ReceiveJSON(mpmtRequest);
+        if Assigned(Req) then
+          begin
+          MCPLogger.Trace('%s RunLoop - receive JSON: %s',[ClassName,Req.AsJSON]);
+          Resp:=FLocalDispatch.ExecuteRequest(req);
+          if Assigned(Resp) then
+            lRes:=Resp.AsJSON
+          else
+            lRes:='<NIL>';
+          MCPLogger.Trace('%s RunLoop - sending result: %s',[ClassName,lRes]);
+          if not SocketTransport.SendJSON(mpmtResponse,Resp) then
+            begin
+            MCPLogger.Debug('%s RunLoop - ending, response send failed: %s',[ClassName,lRes]);
+            Terminate;
+            end;
+          end;
+        FreeAndNil(Resp);
+        FreeAndNil(Req);
+        if SocketTransport.SocketClosed then
+          Terminate;
+        end;
+    finally
+      Req.Free;
+      Resp.Free;
+    end;
+  except
+    on E: Exception do
+      begin
+      MCPLogger.LogException(E,'%s RunLoop disconnected',[ClassName]);
+      Terminate;
+      end;
   end;
   MCPLogger.Trace('%s RunLoop - end',[ClassName]);
 end;
@@ -249,6 +269,8 @@ end;
 procedure TMCPServerSocketConnection.Terminate;
 begin
   FTerminated:=True;
+  if Assigned(FTransport) then
+    FTransport.Close;
 end;
 
 { TMCPSocketServer }
@@ -257,6 +279,8 @@ function TMCPSocketServer.CreateConnection(Data: TSocketStream): TMCPServerSocke
 Var
   Trans : TMCPSocketTransport;
 begin
+  if FConnectionTimeout>0 then
+    Data.IOTimeout:=FConnectionTimeout;
   Trans:=TMCPSocketTransport.Create(Data);
   Result:=TMCPServerSocketConnection.Create(Self);
   Result.SocketTransport:=Trans;
@@ -299,6 +323,7 @@ begin
   Inherited create(aOwner);
   FConns:=TFPList.Create;
   FCS:=TCriticalSection.Create;
+  FConnectionTimeout:=300000;
 end;
 
 destructor TMCPSocketServer.Destroy;

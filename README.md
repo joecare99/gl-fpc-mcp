@@ -19,6 +19,7 @@ the Pascal AI workshop organized by Blaise Pascal Magazine on 2025-07-12.
 * [Src/Client](Src/IDE) Contains the units with classes to create a MCP client. 
 * [Src/IDE](Src/IDE) Contains the packages for Lazarus IDE integration
 * [Src/proxy](Src/proxy) Contains the MCP proxy (using the private socket protocol)
+  * [`mcpproxy` lifecycle and reconnect behavior](Src/proxy/README-mcpproxy.md)
 * [demo](demo) Contains a demo project. Simulates a weather service
 * [dbconnector](dbconnector) Contains a MCP server allowing to execute SQL statements on a database/
 

@@ -91,6 +91,7 @@ Type
     // Read frames till a frame with type aType is read.
     function ReceiveJSON(aType: TMCPProtocolMessageType): TJSONData;
     function SendJSON(aType: TMCPProtocolMessageType; aJSON : TJSONData) : Boolean;
+    procedure Close;
     // Socket is owned by this transport instance.
     Property Socket : TSocketStream Read FSocket;
     // True when last read indicated socket is closed.
@@ -147,6 +148,12 @@ begin
   inherited Destroy;
 end;
 
+procedure TMCPSocketTransport.Close;
+begin
+  FSocketClosed := True;
+  FreeAndNil(FSocket);
+end;
+
 procedure TMCPSocketTransport.DoSendMessage(aMessage: TJSONData);
 begin
   SendJSON(mpmtMessage,aMessage);
@@ -177,21 +184,24 @@ Var
 
 begin
   Result:=False;
+  if FSocketClosed or not Assigned(Socket) then
+    Exit;
   N:=0;
-  if Socket.Write(Msg.Version,SizeOf(Byte))=0 then
-    begin
-    FSocketClosed:=True;
-    exit;
-    end;
   try
+    if Socket.Write(Msg.Version,SizeOf(Byte))=0 then
+      begin
+      FSocketClosed:=True;
+      exit;
+      end;
     Socket.WriteBuffer(Msg.MsgType,SizeOf(Byte));
     N:=htonl(Msg.ID);
     Socket.WriteBuffer(N,SizeOf(cardinal));
     N:=htonl(Msg.PayloadLen);
     Socket.WriteBuffer(N,SizeOf(cardinal));
-    Socket.WriteBuffer(Msg.Payload[0],Msg.PayloadLen);
+    if Msg.PayloadLen>0 then
+      Socket.WriteBuffer(Msg.Payload[0],Msg.PayloadLen);
+    Result:=True;
   except
-    // Rather crude
     FSocketClosed:=True;
   end;
 end;
@@ -205,20 +215,26 @@ begin
   Result:=False;
   N:=0;
   Msg:=Default(TMCPFrame);
-  if Socket.Read(Msg.Version,SizeOf(Byte))=0 then
-    begin
+  if FSocketClosed or not Assigned(Socket) then
+    Exit;
+  try
+    if Socket.Read(Msg.Version,SizeOf(Byte))=0 then
+      begin
+      FSocketClosed:=True;
+      exit;
+      end;
+    Socket.ReadBuffer(Msg.MsgType,SizeOf(Byte));
+    Socket.ReadBuffer(N,SizeOf(cardinal));
+    Msg.ID:=ntohl(N);
+    Socket.ReadBuffer(N,SizeOf(cardinal));
+    Msg.PayloadLen:=ntohl(N);
+    SetLength(Msg.Payload,Msg.PayloadLen);
+    if Msg.PayloadLen>0 then
+      Socket.ReadBuffer(Msg.Payload[0],Msg.PayloadLen);
+    Result:=(Msg.Version=MCPProtocolVersion);
+  except
     FSocketClosed:=True;
-    exit;
-    end;
-  Socket.ReadBuffer(Msg.MsgType,SizeOf(Byte));
-  Socket.ReadBuffer(N,SizeOf(cardinal));
-  Msg.ID:=ntohl(N);
-  Socket.ReadBuffer(N,SizeOf(cardinal));
-  Msg.PayloadLen:=ntohl(N);
-  SetLength(Msg.Payload,Msg.PayloadLen);
-  if Msg.PayloadLen>0 then
-    Socket.ReadBuffer(Msg.Payload[0],Msg.PayloadLen);
-  Result:=(Msg.Version=MCPProtocolVersion);
+  end;
 end;
 
 
@@ -239,8 +255,7 @@ begin
     JS:='';
   Msg.PayLoad:=TEncoding.UTF8.GetAnsiBytes(JS);
   Msg.PayloadLen:=Length(Msg.PayLoad);
-  SendFrame(Msg);
-  Result:=True;
+  Result:=SendFrame(Msg);
 end;
 
 function TMCPSocketTransport.ReceiveJSON(aType: TMCPProtocolMessageType): TJSONData;
@@ -268,4 +283,3 @@ begin
 end;
 
 end.
-

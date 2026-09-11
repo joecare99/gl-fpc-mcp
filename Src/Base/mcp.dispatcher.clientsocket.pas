@@ -34,6 +34,7 @@ type
     FTransport: TMCPSocketTransport;
     function GetMCPTransport: TMCPSocketTransport;
     function GetSocket: TSocketStream;
+    procedure SetTransport(const AValue: TMCPSocketTransport);
   Protected
     function GetTransport: TMCPMessageTransport; override;
     function HandleException(aException: Exception; IsReceive : Boolean): Boolean; virtual;
@@ -43,7 +44,7 @@ type
     Constructor Create(aController : TMCPController); reintroduce;
     Destructor Destroy; override;
     function ExecuteRequest(aRequest: TJSONData): TJSONData; override;
-    Property Transport : TMCPSocketTransport Read GetMCPTransport Write FTransport;
+    Property Transport : TMCPSocketTransport Read GetMCPTransport Write SetTransport;
     Property Socket : TSocketStream Read GetSocket;
   end;
 
@@ -61,6 +62,7 @@ end;
 
 destructor TMCPClientSocketDispatcher.Destroy;
 begin
+  FreeAndNil(FTransport);
   inherited Destroy;
 end;
 
@@ -77,6 +79,14 @@ end;
 function TMCPClientSocketDispatcher.GetTransport: TMCPMessageTransport;
 begin
   Result:=FTransport;
+end;
+
+procedure TMCPClientSocketDispatcher.SetTransport(const AValue: TMCPSocketTransport);
+begin
+  if FTransport=AValue then
+    Exit;
+  FreeAndNil(FTransport);
+  FTransport:=AValue;
 end;
 
 function TMCPClientSocketDispatcher.HandleException(aException : Exception; IsReceive : Boolean) : Boolean;
@@ -107,4 +117,3 @@ begin
 end;
 
 end.
-
