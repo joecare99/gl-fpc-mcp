@@ -8,7 +8,7 @@ unit mcplazcontrol;
 interface
 
 uses
-  mcpcontrolreg, LazarusPackageIntf;
+  mcpcontrolreg, mcp.ide.policy, mcp.ide.options, LazarusPackageIntf;
 
 implementation
 

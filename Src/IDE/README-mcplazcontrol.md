@@ -4,6 +4,20 @@ The `mcplazcontrol` package exposes a loopback MCP server on port `10987`.
 The server runs IDE operations on Lazarus's main thread and currently provides
 the original project actions plus read-only inspection tools.
 
+## Tool permissions
+
+The package adds an **MCP Tools** page to Lazarus's native
+**Tools -> Options -> Environment** dialog. Each tool can be set to:
+
+- **Allowed**: execute without prompting.
+- **Ask**: show a Lazarus confirmation dialog for every invocation.
+- **Disabled**: do not register the tool or expose it through `tools/list`.
+
+The defaults allow the read-only inspection tools and ask before project
+changes or compilation. A client cannot grant itself permission. Changes to
+tool visibility take effect after restarting the IDE; the approval mode is
+checked when a tool is invoked.
+
 ## Read-only inspection tools
 
 - `getWorkspaceInfo` returns the active project file, project directory, main

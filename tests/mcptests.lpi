@@ -97,6 +97,10 @@
         <Filename Value="mcp.ide.tooldata.test.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="mcp.ide.policy.test.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

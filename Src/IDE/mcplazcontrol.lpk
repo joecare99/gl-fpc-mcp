@@ -15,6 +15,14 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="mcpcontrolreg"/>
       </Item>
+      <Item>
+        <Filename Value="mcp.ide.policy.pas"/>
+        <UnitName Value="mcp.ide.policy"/>
+      </Item>
+      <Item>
+        <Filename Value="mcp.ide.options.pas"/>
+        <UnitName Value="mcp.ide.options"/>
+      </Item>
     </Files>
     <RequiredPkgs>
       <Item>

@@ -20,9 +20,10 @@ unit mcpcontrolreg;
 interface
 
 uses
-  SysUtils, Controls, Classes, LazIDEIntf, ProjectIntf, CompOptsIntf,
+  SysUtils, Controls, Classes, Contnrs, Dialogs, LazIDEIntf, ProjectIntf, CompOptsIntf,
+  BaseIDEIntf, LazConfigStorage,
   SrcEditorIntf, IDEMsgIntf, IDEExternToolIntf, fpjson, mcp.types,
-  mcp.tools, mcp.ide.tooldata, mcp.dispatcher.serversocket, mcp.stdhandlers,
+  mcp.tools, mcp.ide.tooldata, mcp.ide.policy, mcp.dispatcher.serversocket, mcp.stdhandlers,
   mcp.controller, mcp.logging;
 
 type
@@ -33,7 +34,10 @@ type
   private
     FLog : TFileStream;
     FServer: TMCPServerTCPSocketDispatcher;
+    FInvokers: TObjectList;
     procedure DoMCPLog(aType: TMCPLogLevel; const Msg: string);
+    function CreateConfiguredTool(const AName, ADescription: string;
+      AHandler: TToolInvocationEvent): TMCPEventTool;
   protected
     function CreateJSONResult(const aContent: Array of const): TMCPToolResultArray;
     function JSONToResult(aJSON: TJSONObject): TMCPToolResultArray;
@@ -77,6 +81,21 @@ begin
 end;
 
 type
+   TToolApprovalCmd = class
+     ToolName: string;
+     Arguments: string;
+     Approved: Boolean;
+     procedure Execute;
+   end;
+
+   TPolicyToolInvoker = class
+     FToolName: string;
+     FHandler: TToolInvocationEvent;
+     procedure Invoke(AInput: TJSONData; var AOutput: TMCPToolResultArray);
+   public
+     constructor Create(const AToolName: string; AHandler: TToolInvocationEvent);
+   end;
+
    TLazCmd = class(TObject)
      ExecuteResult : boolean;
    end;
@@ -88,8 +107,6 @@ type
      Constructor Create(aFileName : string; aisNew : Boolean);
      Procedure Execute;
    end;
-
-   { TOpenProjectCmd }
 
    TOpenProjectCmd = Class(TLazCmd)
      FFileName: string;
@@ -137,6 +154,45 @@ type
      Result: TJSONArray;
      Procedure Execute;
    end;
+
+procedure TToolApprovalCmd.Execute;
+begin
+  Approved:=MessageDlg('MCP tool permission',
+    'Allow MCP tool "'+ToolName+'"?'#13#10#13#10+
+    Arguments,mtConfirmation,[mbYes,mbNo],0)=mrYes;
+end;
+
+constructor TPolicyToolInvoker.Create(const AToolName: string;
+  AHandler: TToolInvocationEvent);
+begin
+  FToolName:=AToolName;
+  FHandler:=AHandler;
+end;
+
+procedure TPolicyToolInvoker.Invoke(AInput: TJSONData;
+  var AOutput: TMCPToolResultArray);
+var
+  C: TToolApprovalCmd;
+begin
+  if MCPToolPolicies[FToolName]=mtpDisabled then
+    raise EMCPException.Create('MCP tool "'+FToolName+'" is disabled');
+  if MCPToolPolicies[FToolName]<>mtpAsk then
+    begin
+    FHandler(AInput,AOutput);
+    Exit;
+    end;
+  C:=TToolApprovalCmd.Create;
+  try
+    C.ToolName:=FToolName;
+    C.Arguments:=MCPToolArgumentSummary(AInput);
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    if not C.Approved then
+      raise EMCPException.Create('Permission denied for MCP tool "'+FToolName+'"');
+  finally
+    C.Free;
+  end;
+  FHandler(AInput,AOutput);
+end;
 
 { TOpenProjectCmd }
 
@@ -341,6 +397,23 @@ begin
   FLog.WriteBuffer(S[1],Length(S));
 end;
 
+function TMCPToolController.CreateConfiguredTool(const AName,
+  ADescription: string; AHandler: TToolInvocationEvent): TMCPEventTool;
+var
+  Invoker: TPolicyToolInvoker;
+begin
+  Result:=nil;
+  if MCPToolPolicies[AName]=mtpDisabled then Exit;
+  if MCPToolPolicies[AName]=mtpAsk then
+    begin
+    Invoker:=TPolicyToolInvoker.Create(AName,AHandler);
+    FInvokers.Add(Invoker);
+    Result:=TMCPEventTool.Create(AName,ADescription,@Invoker.Invoke);
+    end
+  else
+    Result:=TMCPEventTool.Create(AName,ADescription,AHandler);
+end;
+
 function TMCPToolController.CreateJSONResult(const aContent: array of const): TMCPToolResultArray;
 var
   lObj : TJSONObject;
@@ -541,8 +614,22 @@ begin
 end;
 
 constructor TMCPToolController.create(aOwner: TComponent);
+var
+  Cfg: TConfigStorage;
+  I: Integer;
 begin
   inherited create(aOwner);
+  FInvokers:=TObjectList.Create(True);
+  Cfg:=GetIDEConfigStorage('mcp-options.xml',True);
+  try
+    for I:=Low(MCPToolNames) to High(MCPToolNames) do
+      MCPToolPolicies[MCPToolNames[I]]:=MCPToolPolicyFromName(
+        Cfg.GetValue('Tools/'+MCPToolNames[I],MCPToolPolicyName(
+          MCPDefaultToolPolicy(MCPToolNames[I]))),
+        MCPDefaultToolPolicy(MCPToolNames[I]));
+  finally
+    Cfg.Free;
+  end;
   FLog:=TFileStream.Create(GetTempDir(False)+'lazmcplog.log',fmCreate or fmShareDenyNone);
   FServer:=TMCPServerTCPSocketDispatcher.Create(Self);
   FServer.Controller:=TMCPController.Instance;
@@ -551,6 +638,7 @@ end;
 destructor TMCPToolController.destroy;
 begin
   DoMCPLog(mltTrace,'Shutting down');
+  FInvokers.Free;
   FreeAndNil(FLog);
   inherited destroy;
 end;
@@ -580,48 +668,61 @@ begin
 end;
 
 procedure TMCPToolController.RegisterTools;
+var
+  Tool: TMCPEventTool;
 begin
-  With TMCPEventTool.create('openproject','Open a lazarus project',@MCPOpenProject) do
+  Tool:=CreateConfiguredTool('openproject','Open a lazarus project',@MCPOpenProject);
+  if Assigned(Tool) then
     begin
-    InputSchema.AddArgument('projectfile',TJSONObject.Create(['type','string']),True);
-    Register;
+    Tool.InputSchema.AddArgument('projectfile',TJSONObject.Create(['type','string']),True);
+    Tool.Register;
     end;
-  With TMCPEventTool.create('newproject','Create a new lazarus project',@MCPNewProject) do
+  Tool:=CreateConfiguredTool('newproject','Create a new lazarus project',@MCPNewProject);
+  if Assigned(Tool) then
     begin
-    Register;
+    Tool.Register;
     end;
-  With TMCPEventTool.create('newnunit','Add a new unit to the project',@MCPAddNewUnit) do
+  Tool:=CreateConfiguredTool('newnunit','Add a new unit to the project',@MCPAddNewUnit);
+  if Assigned(Tool) then
     begin
-    InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
-    Register;
+    Tool.InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
+    Tool.Register;
     end;
-  With TMCPEventTool.create('addnunit','Add an existing unit to the project',@MCPAddExistingUnit) do
+  Tool:=CreateConfiguredTool('addnunit','Add an existing unit to the project',@MCPAddExistingUnit);
+  if Assigned(Tool) then
     begin
-    InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
-    Register;
+    Tool.InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
+    Tool.Register;
     end;
-  With TMCPEventTool.create('compile','compile project',@MCPCompileProject) do
+  Tool:=CreateConfiguredTool('compile','compile project',@MCPCompileProject);
+  if Assigned(Tool) then
     begin
-    InputSchema.AddArgument('build',TJSONObject.Create(['type','boolean']),True);
-    Register;
+    Tool.InputSchema.AddArgument('build',TJSONObject.Create(['type','boolean']),True);
+    Tool.Register;
     end;
-  With TMCPEventTool.create('getWorkspaceInfo','Inspect the active Lazarus project',@MCPGetWorkspaceInfo) do
-    Register;
-  With TMCPEventTool.create('listProjectFiles','List files in the active Lazarus project',@MCPListProjectFiles) do
-    Register;
-  With TMCPEventTool.create('listOpenEditors','List open Lazarus source editors',@MCPListOpenEditors) do
-    Register;
-  With TMCPEventTool.create('getActiveEditor','Inspect the active Lazarus source editor',@MCPGetActiveEditor) do
-    Register;
-  With TMCPEventTool.create('readEditorText','Read a bounded range from an open project editor',@MCPReadEditorText) do
+  Tool:=CreateConfiguredTool('getWorkspaceInfo','Inspect the active Lazarus project',@MCPGetWorkspaceInfo);
+  if Assigned(Tool) then
+    Tool.Register;
+  Tool:=CreateConfiguredTool('listProjectFiles','List files in the active Lazarus project',@MCPListProjectFiles);
+  if Assigned(Tool) then
+    Tool.Register;
+  Tool:=CreateConfiguredTool('listOpenEditors','List open Lazarus source editors',@MCPListOpenEditors);
+  if Assigned(Tool) then
+    Tool.Register;
+  Tool:=CreateConfiguredTool('getActiveEditor','Inspect the active Lazarus source editor',@MCPGetActiveEditor);
+  if Assigned(Tool) then
+    Tool.Register;
+  Tool:=CreateConfiguredTool('readEditorText','Read a bounded range from an open project editor',@MCPReadEditorText);
+  if Assigned(Tool) then
     begin
-    InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
-    InputSchema.AddArgument('startLine',TJSONObject.Create(['type','integer']),False);
-    InputSchema.AddArgument('endLine',TJSONObject.Create(['type','integer']),False);
-    Register;
+    Tool.InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
+    Tool.InputSchema.AddArgument('startLine',TJSONObject.Create(['type','integer']),False);
+    Tool.InputSchema.AddArgument('endLine',TJSONObject.Create(['type','integer']),False);
+    Tool.Register;
     end;
-  With TMCPEventTool.create('getBuildMessages','Read messages from the Lazarus build window',@MCPGetBuildMessages) do
-    Register;
+  Tool:=CreateConfiguredTool('getBuildMessages','Read messages from the Lazarus build window',@MCPGetBuildMessages);
+  if Assigned(Tool) then
+    Tool.Register;
 end;
 
 procedure TMCPToolController.Terminate;
