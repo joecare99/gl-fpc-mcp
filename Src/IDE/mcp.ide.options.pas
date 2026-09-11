@@ -27,6 +27,8 @@ type
 
 implementation
 
+{$R *.lfm}
+
 const
   MCPOptionsFileName = 'mcp-options.xml';
 

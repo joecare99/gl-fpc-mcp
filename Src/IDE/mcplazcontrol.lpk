@@ -23,6 +23,9 @@
         <Filename Value="mcp.ide.options.pas"/>
         <UnitName Value="mcp.ide.options"/>
       </Item>
+      <Item>
+        <Filename Value="mcp.ide.options.lfm"/>
+      </Item>
     </Files>
     <RequiredPkgs>
       <Item>
