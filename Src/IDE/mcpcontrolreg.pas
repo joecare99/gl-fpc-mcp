@@ -20,7 +20,8 @@ unit mcpcontrolreg;
 interface
 
 uses
-  SysUtils, Controls, Classes, LazIDEIntf, ProjectIntf, CompOptsIntf, fpjson, mcp.types,
+  SysUtils, Controls, Classes, LazIDEIntf, ProjectIntf, CompOptsIntf,
+  SrcEditorIntf, IDEMsgIntf, IDEExternToolIntf, fpjson, mcp.types,
   mcp.tools, mcp.dispatcher.serversocket, mcp.stdhandlers, mcp.controller, mcp.logging;
 
 type
@@ -38,6 +39,12 @@ type
     procedure MCPAddExistingUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
     procedure MCPAddNewUnit(aInput: TJSONData; var aOutput: TMCPToolResultArray);
     procedure MCPCompileProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPGetWorkspaceInfo(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPListProjectFiles(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPListOpenEditors(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPGetActiveEditor(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPReadEditorText(aInput: TJSONData; var aOutput: TMCPToolResultArray);
+    procedure MCPGetBuildMessages(aInput: TJSONData; var aOutput: TMCPToolResultArray);
     procedure MCPOpenProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
     procedure MCPNewProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
   Public
@@ -97,6 +104,39 @@ type
      procedure execute;
    end;
 
+   TWorkspaceInfoCmd = Class(TLazCmd)
+     Result: TJSONObject;
+     Procedure Execute;
+   end;
+
+   TProjectFilesCmd = Class(TLazCmd)
+     Result: TJSONArray;
+     Procedure Execute;
+   end;
+
+   TEditorsCmd = Class(TLazCmd)
+     Result: TJSONArray;
+     Procedure Execute;
+   end;
+
+   TActiveEditorCmd = Class(TLazCmd)
+     Result: TJSONObject;
+     Procedure Execute;
+   end;
+
+   TEditorTextCmd = Class(TLazCmd)
+     FileName: String;
+     StartLine: Integer;
+     EndLine: Integer;
+     Result: TJSONObject;
+     Procedure Execute;
+   end;
+
+   TBuildMessagesCmd = Class(TLazCmd)
+     Result: TJSONArray;
+     Procedure Execute;
+   end;
+
 { TOpenProjectCmd }
 
 constructor TOpenProjectCmd.Create(aFileName: string);
@@ -127,6 +167,148 @@ end;
 procedure TCompileProjectCmd.execute;
 begin
   ExecuteResult:=LazarusIDE.DoBuildProject(Reason,[],True)=mrOK;
+end;
+
+procedure TWorkspaceInfoCmd.Execute;
+var
+  P: TLazProject;
+begin
+  Result:=TJSONObject.Create;
+  P:=LazarusIDE.ActiveProject;
+  Result.Add('hasProject',Assigned(P));
+  if Assigned(P) then
+    begin
+    Result.Add('projectFile',P.ProjectInfoFile);
+    Result.Add('directory',P.Directory);
+    Result.Add('fileCount',P.FileCount);
+    if Assigned(P.MainFile) then
+      Result.Add('mainFile',P.MainFile.GetFullFilename)
+    else
+      Result.Add('mainFile','');
+    end;
+end;
+
+procedure TProjectFilesCmd.Execute;
+var
+  P: TLazProject;
+  I: Integer;
+  F: TLazProjectFile;
+begin
+  Result:=TJSONArray.Create;
+  P:=LazarusIDE.ActiveProject;
+  if not Assigned(P) then Exit;
+  for I:=0 to P.FileCount-1 do
+    begin
+    F:=P.Files[I];
+    Result.Add(TJSONObject.Create([
+      'filename',F.GetFullFilename,
+      'unitName',F.Unit_Name,
+      'isMain',F=P.MainFile,
+      'isPartOfProject',F.IsPartOfProject
+    ]));
+    end;
+end;
+
+procedure TEditorsCmd.Execute;
+var
+  I: Integer;
+  E: TSourceEditorInterface;
+begin
+  Result:=TJSONArray.Create;
+  if not Assigned(SourceEditorManagerIntf) then Exit;
+  for I:=0 to SourceEditorManagerIntf.UniqueSourceEditorCount-1 do
+    begin
+    E:=SourceEditorManagerIntf.UniqueSourceEditors[I];
+    Result.Add(TJSONObject.Create([
+      'filename',E.FileName,
+      'pageName',E.PageName,
+      'modified',E.Modified,
+      'readOnly',E.ReadOnly,
+      'active',E=SourceEditorManagerIntf.ActiveEditor
+    ]));
+    end;
+end;
+
+procedure TActiveEditorCmd.Execute;
+var
+  E: TSourceEditorInterface;
+begin
+  Result:=TJSONObject.Create;
+  E:=nil;
+  if Assigned(SourceEditorManagerIntf) then
+    E:=SourceEditorManagerIntf.ActiveEditor;
+  Result.Add('hasEditor',Assigned(E));
+  if not Assigned(E) then Exit;
+  Result.Add('filename',E.FileName);
+  Result.Add('pageName',E.PageName);
+  Result.Add('modified',E.Modified);
+  Result.Add('readOnly',E.ReadOnly);
+  Result.Add('line',E.CursorTextXY.Y);
+  Result.Add('column',E.CursorTextXY.X);
+  Result.Add('selection',E.Selection);
+end;
+
+procedure TEditorTextCmd.Execute;
+var
+  E: TSourceEditorInterface;
+  P: TLazProject;
+  I, LastLine: Integer;
+  Lines: TJSONArray;
+begin
+  Result:=TJSONObject.Create;
+  if not Assigned(SourceEditorManagerIntf) then
+    raise EMCPException.Create('Source editor manager unavailable');
+  E:=SourceEditorManagerIntf.SourceEditorIntfWithFilename(FileName);
+  if not Assigned(E) then
+    raise EMCPException.Create('File is not open in the Lazarus editor');
+  P:=LazarusIDE.ActiveProject;
+  if not Assigned(P) or (E.GetProjectFile=nil) then
+    raise EMCPException.Create('File is not part of the active project');
+  if not SameText(ExpandFileName(E.GetProjectFile.GetFullFilename),
+    ExpandFileName(FileName)) then
+    raise EMCPException.Create('File is not part of the active project');
+  if StartLine<1 then StartLine:=1;
+  LastLine:=EndLine;
+  if LastLine<StartLine then LastLine:=StartLine;
+  if LastLine-StartLine>499 then
+    raise EMCPException.Create('Maximum range is 500 lines');
+  if LastLine>E.LineCount then LastLine:=E.LineCount;
+  Lines:=TJSONArray.Create;
+  for I:=StartLine-1 to LastLine-1 do
+    Lines.Add(E.Lines[I]);
+  Result.Add('filename',E.FileName);
+  Result.Add('startLine',StartLine);
+  Result.Add('endLine',LastLine);
+  Result.Add('lines',Lines);
+end;
+
+procedure TBuildMessagesCmd.Execute;
+var
+  I, J, Count: Integer;
+  V: TExtToolView;
+  M: TMessageLine;
+begin
+  Result:=TJSONArray.Create;
+  if not Assigned(IDEMessagesWindow) then Exit;
+  Count:=0;
+  for I:=0 to IDEMessagesWindow.ViewCount-1 do
+    begin
+    V:=IDEMessagesWindow.Views[I];
+    for J:=0 to V.Lines.Count-1 do
+      begin
+      if Count>=1000 then Exit;
+      M:=V.Lines[J];
+      Result.Add(TJSONObject.Create([
+        'view',V.Caption,
+        'severity',MessageLineUrgencyNames[M.Urgency],
+        'message',M.Msg,
+        'filename',M.GetFullFilename,
+        'line',M.Line,
+        'column',M.Column
+      ]));
+      Inc(Count);
+      end;
+    end;
 end;
 
 { TAddUnit }
@@ -232,6 +414,103 @@ begin
   aOutput:=CreateJSONResult(['Success',OK]);
 end;
 
+procedure TMCPToolController.MCPGetWorkspaceInfo(aInput: TJSONData;
+  var aOutput: TMCPToolResultArray);
+var
+  C: TWorkspaceInfoCmd;
+begin
+  C:=TWorkspaceInfoCmd.Create;
+  try
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    aOutput:=JSONToResult(C.Result);
+    C.Result:=nil;
+  finally
+    C.Free;
+  end;
+end;
+
+procedure TMCPToolController.MCPListProjectFiles(aInput: TJSONData;
+  var aOutput: TMCPToolResultArray);
+var
+  C: TProjectFilesCmd;
+begin
+  C:=TProjectFilesCmd.Create;
+  try
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    aOutput:=JSONToResult(TJSONObject.Create(['files',C.Result]));
+    C.Result:=nil;
+  finally
+    C.Free;
+  end;
+end;
+
+procedure TMCPToolController.MCPListOpenEditors(aInput: TJSONData;
+  var aOutput: TMCPToolResultArray);
+var
+  C: TEditorsCmd;
+begin
+  C:=TEditorsCmd.Create;
+  try
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    aOutput:=JSONToResult(TJSONObject.Create(['editors',C.Result]));
+    C.Result:=nil;
+  finally
+    C.Free;
+  end;
+end;
+
+procedure TMCPToolController.MCPGetActiveEditor(aInput: TJSONData;
+  var aOutput: TMCPToolResultArray);
+var
+  C: TActiveEditorCmd;
+begin
+  C:=TActiveEditorCmd.Create;
+  try
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    aOutput:=JSONToResult(C.Result);
+    C.Result:=nil;
+  finally
+    C.Free;
+  end;
+end;
+
+procedure TMCPToolController.MCPReadEditorText(aInput: TJSONData;
+  var aOutput: TMCPToolResultArray);
+var
+  C: TEditorTextCmd;
+  O: TJSONObject;
+begin
+  C:=TEditorTextCmd.Create;
+  C.FileName:=(aInput as TJSONObject).Get('filename','');
+  C.StartLine:=(aInput as TJSONObject).Get('startLine',1);
+  C.EndLine:=(aInput as TJSONObject).Get('endLine',C.StartLine+99);
+  if C.FileName='' then
+    raise EMCPException.Create('Need a filename');
+  try
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    O:=TJSONObject.Create(['text',C.Result]);
+    C.Result:=nil;
+    aOutput:=JSONToResult(O);
+  finally
+    C.Free;
+  end;
+end;
+
+procedure TMCPToolController.MCPGetBuildMessages(aInput: TJSONData;
+  var aOutput: TMCPToolResultArray);
+var
+  C: TBuildMessagesCmd;
+begin
+  C:=TBuildMessagesCmd.Create;
+  try
+    TThread.Synchronize(TThread.CurrentThread,@C.Execute);
+    aOutput:=JSONToResult(TJSONObject.Create(['messages',C.Result]));
+    C.Result:=nil;
+  finally
+    C.Free;
+  end;
+end;
+
 procedure TMCPToolController.MCPOpenProject(aInput: TJSONData; var aOutput: TMCPToolResultArray);
 var
   lFileName : string;
@@ -329,6 +608,23 @@ begin
     InputSchema.AddArgument('build',TJSONObject.Create(['type','boolean']),True);
     Register;
     end;
+  With TMCPEventTool.create('getWorkspaceInfo','Inspect the active Lazarus project',@MCPGetWorkspaceInfo) do
+    Register;
+  With TMCPEventTool.create('listProjectFiles','List files in the active Lazarus project',@MCPListProjectFiles) do
+    Register;
+  With TMCPEventTool.create('listOpenEditors','List open Lazarus source editors',@MCPListOpenEditors) do
+    Register;
+  With TMCPEventTool.create('getActiveEditor','Inspect the active Lazarus source editor',@MCPGetActiveEditor) do
+    Register;
+  With TMCPEventTool.create('readEditorText','Read a bounded range from an open project editor',@MCPReadEditorText) do
+    begin
+    InputSchema.AddArgument('filename',TJSONObject.Create(['type','string']),True);
+    InputSchema.AddArgument('startLine',TJSONObject.Create(['type','integer']),False);
+    InputSchema.AddArgument('endLine',TJSONObject.Create(['type','integer']),False);
+    Register;
+    end;
+  With TMCPEventTool.create('getBuildMessages','Read messages from the Lazarus build window',@MCPGetBuildMessages) do
+    Register;
 end;
 
 procedure TMCPToolController.Terminate;
